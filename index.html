@@ -1,0 +1,1098 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt-Dash — Prompting im Büroalltag</title>
+<style>
+  :root {
+    --bg: #f0f4f8; --card: #fff; --accent: #1e3a5f; --accent-light: #2d5986;
+    --green: #2d6a4f; --yellow: #b5830b; --red: #9b2226; --grey: #666;
+    --blue-light: #e8f0fe; --blue-border: #4a90d9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--accent); line-height: 1.6; padding: 0; }
+
+  /* Navigation */
+  .nav { background: var(--accent); color: white; padding: 0.5rem 1rem; position: sticky; top: 0; z-index: 100; display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .nav a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.8rem; padding: 0.25rem 0.5rem; border-radius: 3px; white-space: nowrap; }
+  .nav a:hover { background: rgba(255,255,255,0.15); color: white; }
+  .nav .nav-title { font-weight: bold; font-size: 0.9rem; color: white; margin-right: 0.5rem; }
+
+  .container { max-width: 820px; margin: 0 auto; padding: 1rem; }
+  h1 { font-size: 1.7rem; margin-bottom: 0.3rem; }
+  h2 { font-size: 1.25rem; margin: 1.5rem 0 0.5rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.25rem; }
+  h3 { font-size: 1.05rem; margin: 1rem 0 0.3rem; }
+  .subtitle { color: var(--grey); font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+  .card { background: var(--card); border-radius: 8px; padding: 1.2rem; margin-bottom: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .card-number { display: inline-block; background: var(--accent); color: white; width: 1.8rem; height: 1.8rem; border-radius: 50%; text-align: center; line-height: 1.8rem; font-weight: bold; font-size: 0.85rem; margin-right: 0.5rem; vertical-align: middle; }
+
+  /* Prompt-Boxen */
+  .prompt-box { background: #1e3a5f; color: #e0e8f0; border-radius: 6px; padding: 1rem; font-family: 'Consolas', 'Courier New', monospace; font-size: 0.88rem; white-space: pre-wrap; margin: 0.5rem 0; position: relative; line-height: 1.5; }
+  .prompt-box .placeholder { color: #ffd166; font-weight: bold; }
+  .copy-btn { position: absolute; top: 0.5rem; right: 0.5rem; background: rgba(255,255,255,0.15); color: #ccc; border: none; padding: 0.3rem 0.7rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
+  .copy-btn:hover { background: rgba(255,255,255,0.25); color: white; }
+  .copy-btn.copied { background: var(--green); color: white; }
+
+  /* Schnellstart-Buttons */
+  .quick-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.8rem 0; }
+  .quick-btn { background: var(--blue-light); border: 1px solid var(--blue-border); color: var(--accent); padding: 0.4rem 0.8rem; border-radius: 5px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
+  .quick-btn:hover { background: var(--blue-border); color: white; }
+  .quick-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+  /* Ampel */
+  .traffic { display: flex; gap: 0.5rem; margin: 0.5rem 0; }
+  .light { padding: 0.8rem; border-radius: 6px; flex: 1; }
+  .light-green { background: #d8f3dc; border: 2px solid var(--green); }
+  .light-yellow { background: #fff3cd; border: 2px solid var(--yellow); }
+  .light-red { background: #f8d7da; border: 2px solid var(--red); }
+  .light h4 { font-size: 0.95rem; margin-bottom: 0.3rem; }
+  .light p, .light ul { font-size: 0.88rem; }
+
+  /* KI-Grid */
+  .ki-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem; margin: 0.5rem 0; }
+  .ki-card { border: 1px solid #ddd; border-radius: 6px; padding: 0.8rem; }
+  .ki-card h4 { margin-bottom: 0.3rem; }
+  .badge { display: inline-block; padding: 0.1rem 0.4rem; border-radius: 3px; font-size: 0.8rem; font-weight: bold; color: white; }
+  .badge-green { background: var(--green); }
+  .badge-yellow { background: var(--yellow); }
+
+  /* Akkordeon */
+  .accordion-header { background: var(--blue-light); border: 1px solid #c8d8e8; border-radius: 6px; padding: 0.7rem 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; font-weight: 600; font-size: 0.95rem; transition: background 0.2s; }
+  .accordion-header:hover { background: #d4e4f4; }
+  .accordion-header .arrow { transition: transform 0.3s; font-size: 0.8rem; }
+  .accordion-header.open .arrow { transform: rotate(90deg); }
+  .accordion-body { display: none; padding: 0.5rem 0; }
+  .accordion-body.open { display: block; }
+
+  /* Toggle */
+  .toggle-section { border: 1px dashed #b0b0b0; border-radius: 6px; margin-top: 0.5rem; }
+  .toggle-header { padding: 0.7rem 1rem; cursor: pointer; color: var(--accent-light); font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+  .toggle-header:hover { color: var(--accent); }
+  .toggle-body { display: none; padding: 0 1rem 1rem; }
+  .toggle-body.open { display: block; }
+
+  /* Sonstige */
+  .info-box { background: var(--blue-light); border: 1px solid #b3cce6; border-radius: 6px; padding: 0.8rem; margin: 0.5rem 0; font-size: 0.9rem; }
+  .quote { border-left: 3px solid var(--accent); padding-left: 1rem; font-style: italic; color: var(--grey); margin: 0.8rem 0; }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin: 0.5rem 0; }
+  .compare-box { border-radius: 6px; padding: 0.8rem; font-size: 0.88rem; }
+  .compare-bad { background: #f8d7da; border: 1px solid #e0b0b0; }
+  .compare-good { background: #d8f3dc; border: 1px solid #a0d0a0; }
+  ul { padding-left: 1.2rem; margin: 0.3rem 0; }
+  li { margin: 0.2rem 0; }
+  .ref { font-size: 0.85rem; color: var(--grey); margin-top: 2rem; border-top: 1px solid #ddd; padding-top: 0.5rem; }
+  .method-grid { display: grid; grid-template-columns: auto 1fr; gap: 0.3rem 1rem; margin: 0.5rem 0; font-size: 0.9rem; }
+  .method-num { background: var(--accent); color: white; width: 1.5rem; height: 1.5rem; border-radius: 50%; text-align: center; line-height: 1.5rem; font-size: 0.8rem; font-weight: bold; }
+
+  /* Tool-Modus: Workshop-Einführung ausblenden */
+  body.tool-mode .workshop-intro { display: none; }
+  body.tool-mode .subtitle { display: none; }
+  .tool-btn { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.3); padding: 0.2rem 0.5rem; border-radius: 3px; cursor: pointer; font-size: 0.75rem; white-space: nowrap; }
+  .tool-btn:hover { background: rgba(255,255,255,0.25); color: white; }
+  body.tool-mode .tool-btn { background: var(--green); color: white; border-color: var(--green); }
+
+  /* Sidebar-Modus */
+  body.sidebar-mode { font-size: 13px; line-height: 1.4; }
+  body.sidebar-mode .container { max-width: 100%; padding: 0.3rem; }
+  body.sidebar-mode .card { padding: 0.6rem; margin-bottom: 0.5rem; }
+  body.sidebar-mode h1 { font-size: 1.1rem; }
+  body.sidebar-mode h2 { font-size: 1rem; margin: 0.8rem 0 0.3rem; }
+  body.sidebar-mode h3 { font-size: 0.9rem; }
+  body.sidebar-mode .subtitle { font-size: 0.8rem; margin-bottom: 0.5rem; }
+  body.sidebar-mode .nav { padding: 0.3rem 0.5rem; gap: 0.15rem; }
+  body.sidebar-mode .nav a { font-size: 0.65rem; padding: 0.15rem 0.3rem; }
+  body.sidebar-mode .nav .nav-title { font-size: 0.75rem; }
+  body.sidebar-mode .prompt-box { font-size: 0.78rem; padding: 0.5rem; }
+  body.sidebar-mode .compare { grid-template-columns: 1fr; gap: 0.4rem; }
+  body.sidebar-mode .traffic { flex-direction: column; gap: 0.3rem; }
+  body.sidebar-mode .ki-grid { grid-template-columns: 1fr; }
+  body.sidebar-mode .quick-btns { gap: 0.3rem; }
+  body.sidebar-mode .quick-btn { font-size: 0.75rem; padding: 0.25rem 0.5rem; }
+  body.sidebar-mode .info-box { font-size: 0.8rem; padding: 0.5rem; }
+  body.sidebar-mode .copy-btn { font-size: 0.7rem; padding: 0.2rem 0.4rem; }
+  .sidebar-btn { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.3); padding: 0.2rem 0.5rem; border-radius: 3px; cursor: pointer; font-size: 0.75rem; margin-left: auto; white-space: nowrap; }
+  .sidebar-btn:hover { background: rgba(255,255,255,0.25); color: white; }
+  body.sidebar-mode .sidebar-btn { background: var(--green); color: white; border-color: var(--green); }
+
+  /* Preset-Dropdown */
+  .preset-dropdown { width: 100%; padding: 0.5rem; border: 1px solid var(--blue-border); border-radius: 5px; font-size: 0.9rem; font-family: inherit; color: var(--accent); background: var(--blue-light); cursor: pointer; margin: 0.5rem 0; }
+  .preset-dropdown:focus { outline: 2px solid var(--blue-border); outline-offset: 1px; }
+  .preset-display { margin: 0.5rem 0; }
+  .custom-roles-area, .custom-scenarios-area { margin-top: 0.5rem; }
+  .custom-roles-area h4, .custom-scenarios-area h4 { font-size: 0.9rem; color: var(--grey); margin-bottom: 0.3rem; }
+
+  /* Custom-Einträge (eigene Rollen/Szenarien) */
+  .custom-form { background: var(--blue-light); border: 1px solid var(--blue-border); border-radius: 6px; padding: 0.8rem; margin: 0.5rem 0; display: none; }
+  .custom-form.open { display: block; }
+  .custom-form label { display: block; font-size: 0.85rem; font-weight: 600; margin: 0.4rem 0 0.15rem; }
+  .custom-form input, .custom-form textarea { width: 100%; padding: 0.4rem; border: 1px solid #ccc; border-radius: 4px; font-size: 0.88rem; font-family: inherit; }
+  .custom-form textarea { min-height: 100px; resize: vertical; font-family: 'Consolas', 'Courier New', monospace; }
+  .custom-form-btns { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
+  .custom-form-btns button { padding: 0.35rem 0.8rem; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; font-size: 0.85rem; }
+  .save-btn { background: var(--green); color: white; border-color: var(--green) !important; }
+  .save-btn:hover { background: #245a42; }
+  .delete-custom { background: none; border: none; color: var(--red); cursor: pointer; font-size: 1rem; padding: 0 0.3rem; opacity: 0.5; vertical-align: middle; }
+  .delete-custom:hover { opacity: 1; }
+  .add-custom-btn { border-style: dashed !important; }
+
+  /* Info-Modal */
+  .info-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: flex-start; padding: 2rem 1rem; overflow-y: auto; }
+  .info-modal-overlay.open { display: flex; }
+  .info-modal { background: white; border-radius: 10px; max-width: 640px; width: 100%; padding: 1.5rem; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
+  .info-modal h2 { margin-bottom: 0.8rem; font-size: 1.2rem; border: none; }
+  .info-modal h3 { font-size: 0.95rem; margin: 1rem 0 0.3rem; color: var(--accent); }
+  .info-modal ul { margin: 0.3rem 0 0.5rem 1.2rem; font-size: 0.9rem; }
+  .info-modal li { margin-bottom: 0.25rem; }
+  .info-modal p { font-size: 0.9rem; margin: 0.3rem 0; }
+  .info-modal .close-modal { position: absolute; top: 0.8rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--grey); line-height: 1; }
+  .info-modal .close-modal:hover { color: var(--accent); }
+  .info-modal .feature-tag { display: inline-block; background: var(--blue-light); color: var(--accent); font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 3px; font-weight: 600; margin-right: 0.3rem; }
+  .info-modal .limit-tag { display: inline-block; background: #fff3cd; color: var(--yellow); font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 3px; font-weight: 600; margin-right: 0.3rem; }
+  .info-btn { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.3); padding: 0.2rem 0.5rem; border-radius: 3px; cursor: pointer; font-size: 0.75rem; white-space: nowrap; }
+  .info-btn:hover { background: rgba(255,255,255,0.25); color: white; }
+
+  @media (max-width: 800px) {
+    .compare { grid-template-columns: 1fr; }
+    .ki-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .traffic { flex-direction: column; }
+    .nav { gap: 0.2rem; }
+    .nav a { font-size: 0.7rem; padding: 0.2rem 0.3rem; }
+  }
+  @media print {
+    .nav { display: none; }
+    .copy-btn { display: none; }
+    .quick-btns { display: none; }
+    .accordion-body { display: block !important; }
+    .toggle-body { display: block !important; }
+    .card { break-inside: avoid; box-shadow: none; border: 1px solid #ddd; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <span class="nav-title">Prompt-Dash</span>
+  <a href="#problem" class="workshop-intro">Problem</a>
+  <a href="#rolle">Rolle</a>
+  <a href="#szenarien">Szenarien</a>
+  <a href="#logik">Logik</a>
+  <a href="#datenschutz">Datenschutz</a>
+  <a href="#speicherung">Speicherung</a>
+  <a href="#fortgeschritten">Fortgeschritten</a>
+  <a href="#ki-profile">KI-Profile</a>
+  <button class="info-btn" onclick="document.getElementById('info-modal').classList.add('open')" title="Funktionsübersicht &amp; Hinweise">&#9432; Info</button>
+  <button class="tool-btn" onclick="toggleToolMode()" title="Workshop-Einführung ein/ausblenden">&#9881; Tool-Modus</button>
+  <button class="sidebar-btn" onclick="toggleSidebar()" title="Sidebar-Modus: Fenster schmal, KI links, Text in der Mitte">&#9646; Sidebar</button>
+</nav>
+
+<!-- Info-Modal -->
+<div class="info-modal-overlay" id="info-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="info-modal">
+    <button class="close-modal" onclick="document.getElementById('info-modal').classList.remove('open')">&times;</button>
+    <h2>Funktionsübersicht</h2>
+    <p>Prompt-Dash ist ein interaktives Werkzeug mit folgenden Funktionen:</p>
+
+    <h3><span class="feature-tag">Prompts</span> Kopierbare Prompt-Vorlagen</h3>
+    <ul>
+      <li>Jede Prompt-Box hat einen <strong>Kopieren</strong>-Button — ein Klick kopiert den Text in die Zwischenablage</li>
+      <li>Platzhalter in <strong style="color:#ffd166">[GELB]</strong> sollen durch Ihre echten Angaben ersetzt werden</li>
+    </ul>
+
+    <h3><span class="feature-tag">Rollen</span> Schnellstart-Rollen</h3>
+    <ul>
+      <li>4 vorgefertigte Rollen im Dropdown — wählen und der Rollenprompt wird automatisch ausgefüllt</li>
+      <li><strong>+ Eigene Rolle:</strong> Definieren Sie eigene Rollen mit Branche, Abteilung und Aufgaben</li>
+      <li>Eigene Rollen werden im Browser gespeichert und bleiben über Sitzungen erhalten</li>
+    </ul>
+
+    <h3><span class="feature-tag">Szenarien</span> Szenario-Prompts</h3>
+    <ul>
+      <li>5 Szenario-Vorlagen im Dropdown — auswählen zeigt den Prompt mit Kopieren-Button</li>
+      <li><strong>+ Eigenes Szenario:</strong> Eigene Prompts mit Titel speichern</li>
+      <li>Eigene Szenarien erscheinen als aufklappbare Einträge mit Kopieren-Button</li>
+    </ul>
+
+    <h3><span class="feature-tag">Sichern</span> Export, Import &amp; Teilen</h3>
+    <ul>
+      <li><strong>Offline-Kopie:</strong> Lädt die komplette Seite MIT Ihren eigenen Einträgen als eigenständige HTML-Datei herunter — funktioniert ohne Internet</li>
+      <li><strong>Exportieren:</strong> Speichert eigene Rollen und Szenarien als JSON-Datei</li>
+      <li><strong>Importieren:</strong> Lädt eine zuvor exportierte JSON-Datei — doppelte Einträge werden übersprungen</li>
+      <li><strong>Teilen-Link:</strong> Erzeugt einen Link, der Ihre Einträge enthält. Empfänger sehen eine Bestätigungsabfrage</li>
+    </ul>
+
+    <h3><span class="feature-tag">Modi</span> Ansichtsoptionen</h3>
+    <ul>
+      <li><strong>Tool-Modus</strong> (Zahnrad): Blendet die Workshop-Einführung aus — zeigt nur die produktiven Werkzeuge</li>
+      <li><strong>Sidebar-Modus</strong> (Balken): Komprimiert die Darstellung für schmale Fenster (~400px), ideal neben dem ChatGPT-Fenster</li>
+      <li>Beide Modi auch per URL-Parameter: <code>?tool=1</code> und <code>?sidebar=1</code></li>
+    </ul>
+
+    <h3><span class="limit-tag">Hinweis</span> Grenzen &amp; Technik</h3>
+    <ul>
+      <li>Eigene Einträge liegen im <strong>Browser-Speicher (localStorage)</strong> — sie gelten nur für diesen Browser auf diesem Gerät</li>
+      <li>Privates/Inkognito-Fenster: Daten gehen beim Schließen verloren</li>
+      <li>Für dauerhafte Sicherung: <strong>Offline-Kopie</strong> herunterladen oder <strong>Exportieren</strong> nutzen</li>
+      <li>Die Seite funktioniert komplett ohne externe Dienste — kein Tracking, keine Cookies, keine Anmeldung</li>
+      <li>Drucken: Alle Akkordeons werden automatisch aufgeklappt, Buttons ausgeblendet</li>
+    </ul>
+
+    <p style="margin-top:1rem; font-size:0.85rem; color:var(--grey)">Prompt-Dash v1.1 | Prompting im Büroalltag</p>
+  </div>
+</div>
+
+<div class="container">
+
+<h1>Prompt-Dash</h1>
+<p class="subtitle">Prompt-Dash — Prompting im Büroalltag | Lagerlogistik &amp; Spedition</p>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CARD 1: PROBLEMAUFRISS -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card workshop-intro" id="problem">
+<h2><span class="card-number">1</span> Dasselbe Problem — zwei Wege</h2>
+<p>Ein Kunde reklamiert eine verspätete Lieferung. Sie brauchen eine Antwort. Zwei Versuche:</p>
+
+<div class="compare">
+  <div class="compare-box compare-bad">
+    <strong>Versuch 1 — Ohne Kontext:</strong><br>
+    <em style="color:var(--grey)">"Schreib eine Antwort auf eine Reklamation."</em><br><br>
+    <strong>KI-Ergebnis:</strong> "Sehr geehrte Damen und Herren, vielen Dank für Ihre Nachricht. Wir bedauern die Unannehmlichkeiten und werden uns schnellstmöglich um Ihr Anliegen kümmern. Ihre Zufriedenheit liegt uns am Herzen..."<br><br>
+    <em style="color:var(--red)">Könnten Sie das so abschicken? Nein.</em>
+  </div>
+  <div class="compare-box compare-good">
+    <strong>Versuch 2 — Mit Rolle + Kontext:</strong><br>
+    <em style="color:var(--grey)">"Ich bin Disponent bei einer Spedition. Kunde [KUNDE] reklamiert: Lieferung 3 Tage verspätet, Ware teilweise beschädigt. Wir bieten Ersatzlieferung bis Freitag. Schreib eine sachlich-lösungsorientierte Antwort, max. 80 Wörter."</em><br><br>
+    <strong>KI-Ergebnis:</strong> "Hallo Herr [KUNDE], die Verzögerung und die beschädigte Ware tun uns leid. Die Ersatzlieferung geht morgen raus und ist bis Freitag bei Ihnen. Falls etwas fehlt, melden Sie sich direkt bei mir unter 069-1234. Wir kümmern uns darum."<br><br>
+    <em style="color:var(--green)">Direkt, kurz, klingt nach einem Disponenten.</em>
+  </div>
+</div>
+
+<div class="info-box">
+  <strong>Was den Unterschied gemacht hat:</strong>
+  <ul>
+    <li><strong>Rolle</strong> — "Ich bin Disponent bei einer Spedition" <em>(→ Karte 2)</em></li>
+    <li><strong>Kontext</strong> — Was passiert ist, was angeboten wird <em>(→ Karte 3)</em></li>
+    <li><strong>Stil</strong> — "sachlich-lösungsorientiert, max. 80 Wörter" <em>(→ Karte 4)</em></li>
+    <li><strong>Datenschutz</strong> — "[KUNDE]" statt echter Name <em>(→ Karte 5)</em></li>
+  </ul>
+  <p style="margin-top:0.4rem; font-size:0.88rem;">Dieses Reklamations-Beispiel begleitet Sie durch alle Karten.</p>
+</div>
+
+<div class="quote">Die KI ist nicht schlecht — sie hat nur zu wenig von Ihnen bekommen.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CARD 2: ROLLENPROMPT -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card" id="rolle">
+<h2><span class="card-number">2</span> Rollenprompt — Wer bin ich für die KI?</h2>
+<p>Bevor Sie der KI eine Aufgabe geben: Sagen Sie ihr, wer Sie sind. Das ändert alles.</p>
+
+<div class="compare" style="margin-bottom: 0.8rem;">
+  <div class="compare-box compare-bad">
+    <strong>Ohne Rolle:</strong><br>
+    "Schreib eine Reklamationsantwort."<br>
+    → Generischer Text, den Sie nie abschicken würden.
+  </div>
+  <div class="compare-box compare-good">
+    <strong>Mit Rolle:</strong><br>
+    "Ich bin Disponent bei einer Spedition. Schreib eine Reklamationsantwort."<br>
+    → Fachlich passend, richtiger Ton.
+  </div>
+</div>
+
+<select class="preset-dropdown" id="role-dropdown" onchange="fillRole(this.value)">
+  <option value="">— Rolle wählen —</option>
+  <option value="disponent">Disponent/in</option>
+  <option value="lagerleiter">Lagerleiter/in</option>
+  <option value="ausbilder">Ausbilder/in</option>
+  <option value="buero">Büroleitung</option>
+</select>
+
+<div class="custom-roles-area">
+  <div class="quick-btns">
+    <span id="custom-roles"></span>
+    <button class="quick-btn add-custom-btn" onclick="showRoleForm()">+ Eigene Rolle</button>
+  </div>
+</div>
+
+<div class="custom-form" id="role-form">
+  <label>Name (für den Button):</label>
+  <input type="text" id="rf-name" placeholder="z.B. Teamleiter Versand">
+  <label>Rolle:</label>
+  <input type="text" id="rf-rolle" placeholder="z.B. Teamleiter/in Versand">
+  <label>Branche:</label>
+  <input type="text" id="rf-branche" placeholder="z.B. Spedition und Lagerlogistik">
+  <label>Abteilung:</label>
+  <input type="text" id="rf-abteilung" placeholder="z.B. Versand / Warenausgang">
+  <label>Typische Aufgaben:</label>
+  <input type="text" id="rf-aufgaben" placeholder="z.B. Versandplanung, Personalführung">
+  <label>Tonalität:</label>
+  <input type="text" id="rf-ton" placeholder="z.B. direkt und kollegial">
+  <div class="custom-form-btns">
+    <button class="save-btn" onclick="saveCustomRole()">Speichern</button>
+    <button onclick="hideRoleForm()">Abbrechen</button>
+  </div>
+</div>
+
+<div class="prompt-box" id="prompt-rolle">Ich bin <span class="placeholder" data-field="rolle">[IHRE ROLLE, z.B. Disponent]</span> in einem Unternehmen der <span class="placeholder" data-field="branche">[BRANCHE, z.B. Spedition und Lagerlogistik]</span>.
+Meine Abteilung: <span class="placeholder" data-field="abteilung">[ABTEILUNG, z.B. Disposition / Lager / Büro]</span>.
+Meine typischen Aufgaben: <span class="placeholder" data-field="aufgaben">[z.B. Tourenplanung, Kundenkorrespondenz, Reklamationsbearbeitung]</span>.
+
+Ich kommuniziere <span class="placeholder" data-field="ton">[TONALITÄT, z.B. sachlich und lösungsorientiert]</span>.
+Antworte in meinem Stil — nicht im KI-Stil.<button class="copy-btn" onclick="copyPrompt('prompt-rolle')">Kopieren</button></div>
+
+<div class="info-box"><strong>Tipp:</strong> Diesen Rollenprompt einmal am Anfang eines neuen Chats eingeben. Die KI merkt sich die Rolle für den gesamten Chatverlauf.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CARD 3: 5 SZENARIEN -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card" id="szenarien">
+<h2><span class="card-number">3</span> Prompt-Vorlagen für 5 Szenarien</h2>
+<p>Wählen Sie ein Szenario. Ersetzen Sie die <span style="color:#b5830b; font-weight:bold;">[PLATZHALTER]</span>. Kopieren. Einfügen in ChatGPT.</p>
+
+<select class="preset-dropdown" id="scenario-dropdown" onchange="showPresetScenario(this.value)">
+  <option value="">— Szenario wählen —</option>
+  <option value="s1">Reklamationsantwort</option>
+  <option value="s2">Angebotskorrespondenz</option>
+  <option value="s3">Besprechungsprotokoll</option>
+  <option value="s4">Meetingvorbereitung</option>
+  <option value="s5">Sicherheitsunterweisung</option>
+</select>
+
+<div class="preset-display" id="scenario-display"></div>
+
+<div class="custom-scenarios-area">
+  <div id="custom-scenarios"></div>
+  <button class="quick-btn add-custom-btn" onclick="showScenarioForm()" style="margin-top: 0.5rem;">+ Eigenes Szenario</button>
+</div>
+
+<div class="custom-form" id="scenario-form">
+  <label>Titel:</label>
+  <input type="text" id="sf-title" placeholder="z.B. Lieferschein-Vorlage">
+  <label>Prompt-Vorlage:</label>
+  <textarea id="sf-prompt" placeholder="Schreibe hier deinen Prompt...&#10;&#10;Tipp: Nutze [PLATZHALTER] für variable Teile."></textarea>
+  <div class="custom-form-btns">
+    <button class="save-btn" onclick="saveCustomScenario()">Speichern</button>
+    <button onclick="hideScenarioForm()">Abbrechen</button>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CARD 4: LOGIK STATT LAYOUT -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card" id="logik">
+<h2><span class="card-number">4</span> Logik statt Layout — Die KI spricht wie SIE</h2>
+<p>Die KI hat keinen eigenen Stil. Sie nimmt den an, den Sie ihr geben.</p>
+
+<div class="compare">
+  <div class="compare-box compare-bad">
+    <strong>Ohne Steuerung:</strong><br>
+    "Sehr geehrte Damen und Herren,<br>
+    wir möchten uns aufrichtig bei Ihnen entschuldigen und versichern Ihnen, dass wir den Vorfall sehr ernst nehmen..."<br>
+    <em style="color:var(--red)">KI-typisch: höflich, lang, austauschbar</em>
+  </div>
+  <div class="compare-box compare-good">
+    <strong>Mit Steuerung:</strong><br>
+    "Hallo Herr Müller,<br>
+    die verspätete Lieferung tut uns leid. Ersatzlieferung kommt Freitag. Bei Fragen: 069-1234."<br>
+    <em style="color:var(--green)">Direkt, kurz, klingt nach Ihnen</em>
+  </div>
+</div>
+
+<div class="prompt-box" id="prompt-stil">Stil-Anweisungen für alle folgenden Antworten:
+
+Anrede: <span class="placeholder">[z.B. "Hallo Herr/Frau..." / "Sehr geehrte..." / Du-Form]</span>
+Länge: <span class="placeholder">[z.B. maximal 100 Wörter / 3-5 Sätze / eine halbe Seite]</span>
+Ton: <span class="placeholder">[z.B. sachlich-direkt / freundlich-verbindlich / formell]</span>
+Struktur: <span class="placeholder">[z.B. Stichpunkte / Fließtext / nummerierte Liste]</span>
+Vermeide: <span class="placeholder">[z.B. Floskeln, Passivkonstruktionen, "wir würden uns freuen"]</span>
+
+Orientiere dich an folgendem Beispiel für meinen Schreibstil:
+<span class="placeholder">[OPTIONAL: Fügen Sie hier 2-3 Sätze ein, die Sie tatsächlich so geschrieben haben]</span><button class="copy-btn" onclick="copyPrompt('prompt-stil')">Kopieren</button></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CARD 5: PSEUDONYMISIERUNG -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card" id="datenschutz">
+<h2><span class="card-number">5</span> Datenschutz — Was darf in den Prompt?</h2>
+<p>KI-Anbieter können Eingaben für Training nutzen. Regel: <strong>Keine echten Daten, die Personen oder Geschäftsgeheimnisse identifizieren.</strong></p>
+
+<div class="traffic">
+  <div class="light light-green">
+    <h4>DARF REIN</h4>
+    <ul>
+      <li>Branche ("Spedition")</li>
+      <li>Allgemeine Rollen ("Disponent")</li>
+      <li>Prozesstypen ("Reklamation")</li>
+      <li>Fiktive Beispielzahlen</li>
+    </ul>
+  </div>
+  <div class="light light-yellow">
+    <h4>PSEUDONYMISIEREN</h4>
+    <ul>
+      <li>Firmennamen → [FIRMA]</li>
+      <li>Produktnamen → [PRODUKT]</li>
+      <li>Interne Bezeichnungen</li>
+      <li>Standorte → [STANDORT]</li>
+    </ul>
+  </div>
+  <div class="light light-red">
+    <h4>NIEMALS EINGEBEN</h4>
+    <ul>
+      <li>Personennamen</li>
+      <li>Kunden-/Sendungsnummern</li>
+      <li>Adressen, Telefonnummern</li>
+      <li>Vertragsdaten, Preislisten</li>
+    </ul>
+  </div>
+</div>
+
+<div class="info-box"><strong>Tipp:</strong> Ersetzen Sie echte Daten durch Platzhalter wie <code>[KUNDE]</code>, <code>[SENDUNGSNR]</code>, <code>[BETRAG]</code>. Die KI arbeitet genauso gut damit — und Ihre Daten bleiben bei Ihnen.</div>
+
+<div class="toggle-section" style="margin-top: 0.5rem;">
+  <div class="toggle-header" onclick="toggleSection(this)">
+    Technische Lösungen zur Pseudonymisierung <span class="arrow">&#9654;</span>
+  </div>
+  <div class="toggle-body">
+    <p>Manuelles Ersetzen funktioniert — aber bei größeren Textmengen gibt es bessere Wege:</p>
+
+    <h3>Stufe 1: Suchen &amp; Ersetzen (sofort nutzbar)</h3>
+    <ul>
+      <li><strong>Word / Excel:</strong> Strg+H → Echte Namen durch Platzhalter ersetzen, bevor Sie den Text in die KI kopieren</li>
+      <li><strong>Vorteil:</strong> Keine Software nötig, funktioniert überall</li>
+      <li><strong>Nachteil:</strong> Manuell, fehleranfällig bei vielen Datenpunkten</li>
+    </ul>
+
+    <h3>Stufe 2: Vorlagen mit Platzhaltern (empfohlen)</h3>
+    <ul>
+      <li>Erstellen Sie Ihre Prompts <em>von Anfang an</em> mit Platzhaltern — echte Daten kommen nie in den Prompt</li>
+      <li>Statt: <em>"Herr Müller hat am 12.03. Sendung 4711 reklamiert"</em></li>
+      <li>Besser: <em>"[KUNDE] hat am [DATUM] Sendung [NR] reklamiert"</em></li>
+      <li>Das KI-Ergebnis enthält dann auch Platzhalter → Sie setzen die echten Daten erst im fertigen Text ein</li>
+    </ul>
+
+    <h3>Stufe 3: Lokale KI (für Fortgeschrittene)</h3>
+    <ul>
+      <li><strong>Ollama + Open-Source-Modelle</strong> (z.B. Llama, Mistral): KI läuft komplett auf Ihrem Rechner — keine Daten verlassen das Haus</li>
+      <li><strong>ChatGPT Team / Enterprise:</strong> Laut OpenAI werden Eingaben nicht für Training verwendet (vertragliche Zusicherung)</li>
+      <li><strong>Azure OpenAI / AWS Bedrock:</strong> KI in der eigenen Cloud-Umgebung — Datenhoheit beim Unternehmen</li>
+    </ul>
+
+    <div class="info-box"><strong>Faustregel:</strong> Stufe 2 reicht für die meisten Büroaufgaben. Stufe 3 wird relevant, wenn Sie regelmäßig mit personenbezogenen Daten oder Geschäftsgeheimnissen arbeiten.</div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CARD 6: PROMPT-SPEICHERUNG -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card" id="speicherung">
+<h2><span class="card-number">6</span> Prompt-Speicherung — Wohin mit guten Prompts?</h2>
+<p>Sie haben einen Prompt gebaut, der funktioniert. Wo bleibt er?</p>
+
+<div class="method-grid">
+  <div class="method-num">1</div>
+  <div><strong>Lesezeichen auf diese Seite</strong> — Am einfachsten. Diese Seite ist Ihre Prompt-Bibliothek. Strg+D / Cmd+D.</div>
+  <div class="method-num">2</div>
+  <div><strong>Eigene Textdatei</strong> — Legen Sie eine Datei an: <code>Meine-Prompts.txt</code>. Kopieren Sie funktionierende Prompts dort hinein.</div>
+  <div class="method-num">3</div>
+  <div><strong>Custom Instructions in ChatGPT</strong> — Unter Einstellungen → "Benutzerdefinierte Anweisungen". Der Rollenprompt (Karte 2) passt perfekt hierhin.</div>
+</div>
+
+<div class="toggle-section">
+  <div class="toggle-header" onclick="toggleSection(this)">
+    Ordner-Blaupause — Prompt-Ablage für Sie und Ihr Team <span class="arrow">&#9654;</span>
+  </div>
+  <div class="toggle-body">
+    <p>Kopieren Sie die Pfade und legen Sie die Ordner an. Fertig ist Ihre Prompt-Bibliothek.</p>
+
+    <div class="prompt-box" id="path-root" style="font-size:0.85rem; padding:0.6rem 0.8rem;">T:\Vorlagen\KI-Prompts\<button class="copy-btn" onclick="copyPrompt('path-root')">Kopieren</button></div>
+
+    <p style="margin-top:0.5rem; font-size:0.9rem;"><strong>Dateien im Ordner:</strong></p>
+    <div style="display:grid; grid-template-columns:1fr auto; gap:0.3rem; margin:0.3rem 0;">
+      <div class="prompt-box" id="path-1" style="font-size:0.82rem; padding:0.4rem 0.7rem; margin:0;">00_Rollenprompt.txt<button class="copy-btn" onclick="copyPrompt('path-1')" style="font-size:0.75rem; padding:0.2rem 0.5rem;">Kopieren</button></div>
+      <div></div>
+      <div class="prompt-box" id="path-2" style="font-size:0.82rem; padding:0.4rem 0.7rem; margin:0;">01_Reklamation.txt<button class="copy-btn" onclick="copyPrompt('path-2')" style="font-size:0.75rem; padding:0.2rem 0.5rem;">Kopieren</button></div>
+      <div></div>
+      <div class="prompt-box" id="path-3" style="font-size:0.82rem; padding:0.4rem 0.7rem; margin:0;">02_Angebot.txt<button class="copy-btn" onclick="copyPrompt('path-3')" style="font-size:0.75rem; padding:0.2rem 0.5rem;">Kopieren</button></div>
+      <div></div>
+      <div class="prompt-box" id="path-4" style="font-size:0.82rem; padding:0.4rem 0.7rem; margin:0;">03_Protokoll.txt<button class="copy-btn" onclick="copyPrompt('path-4')" style="font-size:0.75rem; padding:0.2rem 0.5rem;">Kopieren</button></div>
+      <div></div>
+      <div class="prompt-box" id="path-5" style="font-size:0.82rem; padding:0.4rem 0.7rem; margin:0;">04_Meetingvorbereitung.txt<button class="copy-btn" onclick="copyPrompt('path-5')" style="font-size:0.75rem; padding:0.2rem 0.5rem;">Kopieren</button></div>
+      <div></div>
+      <div class="prompt-box" id="path-6" style="font-size:0.82rem; padding:0.4rem 0.7rem; margin:0;">05_Unterweisung.txt<button class="copy-btn" onclick="copyPrompt('path-6')" style="font-size:0.75rem; padding:0.2rem 0.5rem;">Kopieren</button></div>
+      <div></div>
+      <div class="prompt-box" id="path-7" style="font-size:0.82rem; padding:0.4rem 0.7rem; margin:0;">06_Stil-Anweisungen.txt<button class="copy-btn" onclick="copyPrompt('path-7')" style="font-size:0.75rem; padding:0.2rem 0.5rem;">Kopieren</button></div>
+      <div></div>
+    </div>
+
+    <div class="info-box" style="margin-top:0.5rem;">
+      <strong>So nutzen Sie es:</strong>
+      <ol style="margin:0.3rem 0; padding-left:1.2rem;">
+        <li>Ordner anlegen (Pfad oben kopieren, im Explorer einfügen)</li>
+        <li>Pro Szenario eine Textdatei anlegen (Namen oben kopieren)</li>
+        <li>Funktionierende Prompts aus dem Workshop dort hineinkopieren</li>
+        <li>Neue Mitarbeiter: Ordner zeigen, fertig.</li>
+      </ol>
+    </div>
+
+    <div class="info-box"><strong>Für Teams:</strong> Legen Sie den Ordner auf ein Netzlaufwerk (z.B. <code>T:\</code>). Wer einen Prompt verbessert, speichert die neue Version — so lernt das ganze Team mit.</div>
+  </div>
+</div>
+
+<div class="toggle-section" style="margin-top: 0.5rem;">
+  <div class="toggle-header" onclick="toggleSection(this)">
+    Eigene Einträge sichern &amp; teilen <span class="arrow">&#9654;</span>
+  </div>
+  <div class="toggle-body">
+    <p>Ihre selbst erstellten Rollen und Szenarien (Karte 2 + 3) leben im Browser. Hier können Sie sie sichern oder mit Kollegen teilen.</p>
+
+    <div class="quick-btns" style="margin: 0.8rem 0;">
+      <button class="quick-btn" onclick="downloadOfflineCopy()" style="background:var(--accent); color:white; border-color:var(--accent);">Offline-Kopie herunterladen</button>
+      <button class="quick-btn" onclick="exportCustomData()">Exportieren (JSON)</button>
+      <button class="quick-btn" onclick="document.getElementById('import-file').click()">Importieren (JSON)</button>
+      <button class="quick-btn" onclick="shareLink()">Teilen-Link</button>
+      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importCustomData(this)">
+    </div>
+    <p style="font-size:0.82rem; color:var(--grey); margin-bottom:0.5rem;"><strong>Offline-Kopie</strong> = diese Seite + Ihre Rollen/Szenarien in einer HTML-Datei. Funktioniert ohne Internet. Auf <code>T:\</code> legen = Team-Tool.</p>
+
+    <div id="share-result" style="display:none; margin-top:0.5rem;">
+      <div class="prompt-box" id="share-url" style="font-size:0.82rem; word-break:break-all;"><button class="copy-btn" onclick="copyPrompt('share-url')">Kopieren</button></div>
+      <p style="font-size:0.82rem; color:var(--grey); margin-top:0.3rem;">Wer diesen Link öffnet, bekommt Ihre Rollen und Szenarien angeboten.</p>
+    </div>
+
+    <div id="import-status" style="display:none;" class="info-box"></div>
+
+    <div class="info-box" style="margin-top:0.5rem;">
+      <strong>Tipp für Teams:</strong> Eine Person exportiert die Datei → legt sie auf <code>T:\Vorlagen\KI-Prompts\team-eintraege.json</code> → alle anderen importieren sie.
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CARD 7: FORTGESCHRITTEN -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card" id="fortgeschritten">
+<h2><span class="card-number">7</span> Fortgeschritten — Mehr als Copy-Paste</h2>
+
+<div class="toggle-section">
+  <div class="toggle-header" onclick="toggleSection(this)">
+    4-Lösungen-Systematik — für komplexe Aufgaben <span class="arrow">&#9654;</span>
+  </div>
+  <div class="toggle-body">
+    <p>Für wichtige Texte können Sie vier Qualitätsmechanismen kombinieren:</p>
+
+    <h3>1. Best-Practice mitgeben</h3>
+    <p>Zeigen Sie der KI ein Beispiel, das funktioniert hat. "Orientiere dich an diesem Format: ..."</p>
+
+    <h3>2. Rückfragen zulassen</h3>
+    <p>"Bevor du antwortest: Stelle mir maximal 3 Rückfragen, wenn etwas unklar ist."</p>
+
+    <h3>3. Selbstvalidierung</h3>
+    <p>"Prüfe selbst vor der Ausgabe, ob Thema, Zielgruppe, Format und Vollständigkeit stimmen."</p>
+
+    <h3>4. Simulation</h3>
+    <p>"Simuliere typische Missverständnisse: Wo könnte der Empfänger etwas falsch verstehen?"</p>
+
+    <div class="prompt-box" id="prompt-mega">Du bist <span class="placeholder">[ROLLE]</span> in der <span class="placeholder">[BRANCHE]</span>.
+
+Erstelle <span class="placeholder">[AUFGABE, z.B. eine Antwort auf folgende Kundenreklamation]</span>.
+
+LÖSUNG 1: Orientiere dich an diesem Format:
+<span class="placeholder">[BEISPIEL EINFÜGEN ODER BESCHREIBEN]</span>
+
+LÖSUNG 2: Falls etwas unklar ist:
+Stelle maximal 3 Rückfragen, bevor du die Antwort erstellst.
+
+LÖSUNG 3: Vor der Ausgabe:
+Prüfe selbst, ob Ton, Zielgruppe, Format und Vollständigkeit stimmen.
+Falls Fehler: Überarbeite.
+
+LÖSUNG 4: Nach der Ausgabe:
+Simuliere typische Missverständnisse und gib Hinweise.<button class="copy-btn" onclick="copyPrompt('prompt-mega')">Kopieren</button></div>
+
+    <div class="info-box"><strong>Hinweis:</strong> Nicht für jede Mail nötig! Für schnelle Aufgaben reichen die Vorlagen aus Karte 3. Diesen Mega-Prompt nur bei wichtigen oder komplexen Texten einsetzen.</div>
+  </div>
+</div>
+
+<div class="toggle-section" style="margin-top: 0.5rem;">
+  <div class="toggle-header" onclick="toggleSection(this)">
+    Triangulation — Wenn Sie unsicher sind <span class="arrow">&#9654;</span>
+  </div>
+  <div class="toggle-body">
+    <p><strong>Fragen Sie eine zweite KI.</strong> Wenn zwei KIs unterschiedlich antworten, ist das kein Fehler — das ist Information über die Schwierigkeit der Aufgabe.</p>
+
+    <h3>Beispiel: Unsere Reklamationsantwort prüfen</h3>
+    <ol>
+      <li>Sie haben mit ChatGPT eine Reklamationsantwort geschrieben (Karte 3)</li>
+      <li>Geben Sie denselben Prompt auch an Claude oder DeepSeek</li>
+      <li>Öffnen Sie ein drittes KI-Fenster im <strong>Prüfmodus</strong> und geben Sie beide Antworten ein</li>
+      <li>Die Prüf-KI zeigt: Wo stimmen beide überein? Wo weichen sie ab? Was fehlt?</li>
+    </ol>
+    <p style="font-size:0.9rem; margin-top:0.3rem;"><strong>Übereinstimmung</strong> = solide Grundlage. <strong>Abweichung</strong> = genauer hinschauen. <strong>Beides fehlerhaft</strong> = Aufgabe war zu vage.</p>
+    <p style="margin-top:0.5rem;">Mehr dazu: <a href="operator-card.html" target="_blank">Prüfmodus-Karte</a></p>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CARD 8: KI-PROFILE -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card" id="ki-profile">
+<h2><span class="card-number">8</span> KI-Profile — Wer kann was?</h2>
+<p style="font-size:0.9rem; color:var(--grey);">Beobachtete Tendenzen, keine festen Regeln. Jede KI kann jede Aufgabe — aber manche sind in bestimmten Bereichen stärker.</p>
+
+<div class="ki-grid">
+  <div class="ki-card">
+    <h4>ChatGPT <span class="badge badge-green">Texter</span></h4>
+    <p><em>Der strukturierte Allrounder</em></p>
+    <ul>
+      <li>Schnell und zuverlässig</li>
+      <li>Gute Korrespondenz</li>
+      <li>Kohärente, lesbare Texte</li>
+    </ul>
+    <p style="font-size:0.85rem; color:var(--grey)">Ideal für: Mails, Angebote, Protokolle</p>
+  </div>
+  <div class="ki-card">
+    <h4>Claude <span class="badge badge-green">Prüfer</span></h4>
+    <p><em>Der kritische Gegenleser</em></p>
+    <ul>
+      <li>Erkennt Lücken und Annahmen</li>
+      <li>Benennt Unsicherheiten</li>
+      <li>Stark bei Überarbeitung</li>
+    </ul>
+    <p style="font-size:0.85rem; color:var(--grey)">Ideal für: Prüfen, Verbessern, Gegencheck</p>
+  </div>
+  <div class="ki-card">
+    <h4>DeepSeek <span class="badge badge-yellow">Helfer</span></h4>
+    <p><em>Der direkte Spezialist</em></p>
+    <ul>
+      <li>Direkt und ohne Schönreden</li>
+      <li>Stark bei Logik und Technik</li>
+      <li>Kostenlos nutzbar</li>
+    </ul>
+    <p style="font-size:0.85rem; color:var(--grey)">Ideal für: Formeln, Checklisten, Analysen</p>
+  </div>
+</div>
+
+<div class="info-box"><strong>Empfehlung zum Einstieg:</strong> Starten Sie mit <strong>ChatGPT</strong> für den Alltag (Mails, Protokolle). Wenn ein Text wichtig ist: Lassen Sie <strong>Claude</strong> gegenlesen. Für Checklisten und technische Fragen: Probieren Sie <strong>DeepSeek</strong> (kostenlos).</div>
+
+<div class="quote">KIs unterscheiden sich weniger im Wissen als im Umgang mit Wissen. Nutzen Sie das.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- FOOTER -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="ref">
+  <p><strong>Workshop:</strong> Prompt-Dash — Prompting im Büroalltag</p>
+  <p><strong>Kontakt:</strong> Jaroslav Kois | jaroslav.kois@fls-da.de</p>
+  <p><strong>Vertiefung:</strong> <a href="operator-card.html">Prüfmodus-Karte</a> — Multi-KI-Validierung</p>
+  <p><strong>Version:</strong> 1.1.0 | März 2026</p>
+</div>
+
+</div><!-- /container -->
+
+<script>
+/* ─── Kopieren ─── */
+function copyPrompt(id) {
+  const el = document.getElementById(id);
+  // Klartext extrahieren, Platzhalter-Spans als [TEXT] behalten
+  let text = '';
+  el.childNodes.forEach(node => {
+    if (node.nodeType === 3) text += node.textContent;
+    else if (node.classList && node.classList.contains('placeholder')) text += node.textContent;
+    else if (node.classList && node.classList.contains('copy-btn')) return;
+    else text += node.textContent;
+  });
+  text = text.replace(/\s*Kopieren\s*$/, '').replace(/\s*Kopiert!\s*$/, '').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = el.querySelector('.copy-btn');
+    btn.textContent = 'Kopiert!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Kopieren'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+/* ─── Schnellstart-Buttons (Rolle) ─── */
+const rolePresets = {
+  disponent: {
+    rolle: 'Disponent/in',
+    branche: 'Spedition und Lagerlogistik',
+    abteilung: 'Disposition',
+    aufgaben: 'Tourenplanung, Kundenkorrespondenz, Reklamationsbearbeitung, Angebotserstellung',
+    ton: 'sachlich und lösungsorientiert'
+  },
+  lagerleiter: {
+    rolle: 'Lagerleiter/in',
+    branche: 'Lagerlogistik',
+    abteilung: 'Lager / Wareneingang / Versand',
+    aufgaben: 'Personalplanung, Inventurvorbereitung, Unterweisungen, Prozessoptimierung',
+    ton: 'direkt und klar'
+  },
+  ausbilder: {
+    rolle: 'Ausbilder/in für Lagerlogistik',
+    branche: 'Spedition und Lagerlogistik',
+    abteilung: 'Ausbildung',
+    aufgaben: 'Unterweisungen erstellen, Azubis anleiten, Prüfungsvorbereitung, Feedbackgespräche',
+    ton: 'verständlich und ermutigend'
+  },
+  buero: {
+    rolle: 'Büroleiter/in',
+    branche: 'Spedition und Lagerlogistik',
+    abteilung: 'Verwaltung / Büro',
+    aufgaben: 'Auftragsabwicklung, Protokolle, Meetingvorbereitung, interne Kommunikation',
+    ton: 'professionell und verbindlich'
+  }
+};
+
+function fillRole(preset) {
+  const data = rolePresets[preset];
+  if (!data) return;
+  document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#prompt-rolle .placeholder').forEach(span => {
+    const field = span.dataset.field;
+    if (data[field]) span.textContent = data[field];
+  });
+}
+
+/* ─── Szenarien-Dropdown (Presets) ─── */
+const scenarioPresets = {
+  s1: { title: 'Reklamationsantwort', prompt: 'Schreibe eine Antwort auf folgende Kundenreklamation:\n\nSachverhalt: [WAS IST PASSIERT? z.B. Lieferung 3 Tage verspätet, Ware teilweise beschädigt]\nKunde: [KUNDENTYP, z.B. Stammkunde / Neukunde / Großabnehmer]\nGewünschter Ton: [z.B. sachlich-lösungsorientiert / entschuldigend / verbindlich]\nLösung die angeboten wird: [z.B. Ersatzlieferung bis Freitag, 10% Gutschrift]\n\nFormat: Geschäftsbrief, maximal 150 Wörter.\nKeine Floskeln wie "Ihre Zufriedenheit liegt uns am Herzen".' },
+  s2: { title: 'Angebotskorrespondenz', prompt: 'Erstelle ein Angebot / eine Angebotsantwort:\n\nLeistung: [WAS WIRD ANGEBOTEN? z.B. Lagerung von 200 Paletten, Kommissionierung, Versandabwicklung]\nKonditionen: [PREIS / LAUFZEIT / BESONDERHEITEN, z.B. 4,50 EUR/Palette/Monat, Mindestlaufzeit 6 Monate]\nEmpfänger: [WER BEKOMMT DAS? z.B. Einkaufsleiter eines mittelständischen Unternehmens]\nFrist: [BIS WANN GÜLTIG? z.B. 14 Tage]\n\nFormat: Geschäftsbrief. Klar strukturiert: Leistung, Konditionen, nächste Schritte.\nTon: professionell, verbindlich, nicht aufdringlich.' },
+  s3: { title: 'Besprechungsprotokoll', prompt: 'Erstelle ein Besprechungsprotokoll aus folgenden Notizen:\n\nTeilnehmer: [WER WAR DABEI? z.B. Lagerleitung, Disposition, QM]\nDatum: [WANN?]\nThemen: [STICHPUNKTE, z.B. - Inventurdifferenzen Q1 besprechen - Neue Kommissionierstrategie - Azubi-Einsatzplan]\nBeschlüsse: [WAS WURDE ENTSCHIEDEN?]\nOffene Punkte: [WAS IST NOCH ZU KLÄREN?]\n\nFormat: Tabelle mit Spalten: Thema | Ergebnis | Verantwortlich | Frist.\nKurz und präzise. Kein Fließtext.' },
+  s4: { title: 'Meetingvorbereitung', prompt: 'Bereite folgendes Meeting vor:\n\nZiel des Meetings: [WAS SOLL ERREICHT WERDEN? z.B. Entscheidung über neues WMS-System]\nTeilnehmer: [WER KOMMT? z.B. Geschäftsführung, IT, Lagerleitung, Betriebsrat]\nZeitrahmen: [WIE LANGE? z.B. 60 Minuten]\nVorgeschichte: [KONTEXT, z.B. Zwei Anbieter wurden bereits vorgestellt, Testphase läuft]\n\nErstelle:\n1. Agenda mit Zeitblöcken\n2. Je Agendapunkt: 2-3 Leitfragen\n3. Liste: Was muss VOR dem Meeting vorbereitet werden?' },
+  s5: { title: 'Sicherheitsunterweisung', prompt: 'Erstelle eine Sicherheitsunterweisung:\n\nThema: [z.B. Staplerfahren - Rückwärtsfahren / Gefahrstoffe im Lager / PSA-Pflicht]\nZielgruppe: [z.B. Lagermitarbeiter, 1. Lehrjahr, Sprachniveau A2-B1]\nDauer: [z.B. 15 Minuten]\n\nFormat:\n- Sicherheitshinweise: 3-4 Stichpunkte\n- Arbeitsschritte: nummeriert, max. 15 Wörter pro Schritt, aktive Sprache\n- Kontrolle: Checkliste mit 5-7 Punkten (Ja/Nein)\n\nEinfache Sprache. Keine Fachwörter ohne Erklärung.' }
+};
+
+function showPresetScenario(key) {
+  const container = document.getElementById('scenario-display');
+  if (!key) { container.innerHTML = ''; return; }
+  const s = scenarioPresets[key];
+  if (!s) return;
+  const id = 'prompt-' + key;
+  // Platzhalter farbig markieren
+  const html = escapeHtml(s.prompt).replace(/\[([^\]]+)\]/g, '<span class="placeholder">[$1]</span>');
+  container.innerHTML = '<div class="prompt-box" id="' + id + '">' + html + '<button class="copy-btn" onclick="copyPrompt(\'' + id + '\')">Kopieren</button></div>';
+}
+
+/* ─── Akkordeon ─── */
+function toggleAccordion(header) {
+  const body = header.nextElementSibling;
+  const isOpen = header.classList.contains('open');
+  // Alle schliessen
+  header.parentElement.querySelectorAll('.accordion-header').forEach(h => {
+    h.classList.remove('open');
+    h.nextElementSibling.classList.remove('open');
+  });
+  // Dieses öffnen (wenn es vorher zu war)
+  if (!isOpen) {
+    header.classList.add('open');
+    body.classList.add('open');
+  }
+}
+
+/* ─── Tool-Modus ─── */
+function toggleToolMode() {
+  document.body.classList.toggle('tool-mode');
+  const btn = document.querySelector('.tool-btn');
+  const active = document.body.classList.contains('tool-mode');
+  btn.innerHTML = active ? '&#9881; Workshop' : '&#9881; Tool-Modus';
+}
+if (new URLSearchParams(window.location.search).get('tool') === '1') {
+  document.body.classList.add('tool-mode');
+  document.querySelector('.tool-btn').innerHTML = '&#9881; Workshop';
+}
+
+/* ─── Sidebar-Modus ─── */
+function toggleSidebar() {
+  document.body.classList.toggle('sidebar-mode');
+  const btn = document.querySelector('.sidebar-btn');
+  const active = document.body.classList.contains('sidebar-mode');
+  btn.innerHTML = active ? '&#9646; Normal' : '&#9646; Sidebar';
+}
+// URL-Parameter: ?sidebar=1 aktiviert direkt
+if (new URLSearchParams(window.location.search).get('sidebar') === '1') {
+  document.body.classList.add('sidebar-mode');
+  document.querySelector('.sidebar-btn').innerHTML = '&#9646; Normal';
+}
+
+/* ─── Toggle-Sektionen ─── */
+function toggleSection(header) {
+  const body = header.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+  header.querySelector('.arrow').style.transform = isOpen ? '' : 'rotate(90deg)';
+  body.classList.toggle('open');
+}
+
+/* ─── Eigene Rollen (localStorage) ─── */
+const ROLE_KEY = 'workshop-custom-roles';
+const SCENARIO_KEY = 'workshop-custom-scenarios';
+
+function getCustomRoles() {
+  try { return JSON.parse(localStorage.getItem(ROLE_KEY)) || []; } catch { return []; }
+}
+function getCustomScenarios() {
+  try { return JSON.parse(localStorage.getItem(SCENARIO_KEY)) || []; } catch { return []; }
+}
+
+function showRoleForm() { document.getElementById('role-form').classList.add('open'); document.getElementById('rf-name').focus(); }
+function hideRoleForm() { document.getElementById('role-form').classList.remove('open'); }
+
+function saveCustomRole() {
+  const name = document.getElementById('rf-name').value.trim();
+  if (!name) { document.getElementById('rf-name').focus(); return; }
+  const role = {
+    name,
+    rolle: document.getElementById('rf-rolle').value.trim() || name,
+    branche: document.getElementById('rf-branche').value.trim(),
+    abteilung: document.getElementById('rf-abteilung').value.trim(),
+    aufgaben: document.getElementById('rf-aufgaben').value.trim(),
+    ton: document.getElementById('rf-ton').value.trim()
+  };
+  const roles = getCustomRoles();
+  roles.push(role);
+  localStorage.setItem(ROLE_KEY, JSON.stringify(roles));
+  renderCustomRoles();
+  hideRoleForm();
+  ['rf-name','rf-rolle','rf-branche','rf-abteilung','rf-aufgaben','rf-ton'].forEach(id => document.getElementById(id).value = '');
+}
+
+function deleteCustomRole(i) {
+  if (!confirm('Rolle "' + getCustomRoles()[i].name + '" löschen?')) return;
+  const roles = getCustomRoles();
+  roles.splice(i, 1);
+  localStorage.setItem(ROLE_KEY, JSON.stringify(roles));
+  renderCustomRoles();
+}
+
+function fillCustomRole(i) {
+  const data = getCustomRoles()[i];
+  if (!data) return;
+  document.getElementById('role-dropdown').value = '';
+  document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
+  if (event && event.target) { const btn = event.target.closest('.quick-btn'); if (btn) btn.classList.add('active'); }
+  document.querySelectorAll('#prompt-rolle .placeholder').forEach(span => {
+    const field = span.dataset.field;
+    if (data[field]) span.textContent = data[field];
+  });
+}
+
+function renderCustomRoles() {
+  const container = document.getElementById('custom-roles');
+  const roles = getCustomRoles();
+  container.innerHTML = '';
+  roles.forEach((r, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quick-btn';
+    btn.innerHTML = escapeHtml(r.name) + ' <span class="delete-custom" onclick="event.stopPropagation(); deleteCustomRole(' + i + ')" title="Löschen">&times;</span>';
+    btn.onclick = function(e) { if (!e.target.classList.contains('delete-custom')) fillCustomRole(i); };
+    container.appendChild(btn);
+  });
+}
+
+/* ─── Eigene Szenarien (localStorage) ─── */
+function showScenarioForm() { document.getElementById('scenario-form').classList.add('open'); document.getElementById('sf-title').focus(); }
+function hideScenarioForm() { document.getElementById('scenario-form').classList.remove('open'); }
+
+function saveCustomScenario() {
+  const title = document.getElementById('sf-title').value.trim();
+  const prompt = document.getElementById('sf-prompt').value.trim();
+  if (!title || !prompt) { (title ? document.getElementById('sf-prompt') : document.getElementById('sf-title')).focus(); return; }
+  const scenarios = getCustomScenarios();
+  scenarios.push({ title, prompt });
+  localStorage.setItem(SCENARIO_KEY, JSON.stringify(scenarios));
+  renderCustomScenarios();
+  hideScenarioForm();
+  document.getElementById('sf-title').value = '';
+  document.getElementById('sf-prompt').value = '';
+}
+
+function deleteCustomScenario(i) {
+  if (!confirm('Szenario "' + getCustomScenarios()[i].title + '" löschen?')) return;
+  const scenarios = getCustomScenarios();
+  scenarios.splice(i, 1);
+  localStorage.setItem(SCENARIO_KEY, JSON.stringify(scenarios));
+  renderCustomScenarios();
+}
+
+function renderCustomScenarios() {
+  const container = document.getElementById('custom-scenarios');
+  const scenarios = getCustomScenarios();
+  container.innerHTML = '';
+  scenarios.forEach((s, i) => {
+    const id = 'prompt-custom-' + i;
+    const div = document.createElement('div');
+    div.innerHTML =
+      '<div class="accordion-header" onclick="toggleAccordion(this)">' +
+        escapeHtml(s.title) +
+        ' <span class="delete-custom" onclick="event.stopPropagation(); deleteCustomScenario(' + i + ')" title="Löschen">&times;</span>' +
+        ' <span class="arrow">&#9654;</span>' +
+      '</div>' +
+      '<div class="accordion-body">' +
+        '<div class="prompt-box" id="' + id + '">' + escapeHtml(s.prompt) +
+        '<button class="copy-btn" onclick="copyPrompt(\'' + id + '\')">Kopieren</button></div>' +
+      '</div>';
+    container.appendChild(div);
+  });
+}
+
+function escapeHtml(text) {
+  const d = document.createElement('div');
+  d.textContent = text;
+  return d.innerHTML;
+}
+
+/* ─── Offline-Kopie ─── */
+function downloadOfflineCopy() {
+  const roles = getCustomRoles();
+  const scenarios = getCustomScenarios();
+  fetch(window.location.pathname).then(r => r.text()).then(html => {
+    // Custom-Rollen als feste Dropdown-Optionen + Presets einbetten
+    if (roles.length) {
+      const opts = roles.map((r, i) =>
+        '  <option value="embedded_' + i + '">' + escapeHtml(r.name) + '</option>'
+      ).join('\n');
+      html = html.replace(
+        '</select>\n\n<div class="custom-roles-area">',
+        opts + '\n</select>\n\n<div class="custom-roles-area">'
+      );
+      const presetCode = '\n// Eingebettete Team-Rollen (Offline-Kopie)\nObject.assign(rolePresets, {\n' +
+        roles.map((r, i) => '  embedded_' + i + ': ' + JSON.stringify({
+          rolle: r.rolle || r.name, branche: r.branche || '',
+          abteilung: r.abteilung || '', aufgaben: r.aufgaben || '', ton: r.ton || ''
+        })).join(',\n') + '\n});\n';
+      const lastScript = html.lastIndexOf('<\/script>');
+      html = html.substring(0, lastScript) + presetCode + html.substring(lastScript);
+    }
+    // Custom-Szenarien als Dropdown-Optionen + scenarioPresets einbetten
+    if (scenarios.length) {
+      const opts = scenarios.map((s, i) =>
+        '  <option value="embedded_s' + i + '">' + escapeHtml(s.title) + '</option>'
+      ).join('\n');
+      html = html.replace(
+        '</select>\n\n<div class="preset-display" id="scenario-display">',
+        opts + '\n</select>\n\n<div class="preset-display" id="scenario-display">'
+      );
+      const presetCode = '\n// Eingebettete Team-Szenarien (Offline-Kopie)\nObject.assign(scenarioPresets, {\n' +
+        scenarios.map((s, i) => '  embedded_s' + i + ': ' + JSON.stringify({ title: s.title, prompt: s.prompt })).join(',\n') +
+        '\n});\n';
+      const lastScript = html.lastIndexOf('<\/script>');
+      html = html.substring(0, lastScript) + presetCode + html.substring(lastScript);
+    }
+    // Offline-Datum im Footer
+    const today = new Date().toLocaleDateString('de-DE');
+    html = html.replace(
+      '1.1.0 | März 2026',
+      '1.1.0 | März 2026 | Offline-Kopie vom ' + today
+    );
+    const blob = new Blob([html], { type: 'text/html; charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'prompt-dash-offline.html';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  });
+}
+
+/* ─── Export / Import / Share ─── */
+function exportCustomData() {
+  const data = { roles: getCustomRoles(), scenarios: getCustomScenarios() };
+  if (!data.roles.length && !data.scenarios.length) { alert('Keine eigenen Einträge vorhanden.'); return; }
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'workshop-eigene-eintraege.json';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function importCustomData(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const status = document.getElementById('import-status');
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const data = JSON.parse(e.target.result);
+      let count = 0;
+      if (data.roles && Array.isArray(data.roles)) {
+        const existing = getCustomRoles();
+        const names = new Set(existing.map(r => r.name));
+        data.roles.forEach(r => { if (r.name && !names.has(r.name)) { existing.push(r); count++; } });
+        localStorage.setItem(ROLE_KEY, JSON.stringify(existing));
+        renderCustomRoles();
+      }
+      if (data.scenarios && Array.isArray(data.scenarios)) {
+        const existing = getCustomScenarios();
+        const titles = new Set(existing.map(s => s.title));
+        data.scenarios.forEach(s => { if (s.title && s.prompt && !titles.has(s.title)) { existing.push(s); count++; } });
+        localStorage.setItem(SCENARIO_KEY, JSON.stringify(existing));
+        renderCustomScenarios();
+      }
+      status.innerHTML = '<strong>' + count + ' neue Einträge importiert.</strong> Bereits vorhandene wurden übersprungen.';
+      status.style.display = 'block';
+    } catch { status.innerHTML = '<strong style="color:var(--red)">Fehler:</strong> Datei konnte nicht gelesen werden.'; status.style.display = 'block'; }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+function shareLink() {
+  const data = { roles: getCustomRoles(), scenarios: getCustomScenarios() };
+  if (!data.roles.length && !data.scenarios.length) { alert('Keine eigenen Einträge vorhanden.'); return; }
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
+  const url = window.location.origin + window.location.pathname + '?import=' + encoded;
+  const container = document.getElementById('share-result');
+  const urlBox = document.getElementById('share-url');
+  // Text vor dem Copy-Button setzen
+  urlBox.childNodes[0] ? urlBox.childNodes[0].textContent = url : urlBox.insertBefore(document.createTextNode(url), urlBox.firstChild);
+  container.style.display = 'block';
+}
+
+// URL-Import: ?import=BASE64 → Daten anbieten
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const importData = params.get('import');
+  if (!importData) return;
+  try {
+    const data = JSON.parse(decodeURIComponent(escape(atob(importData))));
+    const roleCount = (data.roles || []).length;
+    const scenarioCount = (data.scenarios || []).length;
+    if (!roleCount && !scenarioCount) return;
+    const msg = 'Jemand teilt ' + roleCount + ' Rolle(n) und ' + scenarioCount + ' Szenario(en) mit Ihnen. Übernehmen?';
+    if (!confirm(msg)) return;
+    let count = 0;
+    if (data.roles) {
+      const existing = getCustomRoles();
+      const names = new Set(existing.map(r => r.name));
+      data.roles.forEach(r => { if (r.name && !names.has(r.name)) { existing.push(r); count++; } });
+      localStorage.setItem(ROLE_KEY, JSON.stringify(existing));
+    }
+    if (data.scenarios) {
+      const existing = getCustomScenarios();
+      const titles = new Set(existing.map(s => s.title));
+      data.scenarios.forEach(s => { if (s.title && s.prompt && !titles.has(s.title)) { existing.push(s); count++; } });
+      localStorage.setItem(SCENARIO_KEY, JSON.stringify(existing));
+    }
+    // URL bereinigen (import-Parameter entfernen)
+    const clean = window.location.pathname + (params.get('tool') ? '?tool=1' : '') + (params.get('sidebar') ? (params.get('tool') ? '&' : '?') + 'sidebar=1' : '');
+    window.history.replaceState({}, '', clean);
+    alert(count + ' Einträge übernommen!');
+  } catch { /* ungültige Daten — ignorieren */ }
+})();
+
+// Gespeicherte Einträge beim Laden rendern
+renderCustomRoles();
+renderCustomScenarios();
+</script>
+</body>
+</html>

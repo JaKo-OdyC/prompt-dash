@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prüfmodus-Karte — OdyC MKI</title>
+<style>
+  :root { --bg: #f8f8f8; --card: #fff; --accent: #1a1a2e; --green: #2d6a4f; --yellow: #b5830b; --red: #9b2226; --grey: #666; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--accent); line-height: 1.5; padding: 0; }
+  .topbar { background: var(--accent); color: white; padding: 0.5rem 1rem; display: flex; align-items: center; gap: 0.8rem; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .topbar a, .topbar button { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.85rem; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.3); padding: 0.25rem 0.6rem; border-radius: 4px; cursor: pointer; }
+  .topbar a:hover, .topbar button:hover { background: rgba(255,255,255,0.25); color: white; }
+  .topbar .title { font-weight: bold; font-size: 0.9rem; margin-right: auto; }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 { font-size: 1.6rem; margin-bottom: 0.5rem; }
+  h2 { font-size: 1.25rem; margin: 1.5rem 0 0.5rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.25rem; }
+  h3 { font-size: 1.05rem; margin: 1rem 0 0.3rem; }
+  .subtitle { color: var(--grey); font-size: 0.95rem; margin-bottom: 1.5rem; }
+  .card { background: var(--card); border-radius: 8px; padding: 1.2rem; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+  .prompt-box { background: #1a1a2e; color: #e0e0e0; border-radius: 6px; padding: 1rem; font-family: 'Consolas', monospace; font-size: 0.9rem; white-space: pre-wrap; margin: 0.5rem 0; position: relative; }
+  .copy-btn { position: absolute; top: 0.5rem; right: 0.5rem; background: #333; color: #ccc; border: none; padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+  .copy-btn:hover { background: #555; }
+  .ki-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem; margin: 0.5rem 0; }
+  .ki-card { border: 1px solid #ddd; border-radius: 6px; padding: 0.8rem; }
+  .ki-card h4 { margin-bottom: 0.3rem; }
+  .badge { display: inline-block; padding: 0.1rem 0.4rem; border-radius: 3px; font-size: 0.8rem; font-weight: bold; color: white; }
+  .badge-green { background: var(--green); }
+  .badge-yellow { background: var(--yellow); }
+  .badge-red { background: var(--red); }
+  .traffic { display: flex; gap: 0.5rem; margin: 0.5rem 0; }
+  .light { padding: 0.8rem; border-radius: 6px; flex: 1; }
+  .light-green { background: #d8f3dc; border: 2px solid var(--green); }
+  .light-yellow { background: #fff3cd; border: 2px solid var(--yellow); }
+  .light-red { background: #f8d7da; border: 2px solid var(--red); }
+  .light h4 { font-size: 0.95rem; }
+  .light p, .light ul { font-size: 0.9rem; }
+  ul { padding-left: 1.2rem; margin: 0.3rem 0; }
+  li { margin: 0.2rem 0; }
+  .steps { counter-reset: step; list-style: none; padding: 0; }
+  .steps li { counter-increment: step; padding: 0.5rem 0 0.5rem 2.5rem; position: relative; border-left: 2px solid #ddd; margin-left: 1rem; }
+  .steps li::before { content: counter(step); position: absolute; left: -1rem; top: 0.4rem; width: 2rem; height: 2rem; border-radius: 50%; background: var(--accent); color: white; text-align: center; line-height: 2rem; font-weight: bold; font-size: 0.9rem; }
+  .quote { border-left: 3px solid var(--accent); padding-left: 1rem; font-style: italic; color: var(--grey); margin: 0.5rem 0; }
+  .info-box { background: #e8f4fd; border: 1px solid #b3d9f2; border-radius: 6px; padding: 0.8rem; margin: 0.5rem 0; font-size: 0.9rem; }
+  .ref { font-size: 0.85rem; color: var(--grey); margin-top: 2rem; border-top: 1px solid #ddd; padding-top: 0.5rem; }
+  @media print { body { padding: 0; } .copy-btn { display: none; } .topbar { display: none; } }
+</style>
+</head>
+<body>
+<div class="topbar">
+  <span class="title">Prüfmodus-Karte</span>
+  <a href="./">Zurück zum Prompt-Dash</a>
+  <button onclick="window.close(); if(!window.closed) history.back();">Schließen</button>
+</div>
+<div class="container" style="padding: 1rem;">
+
+<h1>Prüfmodus-Karte</h1>
+<p class="subtitle">Multi-KI-Validierung — Kurzreferenz v1.4.0 | OdyC Corpus Analyzer</p>
+
+<!-- SCHRITT 1: PRÜFMODUS EINSCHALTEN -->
+<div class="card">
+<h2>Schritt 1 — Prüfmodus einschalten</h2>
+<p>Diesen Prompt in ein <strong>neues, eigenes KI-Fenster</strong> eingeben. Nicht in denselben Chat, in dem Inhalte erzeugt wurden.</p>
+
+<div class="prompt-box" id="prompt1">Ab jetzt prüfst du nur. Du erzeugst nichts Neues.
+
+Regeln:
+1. Arbeite nur mit dem, was ich dir gebe. Nichts ergänzen, nichts umschreiben.
+2. Bevor du antwortest: Was tue ich gerade — vergleichen, Unterschiede suchen,
+   Lücken finden oder zusammenführen? Sag es mir kurz.
+3. Unterschiedliche Aussagen bleiben nebeneinander stehen.
+   Nicht glätten, nicht zusammenfassen.
+4. Wenn etwas unklar ist: Sag „unklar", statt es plausibel zu machen.
+5. Du lieferst Befunde, keine Lösungen. Ich entscheide.
+
+Wenn ich sage „fertig" oder die Prüfung abgeschlossen ist, frage:
+„Soll ich ein Übergabeprotokoll für ein neues Fenster erstellen?"
+Falls ja:
+1. ORIGINALTEXTE (vollständig, unverändert)
+2. BEFUNDE (was wurde festgestellt?)
+3. UNKLAR (was konnte nicht geprüft werden?)
+4. OFFEN FÜR ENTSCHEIDUNG (was muss im neuen Fenster geklärt werden?)
+Keine Zusammenfassung. Keine Umschreibung. Nur strukturierte Übergabe.
+
+Dieses Fenster bleibt im Prüfmodus.
+Für normales Arbeiten: neues Fenster öffnen.
+
+Wenn du bereit bist, antworte nur: „Verstanden. Gib mir das Material."<button class="copy-btn" onclick="copy('prompt1')">Kopieren</button></div>
+
+<p><strong>Erwartete Antwort:</strong> „Verstanden. Gib mir das Material."<br>
+Wenn stattdessen Vorschläge kommen: Modus nicht akzeptiert. Nochmal setzen oder Modell wechseln.</p>
+</div>
+
+<!-- ABLAUF -->
+<div class="card">
+<h2>Ablauf — In 5 Schritten</h2>
+<ol class="steps">
+  <li><strong>Material sammeln</strong> — ein eigener Text, zwei KI-Antworten oder mehrere Quellen. Alles, was geprüft werden soll.</li>
+  <li><strong>Neues Fenster öffnen</strong> — eine KI als Prüfer einsetzen (möglichst ein anderes Modell). Prompt oben eingeben.</li>
+  <li><strong>Bestätigung abwarten</strong> — erst wenn „Verstanden" kommt, weitermachen</li>
+  <li><strong>Material eingeben</strong> — Elemente getrennt einfügen, gekennzeichnet (A / B / C... oder nach Quelle)</li>
+  <li><strong>Diagnoseauftrag geben</strong> — siehe Schritt 2 unten. Die KI erkennt die Anzahl und wählt die passende Operation.</li>
+</ol>
+<div class="quote">Die Qualität entsteht nicht durch die KI, sondern durch den Auftrag an sie.</div>
+</div>
+
+<!-- KI PROFILE -->
+<div class="card">
+<h2>KI-Profile — Wer kann was?</h2>
+<p style="font-size:0.9rem; color:var(--grey);">Beobachtete Tendenzen, keine festen Regeln. Basierend auf 808 Konversationen.</p>
+<div class="ki-grid">
+  <div class="ki-card">
+    <h4>Claude <span class="badge badge-green">Prüfer</span></h4>
+    <p><em>Der reflektierte Prüfer</em></p>
+    <ul><li>Erkennt implizite Annahmen</li><li>Stark bei Widersprüchen</li><li>Benennt Unsicherheiten</li></ul>
+    <p style="font-size:0.85rem; color:var(--grey)">Schwäche: manchmal zu vorsichtig</p>
+  </div>
+  <div class="ki-card">
+    <h4>ChatGPT <span class="badge badge-green">Kreativer</span></h4>
+    <p><em>Der strukturierte Redakteur</em></p>
+    <ul><li>Gute Zusammenfassungen</li><li>Kohärente Texte</li><li>Zuverlässig bei Zusammenführung</li></ul>
+    <p style="font-size:0.85rem; color:var(--red)">Nicht für Prüfmodus (glättet zu stark)</p>
+  </div>
+  <div class="ki-card">
+    <h4>DeepSeek <span class="badge badge-green">Prüfer</span></h4>
+    <p><em>Der direkte Spezialist</em></p>
+    <ul><li>Direkt bei Fehlern</li><li>Kein Schönreden</li><li>Ideal bei Logik/Technik</li></ul>
+    <p style="font-size:0.85rem; color:var(--grey)">Schwäche: bei offenen Fragen schwächer</p>
+  </div>
+  <div class="ki-card">
+    <h4>Gemini <span class="badge badge-yellow">Kreativer</span></h4>
+    <p><em>Der breite Wissenssammler</em></p>
+    <ul><li>Viele Querverbindungen</li><li>Stark bei „Was fehlt noch?"</li><li>Inspirierend</li></ul>
+    <p style="font-size:0.85rem; color:var(--grey)">Schwäche: springt thematisch</p>
+  </div>
+  <div class="ki-card">
+    <h4>Kimi <span class="badge badge-yellow">Bedingt</span></h4>
+    <p><em>Der stabile Mitläufer</em></p>
+    <ul><li>Akzeptiert Prüfrolle</li><li>Weniger differenziert</li></ul>
+  </div>
+  <div class="ki-card">
+    <h4>Perplexity <span class="badge badge-yellow">Vergleich</span></h4>
+    <p><em>Der Recherche-Vergleicher</em></p>
+    <ul><li>Stark bei Quellenvergleich</li><li>Guter Faktencheck</li></ul>
+    <p style="font-size:0.85rem; color:var(--red)">Kann Prüfmodus nicht halten</p>
+  </div>
+</div>
+<p style="font-size:0.85rem; color:var(--grey); margin-top:0.5rem;">Prüf-KI sollte ein <strong>anderes Modell</strong> sein als die Erzeuger-KI(s). Grund: Self-Preference Bias <em>(Panickssery et al., NeurIPS 2024)</em>. Bei Einzeltext-Prüfung gilt: Ein zweites Modell sieht andere Lücken.</p>
+<div class="quote">KIs unterscheiden sich weniger im Wissen als im Umgang mit Wissen.</div>
+</div>
+
+<!-- SCHRITT 2: DIAGNOSEAUFTRAG MIT ÜBERGABEPROTOKOLL -->
+<div class="card" style="page-break-before: always;">
+<h2>Schritt 2 — Diagnoseauftrag geben</h2>
+<p>Diesen Prompt <strong>nach</strong> der Bestätigung eingeben. Material einfügen — die KI erkennt selbst, ob es 1, 2 oder mehr Elemente sind, und wählt die passende Operation.</p>
+
+<div class="prompt-box" id="prompt2">Diagnoseauftrag:
+
+Schritt 1 — Identifiziere das Material:
+- Wie viele Elemente habe ich dir gegeben? (1, 2 oder mehr)
+- Was ist jedes Element? (z.B. KI-Antwort, Text, Definition, Entwurf)
+- Benenne sie (A, B, C... oder nach Quelle, wenn angegeben).
+Sag mir kurz, was du siehst, bevor du prüfst.
+
+Schritt 2 — Wähle die passende Operation:
+
+Bei 1 Element:
+- Konsistenz prüfen (Widerspricht sich der Text selbst?)
+- Vollständigkeit prüfen (Was fehlt? Was ist nur angedeutet?)
+- Klarheit prüfen (Was ist vage, missverständlich oder unklar?)
+
+Bei 2 Elementen:
+- Unterschiede zeigen (Was sagt A anders als B?)
+- Lücken finden (Was deckt A ab, was B nicht — und umgekehrt?)
+- Nebeneinander stellen (Strukturierter Vergleich, keine Zusammenführung)
+
+Bei 3+ Elementen:
+- Alle obigen Operationen, plus:
+- Konsens zeigen (Worin stimmen alle überein?)
+- Ausreißer markieren (Wer weicht ab — und worin?)
+
+Falls ich eine bestimmte Aufgabe angebe, folge dieser.
+Falls nicht, wähle die sinnvollste Operation und begründe kurz.
+
+Schritt 3 — Liefere für jeden Befund:
+- Was ist der Befund?
+- Wie sicher bist du? (sicher / teilweise sicher / unsicher)
+- Was kannst du NICHT beurteilen?
+
+Keine Verbesserungsvorschläge. Keine Zusammenfassung. Nur Diagnose.
+
+Nach der Diagnose frage:
+„Soll ich ein Übergabeprotokoll für ein neues Fenster erstellen?"
+
+Falls ja, erstelle es so:
+1. ORIGINALTEXTE (vollständig, unverändert)
+2. BEFUNDE (was wurde festgestellt?)
+3. UNKLAR (was konnte nicht geprüft werden?)
+4. OFFEN FÜR ENTSCHEIDUNG (was muss im neuen Fenster entschieden werden?)
+Keine Zusammenfassung. Keine Umschreibung. Nur strukturierte Übergabe.<button class="copy-btn" onclick="copy('prompt2')">Kopieren</button></div>
+</div>
+
+<!-- ÜBERGABEPROTOKOLL ERKLÄRUNG -->
+<div class="card">
+<h2>Übergabeprotokoll — Was ist das?</h2>
+<div class="info-box">
+Ein <strong>Container</strong> für ein neues Fenster oder eine andere KI. Enthält die <strong>Originaltexte unverändert</strong> + Befunde + offene Entscheidungsstellen. Keine Zusammenfassung, kein Merge. Erst im neuen Fenster wird entschieden und weitergearbeitet.
+</div>
+</div>
+
+<!-- AUFGABENTYPEN -->
+<div class="card">
+<h2>Beispiele — 1, 2 oder mehr Elemente</h2>
+<p style="font-size:0.9rem; color:var(--grey);">Durchgehendes Beispiel: Reklamationsantwort auf eine verspätete Lieferung.</p>
+<h3>1 Element — Einzeltext prüfen</h3>
+<p><code>Gegenstand: Meine Reklamationsantwort an einen Kunden (verspätete Lieferung, Ersatzlieferung angeboten). Prüfe auf Konsistenz, Vollständigkeit und Tonalität.</code></p>
+<h3>2 Elemente — Vergleich</h3>
+<p><code>Gegenstand: Zwei Reklamationsantworten auf dieselbe verspätete Lieferung (A von ChatGPT, B von Claude). Unterschiede zeigen.</code></p>
+<h3>2 Elemente — Lücken</h3>
+<p><code>Gegenstand: Zwei Reklamationsantworten (A und B). Lücken finden — Was deckt A ab, was B nicht erwähnt?</code></p>
+<h3>3+ Elemente — Konsens &amp; Ausreißer</h3>
+<p><code>Gegenstand: Drei Definitionen von „Logistikkette" (ChatGPT, Claude, Gemini). Nebeneinander stellen — Konsens und Abweichungen zeigen.</code></p>
+<div class="info-box"><strong>Hinweis:</strong> Sie müssen die Operation nicht selbst wählen. Geben Sie das Material ein — die KI im Prüfmodus identifiziert die Elemente und schlägt die passende Prüfung vor.</div>
+<div class="quote">Die KI prüft. Sie entscheidet nicht. Das tun Sie.</div>
+</div>
+
+<!-- ESKALATION -->
+<div class="card">
+<h2>Ampel — Wann tiefer prüfen?</h2>
+<p>Nach jedem Diagnoseauftrag: Ergebnis einordnen.</p>
+<div class="traffic">
+  <div class="light light-green">
+    <h4>GRÜN</h4>
+    <ul><li>Max. 1 Befund</li><li>Niedrige Sicherheit</li><li>Kein Kernproblem</li></ul>
+    <p><strong>Entscheiden. Fertig.</strong></p>
+  </div>
+  <div class="light light-yellow">
+    <h4>GELB</h4>
+    <ul><li>2 Befunde</li><li>Mittlere Tragweite</li><li>Leichte Spannung</li></ul>
+    <p><strong>Optional: tiefer prüfen.</strong></p>
+  </div>
+  <div class="light light-red">
+    <h4>ROT</h4>
+    <ul><li>Sichere Fehler</li><li>Kernwiderspruch</li><li>Eigenes Zögern</li></ul>
+    <p><strong>Volle Prüfung (MV2).</strong></p>
+  </div>
+</div>
+<div class="quote">Wenn du bei einem Befund zögerst oder unsicher bist: nicht übergehen, sondern eine Stufe höher prüfen.</div>
+</div>
+
+<!-- REFERENZ -->
+<div class="ref">
+  <p><strong>Vollständige Referenz:</strong> MV1_node_b.md (v1.1.0) + MV2_skalpell.md (v1.1.0)</p>
+  <p><strong>Repository:</strong> <a href="https://github.com/JaKo-OdyC/odyc-monorepo">github.com/JaKo-OdyC/odyc-monorepo</a> — corpus-analyzer/prompts/</p>
+  <p><strong>Validiert gegen:</strong> 808 Konversationen / 44.121 Nachrichten | Corpus-Analyse 2026-02-17</p>
+  <p>KI-Profile basieren auf beobachteten Tendenzen (MKI-Runs), nicht auf festen Profilen.</p>
+</div>
+
+</div>
+
+<script>
+function copy(id) {
+  const el = document.getElementById(id);
+  const text = el.innerText.replace('Kopieren', '').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = el.querySelector('.copy-btn');
+    btn.textContent = 'Kopiert!';
+    setTimeout(() => btn.textContent = 'Kopieren', 2000);
+  });
+}
+</script>
+</body>
+</html>
