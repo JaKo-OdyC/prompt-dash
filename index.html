@@ -210,7 +210,6 @@
   <a href="#ki-profile">KI-Profile</a>
   <button class="info-btn" onclick="document.getElementById('info-modal').classList.add('open')" title="Funktionsübersicht &amp; Hinweise">&#9432; Info</button>
   <button class="tool-btn" onclick="toggleToolMode()" title="Workshop-Einführung ein/ausblenden">&#9881; Tool-Modus</button>
-  <button class="sidebar-btn" onclick="toggleSidebar()" title="Sidebar-Modus: Fenster schmal, KI links, Text in der Mitte">&#9646; Sidebar</button>
   <button class="sidebar-btn" onclick="openAsWindow()" title="Als separates, verschiebbares Fenster öffnen">&#10697; Fenster</button>
 </nav>
 
@@ -838,16 +837,9 @@ if (new URLSearchParams(window.location.search).get('tool') === '1') {
 }
 
 /* ─── Sidebar-Modus ─── */
-function toggleSidebar() {
-  document.body.classList.toggle('sidebar-mode');
-  const btn = document.querySelector('.sidebar-btn');
-  const active = document.body.classList.contains('sidebar-mode');
-  btn.innerHTML = active ? '&#9646; Normal' : '&#9646; Sidebar';
-}
-// URL-Parameter: ?sidebar=1 aktiviert direkt
+// URL-Parameter: ?sidebar=1 aktiviert Kompakt-Modus (fuer Fenster-Button)
 if (new URLSearchParams(window.location.search).get('sidebar') === '1') {
   document.body.classList.add('sidebar-mode');
-  document.querySelector('.sidebar-btn').innerHTML = '&#9646; Normal';
 }
 
 function openAsWindow() {
