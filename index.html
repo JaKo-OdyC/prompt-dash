@@ -211,6 +211,7 @@
   <button class="info-btn" onclick="document.getElementById('info-modal').classList.add('open')" title="Funktionsübersicht &amp; Hinweise">&#9432; Info</button>
   <button class="tool-btn" onclick="toggleToolMode()" title="Workshop-Einführung ein/ausblenden">&#9881; Tool-Modus</button>
   <button class="sidebar-btn" onclick="toggleSidebar()" title="Sidebar-Modus: Fenster schmal, KI links, Text in der Mitte">&#9646; Sidebar</button>
+  <button class="sidebar-btn" onclick="openAsWindow()" title="Als separates, verschiebbares Fenster öffnen">&#10697; Fenster</button>
 </nav>
 
 <!-- Info-Modal -->
@@ -847,6 +848,13 @@ function toggleSidebar() {
 if (new URLSearchParams(window.location.search).get('sidebar') === '1') {
   document.body.classList.add('sidebar-mode');
   document.querySelector('.sidebar-btn').innerHTML = '&#9646; Normal';
+}
+
+function openAsWindow() {
+  const w = 420, h = Math.round(screen.height * 0.85);
+  const left = screen.width - w - 20, top = 40;
+  const url = window.location.pathname + '?sidebar=1';
+  window.open(url, 'prompt-dash', 'width=' + w + ',height=' + h + ',left=' + left + ',top=' + top + ',resizable=yes,scrollbars=yes');
 }
 
 /* ─── Toggle-Sektionen ─── */
