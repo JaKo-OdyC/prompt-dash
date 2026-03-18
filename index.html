@@ -572,7 +572,14 @@ Simuliere typische Missverständnisse und gib Hinweise.</textarea>
       <button class="copy-btn" onclick="copyMegaPrompt()" style="position:static;">Kopieren</button>
     </div>
 
-    <div class="info-box"><strong>Hinweis:</strong> Überschreiben Sie die Platzhalter [ROLLE], [BRANCHE] usw. direkt mit Ihrem Text. Nicht für jede Mail nötig — nur bei wichtigen oder komplexen Texten.</div>
+    <div style="display:flex; gap:0.5rem; margin-top:0.6rem; align-items:center;">
+      <input id="mega-name" type="text" placeholder="Name für diesen Prompt (z.B. Reklamation komplex)" style="flex:1; padding:0.4rem; border:1px solid #ccc; border-radius:4px; font-size:0.88rem; font-family:inherit;">
+      <button class="save-btn" onclick="saveMegaProfile()" style="padding:0.35rem 0.8rem; border-radius:4px; font-size:0.85rem; cursor:pointer;">Speichern</button>
+    </div>
+
+    <div id="mega-profiles" style="margin-top:0.5rem;"></div>
+
+    <div class="info-box"><strong>Hinweis:</strong> Überschreiben Sie die Platzhalter direkt mit Ihrem Text. Speichern Sie verschiedene Prompts unter eigenen Namen — sie bleiben im Browser erhalten.</div>
   </div>
 </div>
 
@@ -678,7 +685,10 @@ function copyPrompt(id) {
   });
 }
 
-/* ─── Mega-Prompt: Zeichenzähler + Kopieren ─── */
+/* ─── Mega-Prompt: Zeichenzähler + Kopieren + Profile ─── */
+const MEGA_KEY = 'workshop-mega-profiles';
+function getMegaProfiles() { try { return JSON.parse(localStorage.getItem(MEGA_KEY)) || []; } catch { return []; } }
+
 function updateMegaCount() {
   const ta = document.getElementById('mega-prompt');
   const counter = document.getElementById('mega-count');
@@ -689,11 +699,46 @@ function updateMegaCount() {
 function copyMegaPrompt() {
   const ta = document.getElementById('mega-prompt');
   navigator.clipboard.writeText(ta.value.trim()).then(() => {
-    const btn = ta.parentElement.nextElementSibling.querySelector('.copy-btn') || event.target;
+    const btn = event.target;
     btn.textContent = 'Kopiert!';
     btn.classList.add('copied');
     setTimeout(() => { btn.textContent = 'Kopieren'; btn.classList.remove('copied'); }, 2000);
   });
+}
+function saveMegaProfile() {
+  const name = document.getElementById('mega-name').value.trim();
+  const prompt = document.getElementById('mega-prompt').value.trim();
+  if (!name) { document.getElementById('mega-name').focus(); return; }
+  if (!prompt) { document.getElementById('mega-prompt').focus(); return; }
+  const profiles = getMegaProfiles();
+  const idx = profiles.findIndex(p => p.name === name);
+  if (idx >= 0) { profiles[idx].prompt = prompt; } else { profiles.push({ name, prompt }); }
+  localStorage.setItem(MEGA_KEY, JSON.stringify(profiles));
+  document.getElementById('mega-name').value = '';
+  renderMegaProfiles();
+}
+function loadMegaProfile(name) {
+  const profiles = getMegaProfiles();
+  const p = profiles.find(x => x.name === name);
+  if (!p) return;
+  document.getElementById('mega-prompt').value = p.prompt;
+  document.getElementById('mega-name').value = p.name;
+  updateMegaCount();
+}
+function deleteMegaProfile(name) {
+  const profiles = getMegaProfiles().filter(p => p.name !== name);
+  localStorage.setItem(MEGA_KEY, JSON.stringify(profiles));
+  renderMegaProfiles();
+}
+function renderMegaProfiles() {
+  const container = document.getElementById('mega-profiles');
+  const profiles = getMegaProfiles();
+  if (!profiles.length) { container.innerHTML = ''; return; }
+  container.innerHTML = '<p style="font-size:0.85rem; font-weight:600; margin-bottom:0.3rem;">Gespeicherte Prompts:</p>' +
+    profiles.map(p => '<div style="display:flex; justify-content:space-between; align-items:center; padding:0.35rem 0.6rem; margin:0.2rem 0; background:var(--blue-light); border:1px solid var(--blue-border); border-radius:4px; cursor:pointer;" onclick="loadMegaProfile(\'' + p.name.replace(/'/g, "\\'") + '\')">' +
+      '<span style="font-size:0.88rem;">' + p.name + ' <span style="color:var(--grey); font-size:0.78rem;">(' + p.prompt.length + ' Zeichen)</span></span>' +
+      '<button onclick="event.stopPropagation(); deleteMegaProfile(\'' + p.name.replace(/'/g, "\\'") + '\')" style="background:none; border:none; color:var(--red); cursor:pointer; font-size:1rem; padding:0 0.3rem;" title="Löschen">&times;</button>' +
+    '</div>').join('');
 }
 
 /* ─── Schnellstart-Buttons (Rolle) ─── */
@@ -949,6 +994,13 @@ function downloadOfflineCopy() {
       const lastScript = html.lastIndexOf('<\/script>');
       html = html.substring(0, lastScript) + presetCode + html.substring(lastScript);
     }
+    // Mega-Profile einbetten
+    const megaProfiles = getMegaProfiles();
+    if (megaProfiles.length) {
+      const megaCode = '\n// Eingebettete Mega-Profile (Offline-Kopie)\nlocalStorage.setItem("workshop-mega-profiles", JSON.stringify(' + JSON.stringify(megaProfiles) + '));\nrenderMegaProfiles();\n';
+      const lastScript = html.lastIndexOf('<\/script>');
+      html = html.substring(0, lastScript) + megaCode + html.substring(lastScript);
+    }
     // Offline-Datum im Footer
     const today = new Date().toLocaleDateString('de-DE');
     html = html.replace(
@@ -997,6 +1049,7 @@ function loadExampleData() {
 renderCustomRoles();
 renderCustomScenarios();
 updateMegaCount();
+renderMegaProfiles();
 </script>
 </body>
 </html>
