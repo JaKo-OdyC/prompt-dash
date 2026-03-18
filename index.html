@@ -585,6 +585,36 @@ Simuliere typische Missverständnisse und gib Hinweise.</textarea>
 
 <div class="toggle-section" style="margin-top: 0.5rem;">
   <div class="toggle-header" onclick="toggleSection(this)">
+    Prompt aus Ergebnis extrahieren — Rückwärtsentwicklung <span class="arrow">&#9654;</span>
+  </div>
+  <div class="toggle-body">
+    <p>Sie haben über eine längere Session ein sehr gutes Ergebnis erzielt. Beim nächsten Mal soll es schneller gehen. <strong>Lassen Sie die KI selbst analysieren, was funktioniert hat.</strong></p>
+
+    <p style="font-size:0.9rem; margin-top:0.5rem;"><strong>So geht's:</strong> Kopieren Sie den Extraktions-Prompt, fügen Sie Ihr gutes Ergebnis ein und schicken Sie beides an die KI. Die Antwort können Sie oben als neues Mega-Prompt-Profil speichern.</p>
+
+    <div class="prompt-box" id="prompt-extract">Analysiere den folgenden Text. Er ist das Ergebnis einer längeren KI-Session und hat genau die Qualität, die ich brauche.
+
+Extrahiere daraus die Elemente, die zu diesem Ergebnis geführt haben:
+
+1. ROLLE: Welche Rolle/Perspektive wurde eingenommen?
+2. KONTEXT: Welche Hintergrundinformationen waren entscheidend?
+3. AUFGABE: Was genau war der Auftrag?
+4. QUALITÄTSKRITERIEN: Welche Anforderungen an Ton, Format, Länge, Zielgruppe sind erkennbar?
+5. STRUKTUR: Welches Aufbaumuster wurde verwendet?
+6. BESONDERHEITEN: Was macht dieses Ergebnis besonders gut?
+
+Formuliere aus diesen Elementen einen wiederverwendbaren Prompt, den ich künftig direkt verwenden kann, um ein gleichwertiges Ergebnis zu erhalten — ohne lange Session.
+
+--- ERGEBNIS EINFÜGEN ---
+
+[HIER IHR GUTES ERGEBNIS EINFÜGEN]<button class="copy-btn" onclick="copyPrompt('prompt-extract')">Kopieren</button></div>
+
+    <div class="info-box"><strong>Tipp:</strong> Probieren Sie den extrahierten Prompt sofort aus. Kommt ein vergleichbares Ergebnis? Dann speichern Sie ihn oben als Profil. Wenn nicht: Lassen Sie die KI nachbessern.</div>
+  </div>
+</div>
+
+<div class="toggle-section" style="margin-top: 0.5rem;">
+  <div class="toggle-header" onclick="toggleSection(this)">
     Triangulation — Wenn Sie unsicher sind <span class="arrow">&#9654;</span>
   </div>
   <div class="toggle-body">
