@@ -551,12 +551,12 @@ Orientiere dich an folgendem Beispiel für meinen Schreibstil:
     <h3>4. Simulation</h3>
     <p>"Simuliere typische Missverständnisse: Wo könnte der Empfänger etwas falsch verstehen?"</p>
 
-    <div class="prompt-box" id="prompt-mega">Du bist <span class="placeholder">[ROLLE]</span> in der <span class="placeholder">[BRANCHE]</span>.
+    <textarea id="mega-prompt" oninput="updateMegaCount()" style="width:100%; min-height:280px; padding:0.8rem; border:1px solid var(--blue-border); border-radius:6px; font-family:'Consolas','Courier New',monospace; font-size:0.88rem; line-height:1.5; resize:vertical; color:var(--accent); background:var(--blue-light);">Du bist [ROLLE] in der [BRANCHE].
 
-Erstelle <span class="placeholder">[AUFGABE, z.B. eine Antwort auf folgende Kundenreklamation]</span>.
+Erstelle [AUFGABE, z.B. eine Antwort auf folgende Kundenreklamation].
 
 LÖSUNG 1: Orientiere dich an diesem Format:
-<span class="placeholder">[BEISPIEL EINFÜGEN ODER BESCHREIBEN]</span>
+[BEISPIEL EINFÜGEN ODER BESCHREIBEN]
 
 LÖSUNG 2: Falls etwas unklar ist:
 Stelle maximal 3 Rückfragen, bevor du die Antwort erstellst.
@@ -566,9 +566,13 @@ Prüfe selbst, ob Ton, Zielgruppe, Format und Vollständigkeit stimmen.
 Falls Fehler: Überarbeite.
 
 LÖSUNG 4: Nach der Ausgabe:
-Simuliere typische Missverständnisse und gib Hinweise.<button class="copy-btn" onclick="copyPrompt('prompt-mega')">Kopieren</button></div>
+Simuliere typische Missverständnisse und gib Hinweise.</textarea>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.4rem;">
+      <span id="mega-count" style="font-size:0.82rem;">0 / 4.000 Zeichen</span>
+      <button class="copy-btn" onclick="copyMegaPrompt()" style="position:static;">Kopieren</button>
+    </div>
 
-    <div class="info-box"><strong>Hinweis:</strong> Nicht für jede Mail nötig! Für schnelle Aufgaben reichen die Vorlagen aus Karte 3. Diesen Mega-Prompt nur bei wichtigen oder komplexen Texten einsetzen.</div>
+    <div class="info-box"><strong>Hinweis:</strong> Überschreiben Sie die Platzhalter [ROLLE], [BRANCHE] usw. direkt mit Ihrem Text. Nicht für jede Mail nötig — nur bei wichtigen oder komplexen Texten.</div>
   </div>
 </div>
 
@@ -668,6 +672,24 @@ function copyPrompt(id) {
   text = text.replace(/\s*Kopieren\s*$/, '').replace(/\s*Kopiert!\s*$/, '').trim();
   navigator.clipboard.writeText(text).then(() => {
     const btn = el.querySelector('.copy-btn');
+    btn.textContent = 'Kopiert!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Kopieren'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+/* ─── Mega-Prompt: Zeichenzähler + Kopieren ─── */
+function updateMegaCount() {
+  const ta = document.getElementById('mega-prompt');
+  const counter = document.getElementById('mega-count');
+  const len = ta.value.length;
+  counter.textContent = len.toLocaleString('de-DE') + ' / 4.000 Zeichen';
+  counter.style.color = len > 4000 ? 'var(--red)' : len > 3000 ? '#b8860b' : 'var(--green)';
+}
+function copyMegaPrompt() {
+  const ta = document.getElementById('mega-prompt');
+  navigator.clipboard.writeText(ta.value.trim()).then(() => {
+    const btn = ta.parentElement.nextElementSibling.querySelector('.copy-btn') || event.target;
     btn.textContent = 'Kopiert!';
     btn.classList.add('copied');
     setTimeout(() => { btn.textContent = 'Kopieren'; btn.classList.remove('copied'); }, 2000);
@@ -974,6 +996,7 @@ function loadExampleData() {
 // Gespeicherte Einträge beim Laden rendern
 renderCustomRoles();
 renderCustomScenarios();
+updateMegaCount();
 </script>
 </body>
 </html>
