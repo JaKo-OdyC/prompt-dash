@@ -509,60 +509,21 @@ Orientiere dich an folgendem Beispiel für meinen Schreibstil:
 
 <div class="toggle-section">
   <div class="toggle-header" onclick="toggleSection(this)">
-    Ordner-Blaupause — Prompt-Ablage für Sie und Ihr Team <span class="arrow">&#9654;</span>
-  </div>
-  <div class="toggle-body">
-    <p>Kopieren Sie die Pfade und legen Sie die Ordner an. Fertig ist Ihre Prompt-Bibliothek.</p>
-
-    <div class="prompt-box" id="path-root" style="font-size:0.85rem; padding:0.6rem 0.8rem;">T:\Vorlagen\KI-Prompts\<button class="copy-btn" onclick="copyPrompt('path-root')">Kopieren</button></div>
-
-    <p style="margin-top:0.5rem; font-size:0.9rem;"><strong>Dateien im Ordner:</strong></p>
-    <div style="display:grid; grid-template-columns:1fr auto; gap:0.3rem; margin:0.3rem 0;">
-      <div class="prompt-box" id="path-1" style="font-size:0.82rem; padding:0.4rem 0.7rem; margin:0;">00_Rollenprompt.txt<button class="copy-btn" onclick="copyPrompt('path-1')" style="font-size:0.75rem; padding:0.2rem 0.5rem;">Kopieren</button></div>
-      <div></div>
-      <div class="prompt-box" id="path-2" style="font-size:0.82rem; padding:0.4rem 0.7rem; margin:0;">01_Reklamation.txt<button class="copy-btn" onclick="copyPrompt('path-2')" style="font-size:0.75rem; padding:0.2rem 0.5rem;">Kopieren</button></div>
-      <div></div>
-      <div class="prompt-box" id="path-3" style="font-size:0.82rem; padding:0.4rem 0.7rem; margin:0;">02_Angebot.txt<button class="copy-btn" onclick="copyPrompt('path-3')" style="font-size:0.75rem; padding:0.2rem 0.5rem;">Kopieren</button></div>
-      <div></div>
-      <div class="prompt-box" id="path-4" style="font-size:0.82rem; padding:0.4rem 0.7rem; margin:0;">03_Protokoll.txt<button class="copy-btn" onclick="copyPrompt('path-4')" style="font-size:0.75rem; padding:0.2rem 0.5rem;">Kopieren</button></div>
-      <div></div>
-      <div class="prompt-box" id="path-5" style="font-size:0.82rem; padding:0.4rem 0.7rem; margin:0;">04_Meetingvorbereitung.txt<button class="copy-btn" onclick="copyPrompt('path-5')" style="font-size:0.75rem; padding:0.2rem 0.5rem;">Kopieren</button></div>
-      <div></div>
-      <div class="prompt-box" id="path-6" style="font-size:0.82rem; padding:0.4rem 0.7rem; margin:0;">05_Unterweisung.txt<button class="copy-btn" onclick="copyPrompt('path-6')" style="font-size:0.75rem; padding:0.2rem 0.5rem;">Kopieren</button></div>
-      <div></div>
-      <div class="prompt-box" id="path-7" style="font-size:0.82rem; padding:0.4rem 0.7rem; margin:0;">06_Stil-Anweisungen.txt<button class="copy-btn" onclick="copyPrompt('path-7')" style="font-size:0.75rem; padding:0.2rem 0.5rem;">Kopieren</button></div>
-      <div></div>
-    </div>
-
-    <div class="info-box" style="margin-top:0.5rem;">
-      <strong>So nutzen Sie es:</strong>
-      <ol style="margin:0.3rem 0; padding-left:1.2rem;">
-        <li>Ordner anlegen (Pfad oben kopieren, im Explorer einfügen)</li>
-        <li>Pro Szenario eine Textdatei anlegen (Namen oben kopieren)</li>
-        <li>Funktionierende Prompts aus dem Workshop dort hineinkopieren</li>
-        <li>Neue Mitarbeiter: Ordner zeigen, fertig.</li>
-      </ol>
-    </div>
-
-    <div class="info-box"><strong>Für Teams:</strong> Legen Sie den Ordner auf ein Netzlaufwerk (z.B. <code>T:\</code>). Wer einen Prompt verbessert, speichert die neue Version — so lernt das ganze Team mit.</div>
-  </div>
-</div>
-
-<div class="toggle-section" style="margin-top: 0.5rem;">
-  <div class="toggle-header" onclick="toggleSection(this)">
     Eigene Einträge sichern &amp; teilen <span class="arrow">&#9654;</span>
   </div>
   <div class="toggle-body">
     <p>Ihre selbst erstellten Rollen und Szenarien (Karte 2 + 3) leben im Browser. Hier können Sie sie sichern oder mit Kollegen teilen.</p>
 
     <div class="quick-btns" style="margin: 0.8rem 0;">
+      <button class="quick-btn" onclick="loadExampleData()" style="background:var(--green); color:white; border-color:var(--green);">Beispiel-Prompts laden</button>
       <button class="quick-btn" onclick="downloadOfflineCopy()" style="background:var(--accent); color:white; border-color:var(--accent);">Offline-Kopie herunterladen</button>
       <button class="quick-btn" onclick="exportCustomData()">Exportieren (JSON)</button>
       <button class="quick-btn" onclick="document.getElementById('import-file').click()">Importieren (JSON)</button>
       <button class="quick-btn" onclick="shareLink()">Teilen-Link</button>
       <input type="file" id="import-file" accept=".json" style="display:none" onchange="importCustomData(this)">
     </div>
-    <p style="font-size:0.82rem; color:var(--grey); margin-bottom:0.5rem;"><strong>Offline-Kopie</strong> = diese Seite + Ihre Rollen/Szenarien in einer HTML-Datei. Funktioniert ohne Internet. Auf <code>T:\</code> legen = Team-Tool.</p>
+    <p style="font-size:0.82rem; color:var(--grey); margin-bottom:0.5rem;"><strong>Beispiel-Prompts laden</strong> = fertige Rollen und Szenarien aus dem Workshop als Startpaket. Bereits vorhandene Einträge werden nicht überschrieben.</p>
+    <p style="font-size:0.82rem; color:var(--grey); margin-bottom:0.5rem;"><strong>Offline-Kopie</strong> = diese Seite + Ihre Rollen/Szenarien in einer HTML-Datei. Funktioniert ohne Internet. Auf ein Netzlaufwerk legen = Team-Tool.</p>
 
     <div id="share-result" style="display:none; margin-top:0.5rem;">
       <div class="prompt-box" id="share-url" style="font-size:0.82rem; word-break:break-all;"><button class="copy-btn" onclick="copyPrompt('share-url')">Kopieren</button></div>
@@ -572,7 +533,7 @@ Orientiere dich an folgendem Beispiel für meinen Schreibstil:
     <div id="import-status" style="display:none;" class="info-box"></div>
 
     <div class="info-box" style="margin-top:0.5rem;">
-      <strong>Tipp für Teams:</strong> Eine Person exportiert die Datei → legt sie auf <code>T:\Vorlagen\KI-Prompts\team-eintraege.json</code> → alle anderen importieren sie.
+      <strong>Tipp für Teams:</strong> Eine Person exportiert die Datei → legt sie auf ein gemeinsames Laufwerk → alle anderen importieren sie.
     </div>
   </div>
 </div>
@@ -992,6 +953,35 @@ function downloadOfflineCopy() {
     a.click();
     URL.revokeObjectURL(a.href);
   });
+}
+
+/* ─── Beispiel-Prompts laden ─── */
+function loadExampleData() {
+  const exampleRoles = [
+    { name: 'Speditionskaufmann', rolle: 'Speditionskaufmann/frau', branche: 'Spedition und Logistik', abteilung: 'Disposition / Kundenservice', aufgaben: 'Transportplanung, Kundenkorrespondenz, Reklamationsbearbeitung, Angebotserstellung', ton: 'professionell, klar, lösungsorientiert' },
+    { name: 'Lagerlogistik', rolle: 'Fachkraft für Lagerlogistik', branche: 'Logistik', abteilung: 'Lager / Versand', aufgaben: 'Wareneingang, Kommissionierung, Bestandskontrolle, Versandvorbereitung', ton: 'präzise, sachlich' }
+  ];
+  const exampleScenarios = [
+    { title: 'Reklamation beantworten', prompt: 'Ein Kunde reklamiert eine verspätete Lieferung. Schreibe eine professionelle Antwort, die das Problem anerkennt, eine Erklärung liefert und eine konkrete Lösung anbietet.' },
+    { title: 'Angebot formulieren', prompt: 'Erstelle ein Angebot für einen Transportauftrag. Enthält: Leistungsbeschreibung, Laufzeit, Preis, Zahlungsbedingungen. Professioneller Ton.' },
+    { title: 'Meetingprotokoll', prompt: 'Fasse das folgende Meeting zusammen. Struktur: Teilnehmer, besprochene Themen, Entscheidungen, offene Punkte mit Verantwortlichen und Fristen.' },
+    { title: 'Unterweisung erstellen', prompt: 'Erstelle eine Sicherheitsunterweisung zum Thema Ladungssicherung. Zielgruppe: Berufskraftfahrer. Struktur: Rechtsgrundlage, Gefahren, Maßnahmen, Checkliste.' }
+  ];
+  const roles = getCustomRoles();
+  const scenarios = getCustomScenarios();
+  let count = 0;
+  exampleRoles.forEach(r => {
+    if (!roles.some(e => e.name === r.name)) { roles.push(r); count++; }
+  });
+  exampleScenarios.forEach(s => {
+    if (!scenarios.some(e => e.title === s.title)) { scenarios.push(s); count++; }
+  });
+  if (count === 0) { alert('Alle Beispiele sind bereits vorhanden.'); return; }
+  localStorage.setItem(ROLE_KEY, JSON.stringify(roles));
+  localStorage.setItem(SCENARIO_KEY, JSON.stringify(scenarios));
+  renderCustomRoles();
+  renderCustomScenarios();
+  alert(count + ' Beispiel-Einträge geladen. Sie finden sie auf Karte 2 (Rollen) und Karte 3 (Szenarien).');
 }
 
 /* ─── Export / Import / Share ─── */
