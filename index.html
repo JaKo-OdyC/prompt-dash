@@ -519,16 +519,10 @@ Orientiere dich an folgendem Beispiel für meinen Schreibstil:
       <button class="quick-btn" onclick="downloadOfflineCopy()" style="background:var(--accent); color:white; border-color:var(--accent);">Offline-Kopie herunterladen</button>
       <button class="quick-btn" onclick="exportCustomData()">Exportieren (JSON)</button>
       <button class="quick-btn" onclick="document.getElementById('import-file').click()">Importieren (JSON)</button>
-      <button class="quick-btn" onclick="shareLink()">Teilen-Link</button>
       <input type="file" id="import-file" accept=".json" style="display:none" onchange="importCustomData(this)">
     </div>
     <p style="font-size:0.82rem; color:var(--grey); margin-bottom:0.5rem;"><strong>Beispiel-Prompts laden</strong> = fertige Rollen und Szenarien aus dem Workshop als Startpaket. Bereits vorhandene Einträge werden nicht überschrieben.</p>
     <p style="font-size:0.82rem; color:var(--grey); margin-bottom:0.5rem;"><strong>Offline-Kopie</strong> = diese Seite + Ihre Rollen/Szenarien in einer HTML-Datei. Funktioniert ohne Internet. Auf ein Netzlaufwerk legen = Team-Tool.</p>
-
-    <div id="share-result" style="display:none; margin-top:0.5rem;">
-      <div class="prompt-box" id="share-url" style="font-size:0.82rem; word-break:break-all;"><button class="copy-btn" onclick="copyPrompt('share-url')">Kopieren</button></div>
-      <p style="font-size:0.82rem; color:var(--grey); margin-top:0.3rem;">Wer diesen Link öffnet, bekommt Ihre Rollen und Szenarien angeboten.</p>
-    </div>
 
     <div id="import-status" style="display:none;" class="info-box"></div>
 
@@ -1026,50 +1020,6 @@ function importCustomData(input) {
   reader.readAsText(file);
   input.value = '';
 }
-
-function shareLink() {
-  const data = { roles: getCustomRoles(), scenarios: getCustomScenarios() };
-  if (!data.roles.length && !data.scenarios.length) { alert('Keine eigenen Einträge vorhanden.'); return; }
-  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(data))));
-  const url = window.location.origin + window.location.pathname + '?import=' + encoded;
-  const container = document.getElementById('share-result');
-  const urlBox = document.getElementById('share-url');
-  // Text vor dem Copy-Button setzen
-  urlBox.childNodes[0] ? urlBox.childNodes[0].textContent = url : urlBox.insertBefore(document.createTextNode(url), urlBox.firstChild);
-  container.style.display = 'block';
-}
-
-// URL-Import: ?import=BASE64 → Daten anbieten
-(function() {
-  const params = new URLSearchParams(window.location.search);
-  const importData = params.get('import');
-  if (!importData) return;
-  try {
-    const data = JSON.parse(decodeURIComponent(escape(atob(importData))));
-    const roleCount = (data.roles || []).length;
-    const scenarioCount = (data.scenarios || []).length;
-    if (!roleCount && !scenarioCount) return;
-    const msg = 'Jemand teilt ' + roleCount + ' Rolle(n) und ' + scenarioCount + ' Szenario(en) mit Ihnen. Übernehmen?';
-    if (!confirm(msg)) return;
-    let count = 0;
-    if (data.roles) {
-      const existing = getCustomRoles();
-      const names = new Set(existing.map(r => r.name));
-      data.roles.forEach(r => { if (r.name && !names.has(r.name)) { existing.push(r); count++; } });
-      localStorage.setItem(ROLE_KEY, JSON.stringify(existing));
-    }
-    if (data.scenarios) {
-      const existing = getCustomScenarios();
-      const titles = new Set(existing.map(s => s.title));
-      data.scenarios.forEach(s => { if (s.title && s.prompt && !titles.has(s.title)) { existing.push(s); count++; } });
-      localStorage.setItem(SCENARIO_KEY, JSON.stringify(existing));
-    }
-    // URL bereinigen (import-Parameter entfernen)
-    const clean = window.location.pathname + (params.get('tool') ? '?tool=1' : '') + (params.get('sidebar') ? (params.get('tool') ? '&' : '?') + 'sidebar=1' : '');
-    window.history.replaceState({}, '', clean);
-    alert(count + ' Einträge übernommen!');
-  } catch { /* ungültige Daten — ignorieren */ }
-})();
 
 // Gespeicherte Einträge beim Laden rendern
 renderCustomRoles();
