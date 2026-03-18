@@ -216,26 +216,24 @@
       <li>Eigene Szenarien erscheinen als aufklappbare Einträge mit Kopieren-Button</li>
     </ul>
 
-    <h3><span class="feature-tag">Sichern</span> Export, Import &amp; Teilen</h3>
+    <h3><span class="feature-tag">Sichern</span> Speichern &amp; Teilen</h3>
     <ul>
+      <li><strong>Beispiel-Prompts laden:</strong> Fertige Rollen und Szenarien aus dem Workshop als Startpaket</li>
       <li><strong>Offline-Kopie:</strong> Lädt die komplette Seite MIT Ihren eigenen Einträgen als eigenständige HTML-Datei herunter — funktioniert ohne Internet</li>
-      <li><strong>Exportieren:</strong> Speichert eigene Rollen und Szenarien als JSON-Datei</li>
-      <li><strong>Importieren:</strong> Lädt eine zuvor exportierte JSON-Datei — doppelte Einträge werden übersprungen</li>
-      <li><strong>Teilen-Link:</strong> Erzeugt einen Link, der Ihre Einträge enthält. Empfänger sehen eine Bestätigungsabfrage</li>
+      <li><strong>Für Teams:</strong> Offline-Kopie auf ein gemeinsames Laufwerk legen — alle öffnen dieselbe Datei</li>
     </ul>
 
     <h3><span class="feature-tag">Modi</span> Ansichtsoptionen</h3>
     <ul>
       <li><strong>Tool-Modus</strong> (Zahnrad): Blendet die Workshop-Einführung aus — zeigt nur die produktiven Werkzeuge</li>
-      <li><strong>Sidebar-Modus</strong> (Balken): Komprimiert die Darstellung für schmale Fenster (~400px), ideal neben dem ChatGPT-Fenster</li>
-      <li>Beide Modi auch per URL-Parameter: <code>?tool=1</code> und <code>?sidebar=1</code></li>
+      <li>Auch per URL-Parameter: <code>?tool=1</code></li>
     </ul>
 
     <h3><span class="limit-tag">Hinweis</span> Grenzen &amp; Technik</h3>
     <ul>
       <li>Eigene Einträge liegen im <strong>Browser-Speicher (localStorage)</strong> — sie gelten nur für diesen Browser auf diesem Gerät</li>
       <li>Privates/Inkognito-Fenster: Daten gehen beim Schließen verloren</li>
-      <li>Für dauerhafte Sicherung: <strong>Offline-Kopie</strong> herunterladen oder <strong>Exportieren</strong> nutzen</li>
+      <li>Für dauerhafte Sicherung: <strong>Offline-Kopie</strong> herunterladen</li>
       <li>Die Seite funktioniert komplett ohne externe Dienste — kein Tracking, keine Cookies, keine Anmeldung</li>
       <li>Drucken: Alle Akkordeons werden automatisch aufgeklappt, Buttons ausgeblendet</li>
     </ul>
@@ -517,17 +515,12 @@ Orientiere dich an folgendem Beispiel für meinen Schreibstil:
     <div class="quick-btns" style="margin: 0.8rem 0;">
       <button class="quick-btn" onclick="loadExampleData()" style="background:var(--green); color:white; border-color:var(--green);">Beispiel-Prompts laden</button>
       <button class="quick-btn" onclick="downloadOfflineCopy()" style="background:var(--accent); color:white; border-color:var(--accent);">Offline-Kopie herunterladen</button>
-      <button class="quick-btn" onclick="exportCustomData()">Exportieren (JSON)</button>
-      <button class="quick-btn" onclick="document.getElementById('import-file').click()">Importieren (JSON)</button>
-      <input type="file" id="import-file" accept=".json" style="display:none" onchange="importCustomData(this)">
     </div>
     <p style="font-size:0.82rem; color:var(--grey); margin-bottom:0.5rem;"><strong>Beispiel-Prompts laden</strong> = fertige Rollen und Szenarien aus dem Workshop als Startpaket. Bereits vorhandene Einträge werden nicht überschrieben.</p>
-    <p style="font-size:0.82rem; color:var(--grey); margin-bottom:0.5rem;"><strong>Offline-Kopie</strong> = diese Seite + Ihre Rollen/Szenarien in einer HTML-Datei. Funktioniert ohne Internet. Auf ein Netzlaufwerk legen = Team-Tool.</p>
-
-    <div id="import-status" style="display:none;" class="info-box"></div>
+    <p style="font-size:0.82rem; color:var(--grey); margin-bottom:0.5rem;"><strong>Offline-Kopie</strong> = diese Seite + Ihre Rollen/Szenarien in einer HTML-Datei. Funktioniert ohne Internet.</p>
 
     <div class="info-box" style="margin-top:0.5rem;">
-      <strong>Tipp für Teams:</strong> Eine Person exportiert die Datei → legt sie auf ein gemeinsames Laufwerk → alle anderen importieren sie.
+      <strong>Tipp für Teams:</strong> Offline-Kopie herunterladen → auf ein gemeinsames Laufwerk legen → alle öffnen dieselbe Datei.
     </div>
   </div>
 </div>
@@ -976,49 +969,6 @@ function loadExampleData() {
   renderCustomRoles();
   renderCustomScenarios();
   alert(count + ' Beispiel-Einträge geladen. Sie finden sie auf Karte 2 (Rollen) und Karte 3 (Szenarien).');
-}
-
-/* ─── Export / Import / Share ─── */
-function exportCustomData() {
-  const data = { roles: getCustomRoles(), scenarios: getCustomScenarios() };
-  if (!data.roles.length && !data.scenarios.length) { alert('Keine eigenen Einträge vorhanden.'); return; }
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'workshop-eigene-eintraege.json';
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-
-function importCustomData(input) {
-  const file = input.files[0];
-  if (!file) return;
-  const status = document.getElementById('import-status');
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    try {
-      const data = JSON.parse(e.target.result);
-      let count = 0;
-      if (data.roles && Array.isArray(data.roles)) {
-        const existing = getCustomRoles();
-        const names = new Set(existing.map(r => r.name));
-        data.roles.forEach(r => { if (r.name && !names.has(r.name)) { existing.push(r); count++; } });
-        localStorage.setItem(ROLE_KEY, JSON.stringify(existing));
-        renderCustomRoles();
-      }
-      if (data.scenarios && Array.isArray(data.scenarios)) {
-        const existing = getCustomScenarios();
-        const titles = new Set(existing.map(s => s.title));
-        data.scenarios.forEach(s => { if (s.title && s.prompt && !titles.has(s.title)) { existing.push(s); count++; } });
-        localStorage.setItem(SCENARIO_KEY, JSON.stringify(existing));
-        renderCustomScenarios();
-      }
-      status.innerHTML = '<strong>' + count + ' neue Einträge importiert.</strong> Bereits vorhandene wurden übersprungen.';
-      status.style.display = 'block';
-    } catch { status.innerHTML = '<strong style="color:var(--red)">Fehler:</strong> Datei konnte nicht gelesen werden.'; status.style.display = 'block'; }
-  };
-  reader.readAsText(file);
-  input.value = '';
 }
 
 // Gespeicherte Einträge beim Laden rendern
