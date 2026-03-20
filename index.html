@@ -98,7 +98,6 @@
   body.tool-mode .workshop-intro { display: none; }
   body.tool-mode .subtitle { display: none; }
   body.tool-mode #situationen { display: none; }
-  body.tool-mode #werkstatt { display: none; }
   body.tool-mode #datenschutz { display: none; }
   body.tool-mode #speicherung { display: none; }
   body.tool-mode #ki-profile { display: none; }
@@ -108,7 +107,6 @@
   body.tool-mode .info-box { display: none; }
   body.tool-mode .card > p { display: none; }
   body.tool-mode .toggle-section { display: none; }
-  body.tool-mode .nav a[href="#werkstatt"],
   body.tool-mode .nav a[href="#datenschutz"],
   body.tool-mode .nav a[href="#speicherung"],
   body.tool-mode .nav a[href="#ki-profile"] { display: none; }
@@ -198,7 +196,6 @@
 <nav class="nav">
   <span class="nav-title">Prompt-Dash</span>
   <a href="#problem" class="workshop-intro">Problem</a>
-  <a href="#werkstatt">Werkstatt</a>
   <a href="#situationen" class="workshop-intro">Situationen</a>
   <a href="#rolle">Rolle</a>
   <a href="#datenschutz">Datenschutz</a>
@@ -306,9 +303,9 @@
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<!-- PROMPT-WERKSTATT -->
+<!-- PROMPT-WERKSTATT (nur Workshop-Modus, im Tool-Modus ausgeblendet) -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<div class="card" id="werkstatt">
+<div class="card workshop-intro" id="werkstatt">
 <h2>&#9998; Prompt-Werkstatt</h2>
 <p style="font-size:0.9rem; color:var(--grey); margin-bottom:0.5rem;">Schreiben Sie hier Ihren Prompt — frei, ohne Vorlage. Kopieren und direkt in die KI einfügen.</p>
 <textarea id="werkstatt-prompt" oninput="updateWerkstattCount()" placeholder="Ihren Prompt hier schreiben oder einfügen..." style="width:100%; min-height:180px; padding:0.8rem; border:1px solid var(--blue-border); border-radius:6px; font-family:'Consolas','Courier New',monospace; font-size:0.88rem; line-height:1.5; resize:vertical; color:var(--accent); background:var(--blue-light);"></textarea>
@@ -812,7 +809,7 @@ const store = {
   }
 };
 
-/* ─── Prompt-Werkstatt ─── */
+/* ─── Prompt-Werkstatt (Workshop-Modus) ─── */
 function updateWerkstattCount() {
   const ta = document.getElementById('werkstatt-prompt');
   const counter = document.getElementById('werkstatt-count');
