@@ -178,12 +178,13 @@
 <nav class="nav">
   <span class="nav-title">Prompt-Dash</span>
   <a href="#problem" class="workshop-intro">Problem</a>
+  <a href="#situationen">Situationen</a>
   <a href="#rolle">Rolle</a>
-  <a href="#szenarien">Szenarien</a>
-  <a href="#logik">Logik</a>
   <a href="#datenschutz">Datenschutz</a>
-  <a href="#speicherung">Speicherung</a>
+  <a href="#szenarien">Szenarien</a>
+  <a href="#logik">Stil</a>
   <a href="#fortgeschritten">Fortgeschritten</a>
+  <a href="#speicherung">Speicherung</a>
   <a href="#ki-profile">KI-Profile</a>
   <button class="info-btn" onclick="document.getElementById('info-modal').classList.add('open')" title="Funktionsübersicht &amp; Hinweise">&#9432; Info</button>
   <button class="tool-btn" onclick="toggleToolMode()" title="Workshop-Einführung ein/ausblenden">&#9881; Tool-Modus</button>
@@ -273,14 +274,46 @@
   <strong>Was den Unterschied gemacht hat:</strong>
   <ul>
     <li><strong>Rolle</strong> — "Ich bin Disponent bei einer Spedition" <em>(→ Karte 2)</em></li>
-    <li><strong>Kontext</strong> — Was passiert ist, was angeboten wird <em>(→ Karte 3)</em></li>
-    <li><strong>Stil</strong> — "sachlich-lösungsorientiert, max. 80 Wörter" <em>(→ Karte 4)</em></li>
-    <li><strong>Datenschutz</strong> — "[KUNDE]" statt echter Name <em>(→ Karte 5)</em></li>
+    <li><strong>Datenschutz</strong> — "[KUNDE]" statt echter Name <em>(→ Karte 3)</em></li>
+    <li><strong>Kontext</strong> — Was passiert ist, was angeboten wird <em>(→ Karte 4)</em></li>
+    <li><strong>Stil</strong> — "sachlich-lösungsorientiert, max. 80 Wörter" <em>(→ Karte 5)</em></li>
   </ul>
   <p style="margin-top:0.4rem; font-size:0.88rem;">Dieses Reklamations-Beispiel begleitet Sie durch alle Karten.</p>
 </div>
 
 <div class="quote">Die KI ist nicht schlecht — sie hat nur zu wenig von Ihnen bekommen.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- WORKSHOP-SITUATIONEN -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card" id="situationen">
+<h2>Workshop-Situationen</h2>
+<p>Diese zwei Situationen begleiten Sie durch alle Karten. Sie enthalten <strong>Originaldaten</strong> — pseudonymisieren Sie diese über Karte 3, bevor Sie sie in die KI eingeben.</p>
+
+<div class="toggle-section">
+  <div class="toggle-header" onclick="toggleSection(this)">
+    Situation 1: Frau Bergmann — Reklamationsantwort <span class="arrow">&#9654;</span>
+  </div>
+  <div class="toggle-body">
+    <p>Dienstagvormittag. Frau Bergmann öffnet ihren Posteingang. Zwischen zwei Auftragsbestätigungen: eine E-Mail von Firma Hartmann &amp; Sohn, einem Kunden den sie seit drei Jahren betreut. Zwei Sendungen pro Monat, immer reibungslos.</p>
+    <p>Diesmal nicht. Eine Palette kam beschädigt an, die Lieferung war zwei Tage später als vereinbart. Der Einkäufer, Herr Meier, schreibt knapp — kein Vorwurf, aber auch keine Entschuldigung für den Ton. Er bezieht sich auf Sendung SP-2026-04417. Er wartet auf eine Rückmeldung.</p>
+    <p>Frau Bergmann weiß was sie sagen will. Erklärung, Entschuldigung, konkretes Angebot. Sie kennt den Kunden, sie weiß wie er kommuniziert. Was sie nicht hat: Zeit. Und sie will, dass die Antwort so klingt wie von ihr — nicht wie ein Formbrief.</p>
+    <div class="info-box"><strong>Daten für Karte 3 (Pseudonymisierung):</strong> Hartmann &amp; Sohn → [FIRMA], SP-2026-04417 → [NR], Herr Meier → [NAME], 28. März 2026 → [DATUM], Lisa Bergmann → [FRAU BERGMANN]</div>
+  </div>
+</div>
+
+<div class="toggle-section" style="margin-top: 0.5rem;">
+  <div class="toggle-header" onclick="toggleSection(this)">
+    Situation 2: Herr Novak — Rückfrage Auftragsabwicklung <span class="arrow">&#9654;</span>
+  </div>
+  <div class="toggle-body">
+    <p>Montagmorgen. Herr Novak öffnet das Auftragspostfach. Drei neue Eingänge über Nacht, einer davon ein Neukunde — Radic Haustechnik, über das Online-Portal reingekommen. Absender: M. Radic, radic-haustechnik@web.de. Auftrag AE-0417, unvollständig: kein Wunschtermin, das Gewicht fehlt, kein Ansprechpartner für die Lieferankündigung am Zielort.</p>
+    <p>Herr Novak kennt das. Er tippt die Rückfrage, wie er es immer macht. Sachlich, höflich. Aber er merkt beim Schreiben: zu kurz wirkt schroff, zu lang wirkt bürokratisch. Der Kunde kennt ihn nicht, er kennt den Kunden nicht. Es ist der erste Kontakt.</p>
+    <p>Er schickt die Mail ab. Drei Minuten für einen Zweizeiler. Beim nächsten unvollständigen Auftrag fängt er wieder von vorne an.</p>
+    <div class="info-box"><strong>Daten für Karte 3 (Pseudonymisierung):</strong> Radic Haustechnik → [FIRMA], AE-0417 → [NR], M. Radic → [NAME], radic-haustechnik@web.de → ENTFERNEN, 23. März 2026 → [DATUM], Tomáš Novak → [HERR NOVAK]</div>
+  </div>
+</div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -305,10 +338,16 @@
 
 <select class="preset-dropdown" id="role-dropdown" onchange="fillRole(this.value)">
   <option value="">— Rolle wählen —</option>
-  <option value="disponent">Disponent/in</option>
-  <option value="lagerleiter">Lagerleiter/in</option>
-  <option value="ausbilder">Ausbilder/in</option>
-  <option value="buero">Büroleitung</option>
+  <optgroup label="Workshop-Situationen">
+    <option value="bergmann">Frau Bergmann (Reklamation)</option>
+    <option value="novak">Herr Novak (Rückfrage)</option>
+  </optgroup>
+  <optgroup label="Weitere Rollen">
+    <option value="disponent">Disponent/in</option>
+    <option value="lagerleiter">Lagerleiter/in</option>
+    <option value="ausbilder">Ausbilder/in</option>
+    <option value="buero">Büroleitung</option>
+  </optgroup>
 </select>
 
 <div class="custom-roles-area">
@@ -348,79 +387,10 @@ Antworte in meinem Stil — nicht im KI-Stil.<button class="copy-btn" onclick="c
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<!-- CARD 3: 5 SZENARIEN -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
-<div class="card" id="szenarien">
-<h2><span class="card-number">3</span> Prompt-Vorlagen für 5 Szenarien</h2>
-<p>Wählen Sie ein Szenario. Ersetzen Sie die <span style="color:#b5830b; font-weight:bold;">[PLATZHALTER]</span>. Kopieren. Einfügen in ChatGPT.</p>
-
-<select class="preset-dropdown" id="scenario-dropdown" onchange="showPresetScenario(this.value)">
-  <option value="">— Szenario wählen —</option>
-  <option value="s1">Reklamationsantwort</option>
-  <option value="s2">Angebotskorrespondenz</option>
-  <option value="s3">Besprechungsprotokoll</option>
-  <option value="s4">Meetingvorbereitung</option>
-  <option value="s5">Sicherheitsunterweisung</option>
-</select>
-
-<div class="preset-display" id="scenario-display"></div>
-
-<div class="custom-scenarios-area">
-  <div id="custom-scenarios"></div>
-  <button class="quick-btn add-custom-btn" onclick="showScenarioForm()" style="margin-top: 0.5rem;">+ Eigenes Szenario</button>
-</div>
-
-<div class="custom-form" id="scenario-form">
-  <label>Titel:</label>
-  <input type="text" id="sf-title" placeholder="z.B. Lieferschein-Vorlage">
-  <label>Prompt-Vorlage:</label>
-  <textarea id="sf-prompt" placeholder="Schreibe hier deinen Prompt...&#10;&#10;Tipp: Nutze [PLATZHALTER] für variable Teile."></textarea>
-  <div class="custom-form-btns">
-    <button class="save-btn" onclick="saveCustomScenario()">Speichern</button>
-    <button onclick="hideScenarioForm()">Abbrechen</button>
-  </div>
-</div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════ -->
-<!-- CARD 4: LOGIK STATT LAYOUT -->
-<!-- ═══════════════════════════════════════════════════════════════ -->
-<div class="card" id="logik">
-<h2><span class="card-number">4</span> Logik statt Layout — Die KI spricht wie SIE</h2>
-<p>Die KI hat keinen eigenen Stil. Sie nimmt den an, den Sie ihr geben.</p>
-
-<div class="compare">
-  <div class="compare-box compare-bad">
-    <strong>Ohne Steuerung:</strong><br>
-    "Sehr geehrte Damen und Herren,<br>
-    wir möchten uns aufrichtig bei Ihnen entschuldigen und versichern Ihnen, dass wir den Vorfall sehr ernst nehmen..."<br>
-    <em style="color:var(--red)">KI-typisch: höflich, lang, austauschbar</em>
-  </div>
-  <div class="compare-box compare-good">
-    <strong>Mit Steuerung:</strong><br>
-    "Hallo Herr Müller,<br>
-    die verspätete Lieferung tut uns leid. Ersatzlieferung kommt Freitag. Bei Fragen: 069-1234."<br>
-    <em style="color:var(--green)">Direkt, kurz, klingt nach Ihnen</em>
-  </div>
-</div>
-
-<div class="prompt-box" id="prompt-stil">Stil-Anweisungen für alle folgenden Antworten:
-
-Anrede: <span class="placeholder">[z.B. "Hallo Herr/Frau..." / "Sehr geehrte..." / Du-Form]</span>
-Länge: <span class="placeholder">[z.B. maximal 100 Wörter / 3-5 Sätze / eine halbe Seite]</span>
-Ton: <span class="placeholder">[z.B. sachlich-direkt / freundlich-verbindlich / formell]</span>
-Struktur: <span class="placeholder">[z.B. Stichpunkte / Fließtext / nummerierte Liste]</span>
-Vermeide: <span class="placeholder">[z.B. Floskeln, Passivkonstruktionen, "wir würden uns freuen"]</span>
-
-Orientiere dich an folgendem Beispiel für meinen Schreibstil:
-<span class="placeholder">[OPTIONAL: Fügen Sie hier 2-3 Sätze ein, die Sie tatsächlich so geschrieben haben]</span><button class="copy-btn" onclick="copyPrompt('prompt-stil')">Kopieren</button></div>
-</div>
-
-<!-- ═══════════════════════════════════════════════════════════════ -->
-<!-- CARD 5: PSEUDONYMISIERUNG -->
+<!-- CARD 3: PSEUDONYMISIERUNG -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div class="card" id="datenschutz">
-<h2><span class="card-number">5</span> Datenschutz — Was darf in den Prompt?</h2>
+<h2><span class="card-number">3</span> Datenschutz — Was darf in den Prompt?</h2>
 <p>KI-Anbieter können Eingaben für Training nutzen. Regel: <strong>Keine echten Daten, die Personen oder Geschäftsgeheimnisse identifizieren.</strong></p>
 
 <div class="traffic">
@@ -490,47 +460,85 @@ Orientiere dich an folgendem Beispiel für meinen Schreibstil:
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<!-- CARD 6: PROMPT-SPEICHERUNG -->
+<!-- CARD 4: 5 SZENARIEN -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<div class="card" id="speicherung">
-<h2><span class="card-number">6</span> Prompt-Speicherung — Wohin mit guten Prompts?</h2>
-<p>Sie haben einen Prompt gebaut, der funktioniert. Wo bleibt er?</p>
+<div class="card" id="szenarien">
+<h2><span class="card-number">4</span> Prompt-Vorlagen für 5 Szenarien</h2>
+<p>Wählen Sie ein Szenario. Ersetzen Sie die <span style="color:#b5830b; font-weight:bold;">[PLATZHALTER]</span>. Kopieren. Einfügen in ChatGPT.</p>
 
-<div class="method-grid">
-  <div class="method-num">1</div>
-  <div><strong>Lesezeichen auf diese Seite</strong> — Am einfachsten. Diese Seite ist Ihre Prompt-Bibliothek. Strg+D / Cmd+D.</div>
-  <div class="method-num">2</div>
-  <div><strong>Eigene Textdatei</strong> — Legen Sie eine Datei an: <code>Meine-Prompts.txt</code>. Kopieren Sie funktionierende Prompts dort hinein.</div>
-  <div class="method-num">3</div>
-  <div><strong>Custom Instructions in ChatGPT</strong> — Unter Einstellungen → "Benutzerdefinierte Anweisungen". Der Rollenprompt (Karte 2) passt perfekt hierhin.</div>
+<select class="preset-dropdown" id="scenario-dropdown" onchange="showPresetScenario(this.value)">
+  <option value="">— Szenario wählen —</option>
+  <optgroup label="Workshop-Situationen">
+    <option value="ws1">Workshop: Bergmann — Reklamationsantwort</option>
+    <option value="ws2">Workshop: Novak — Rückfrage Auftragsabwicklung</option>
+  </optgroup>
+  <optgroup label="Weitere Szenarien">
+    <option value="s1">Reklamationsantwort (allgemein)</option>
+    <option value="s2">Angebotskorrespondenz</option>
+    <option value="s3">Besprechungsprotokoll</option>
+    <option value="s4">Meetingvorbereitung</option>
+    <option value="s5">Sicherheitsunterweisung</option>
+  </optgroup>
+</select>
+
+<div class="preset-display" id="scenario-display"></div>
+
+<div class="custom-scenarios-area">
+  <div id="custom-scenarios"></div>
+  <button class="quick-btn add-custom-btn" onclick="showScenarioForm()" style="margin-top: 0.5rem;">+ Eigenes Szenario</button>
 </div>
 
-<div class="toggle-section">
-  <div class="toggle-header" onclick="toggleSection(this)">
-    Eigene Einträge sichern &amp; teilen <span class="arrow">&#9654;</span>
-  </div>
-  <div class="toggle-body">
-    <p>Ihre selbst erstellten Rollen und Szenarien (Karte 2 + 3) leben im Browser. Hier können Sie sie sichern oder mit Kollegen teilen.</p>
-
-    <div class="quick-btns" style="margin: 0.8rem 0;">
-      <button class="quick-btn" onclick="loadExampleData()" style="background:var(--green); color:white; border-color:var(--green);">Beispiel-Prompts laden</button>
-      <button class="quick-btn" onclick="downloadOfflineCopy()" style="background:var(--accent); color:white; border-color:var(--accent);">Offline-Kopie herunterladen</button>
-    </div>
-    <p style="font-size:0.82rem; color:var(--grey); margin-bottom:0.5rem;"><strong>Beispiel-Prompts laden</strong> = fertige Rollen und Szenarien aus dem Workshop als Startpaket. Bereits vorhandene Einträge werden nicht überschrieben.</p>
-    <p style="font-size:0.82rem; color:var(--grey); margin-bottom:0.5rem;"><strong>Offline-Kopie</strong> = diese Seite + Ihre Rollen/Szenarien in einer HTML-Datei. Funktioniert ohne Internet.</p>
-
-    <div class="info-box" style="margin-top:0.5rem;">
-      <strong>Tipp für Teams:</strong> Offline-Kopie herunterladen → auf ein gemeinsames Laufwerk legen → alle öffnen dieselbe Datei.
-    </div>
+<div class="custom-form" id="scenario-form">
+  <label>Titel:</label>
+  <input type="text" id="sf-title" placeholder="z.B. Lieferschein-Vorlage">
+  <label>Prompt-Vorlage:</label>
+  <textarea id="sf-prompt" placeholder="Schreibe hier deinen Prompt...&#10;&#10;Tipp: Nutze [PLATZHALTER] für variable Teile."></textarea>
+  <div class="custom-form-btns">
+    <button class="save-btn" onclick="saveCustomScenario()">Speichern</button>
+    <button onclick="hideScenarioForm()">Abbrechen</button>
   </div>
 </div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<!-- CARD 7: FORTGESCHRITTEN -->
+<!-- CARD 5: LOGIK STATT LAYOUT -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card" id="logik">
+<h2><span class="card-number">5</span> Stil — Die KI spricht wie SIE</h2>
+<p>Die KI hat keinen eigenen Stil. Sie nimmt den an, den Sie ihr geben.</p>
+
+<div class="compare">
+  <div class="compare-box compare-bad">
+    <strong>Ohne Steuerung:</strong><br>
+    "Sehr geehrte Damen und Herren,<br>
+    wir möchten uns aufrichtig bei Ihnen entschuldigen und versichern Ihnen, dass wir den Vorfall sehr ernst nehmen..."<br>
+    <em style="color:var(--red)">KI-typisch: höflich, lang, austauschbar</em>
+  </div>
+  <div class="compare-box compare-good">
+    <strong>Mit Steuerung:</strong><br>
+    "Hallo Herr Müller,<br>
+    die verspätete Lieferung tut uns leid. Ersatzlieferung kommt Freitag. Bei Fragen: 069-1234."<br>
+    <em style="color:var(--green)">Direkt, kurz, klingt nach Ihnen</em>
+  </div>
+</div>
+
+<div class="prompt-box" id="prompt-stil">Stil-Anweisungen für alle folgenden Antworten:
+
+Anrede: <span class="placeholder">[z.B. "Hallo Herr/Frau..." / "Sehr geehrte..." / Du-Form]</span>
+Länge: <span class="placeholder">[z.B. maximal 100 Wörter / 3-5 Sätze / eine halbe Seite]</span>
+Ton: <span class="placeholder">[z.B. sachlich-direkt / freundlich-verbindlich / formell]</span>
+Struktur: <span class="placeholder">[z.B. Stichpunkte / Fließtext / nummerierte Liste]</span>
+Vermeide: <span class="placeholder">[z.B. Floskeln, Passivkonstruktionen, "wir würden uns freuen"]</span>
+
+Orientiere dich an folgendem Beispiel für meinen Schreibstil:
+<span class="placeholder">[OPTIONAL: Fügen Sie hier 2-3 Sätze ein, die Sie tatsächlich so geschrieben haben]</span><button class="copy-btn" onclick="copyPrompt('prompt-stil')">Kopieren</button></div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CARD 6: FORTGESCHRITTEN -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div class="card" id="fortgeschritten">
-<h2><span class="card-number">7</span> Fortgeschritten — Mehr als Copy-Paste</h2>
+<h2><span class="card-number">6</span> Fortgeschritten — Mehr als Copy-Paste</h2>
 
 <div class="toggle-section">
   <div class="toggle-header" onclick="toggleSection(this)">
@@ -622,13 +630,50 @@ Formuliere aus diesen Elementen einen wiederverwendbaren Prompt, den ich künfti
 
     <h3>Beispiel: Unsere Reklamationsantwort prüfen</h3>
     <ol>
-      <li>Sie haben mit ChatGPT eine Reklamationsantwort geschrieben (Karte 3)</li>
+      <li>Sie haben mit ChatGPT eine Reklamationsantwort geschrieben (Karte 4)</li>
       <li>Geben Sie denselben Prompt auch an Claude oder DeepSeek</li>
       <li>Öffnen Sie ein drittes KI-Fenster im <strong>Prüfmodus</strong> und geben Sie beide Antworten ein</li>
       <li>Die Prüf-KI zeigt: Wo stimmen beide überein? Wo weichen sie ab? Was fehlt?</li>
     </ol>
     <p style="font-size:0.9rem; margin-top:0.3rem;"><strong>Übereinstimmung</strong> = solide Grundlage. <strong>Abweichung</strong> = genauer hinschauen. <strong>Beides fehlerhaft</strong> = Aufgabe war zu vage.</p>
     <p style="margin-top:0.5rem;">Mehr dazu: <a href="https://jako-odyc.github.io/prompt-dash/operator-card.html" target="_blank">Prüfmodus-Karte</a></p>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CARD 7: PROMPT-SPEICHERUNG -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card" id="speicherung">
+<h2><span class="card-number">7</span> Prompt-Speicherung — Wohin mit guten Prompts?</h2>
+<p>Sie haben einen Prompt gebaut, der funktioniert. Wo bleibt er?</p>
+
+<div class="method-grid">
+  <div class="method-num">1</div>
+  <div><strong>Lesezeichen auf diese Seite</strong> — Am einfachsten. Diese Seite ist Ihre Prompt-Bibliothek. Strg+D / Cmd+D.</div>
+  <div class="method-num">2</div>
+  <div><strong>Eigene Textdatei</strong> — Legen Sie eine Datei an: <code>Meine-Prompts.txt</code>. Kopieren Sie funktionierende Prompts dort hinein.</div>
+  <div class="method-num">3</div>
+  <div><strong>Custom Instructions in ChatGPT</strong> — Unter Einstellungen → "Benutzerdefinierte Anweisungen". Der Rollenprompt (Karte 2) passt perfekt hierhin.</div>
+</div>
+
+<div class="toggle-section">
+  <div class="toggle-header" onclick="toggleSection(this)">
+    Eigene Einträge sichern &amp; teilen <span class="arrow">&#9654;</span>
+  </div>
+  <div class="toggle-body">
+    <p>Ihre selbst erstellten Rollen und Szenarien (Karte 2 + 4) leben im Browser. Hier können Sie sie sichern oder mit Kollegen teilen.</p>
+
+    <div class="quick-btns" style="margin: 0.8rem 0;">
+      <button class="quick-btn" onclick="loadExampleData()" style="background:var(--green); color:white; border-color:var(--green);">Beispiel-Prompts laden</button>
+      <button class="quick-btn" onclick="downloadOfflineCopy()" style="background:var(--accent); color:white; border-color:var(--accent);">Offline-Kopie herunterladen</button>
+    </div>
+    <p style="font-size:0.82rem; color:var(--grey); margin-bottom:0.5rem;"><strong>Beispiel-Prompts laden</strong> = fertige Rollen und Szenarien aus dem Workshop als Startpaket. Bereits vorhandene Einträge werden nicht überschrieben.</p>
+    <p style="font-size:0.82rem; color:var(--grey); margin-bottom:0.5rem;"><strong>Offline-Kopie</strong> = diese Seite + Ihre Rollen/Szenarien in einer HTML-Datei. Funktioniert ohne Internet.</p>
+
+    <div class="info-box" style="margin-top:0.5rem;">
+      <strong>Tipp für Teams:</strong> Offline-Kopie herunterladen → auf ein gemeinsames Laufwerk legen → alle öffnen dieselbe Datei.
+    </div>
   </div>
 </div>
 </div>
@@ -685,7 +730,7 @@ Formuliere aus diesen Elementen einen wiederverwendbaren Prompt, den ich künfti
   <p><strong>Workshop:</strong> Prompt-Dash — Prompting im Büroalltag</p>
   <p><strong>Kontakt:</strong> Jaroslav Kois | jaroslav.kois@fls-da.de</p>
   <p><strong>Vertiefung:</strong> <a href="https://jako-odyc.github.io/prompt-dash/operator-card.html">Prüfmodus-Karte</a> — Multi-KI-Validierung</p>
-  <p><strong>Version:</strong> 1.1.0 | März 2026</p>
+  <p><strong>Version:</strong> 1.2.0 | März 2026</p>
   <div style="margin-top:1rem; text-align:center;">
     <p style="font-size:0.85rem; color:var(--grey); margin-bottom:0.5rem;">Auf dem Smartphone öffnen:</p>
     <img src="qr-code.svg" alt="QR-Code: Prompt-Dash öffnen" style="width:140px; height:140px;">
@@ -715,9 +760,32 @@ function copyPrompt(id) {
   });
 }
 
+/* ─── Storage-Wrapper (Fallback für file://) ─── */
+const _memStore = {};
+let _storageWarnShown = false;
+const store = {
+  get(key) {
+    try { const v = localStorage.getItem(key); return v; }
+    catch { return _memStore[key] || null; }
+  },
+  set(key, value) {
+    try { localStorage.setItem(key, value); }
+    catch {
+      _memStore[key] = value;
+      if (!_storageWarnShown) {
+        _storageWarnShown = true;
+        const bar = document.createElement('div');
+        bar.style.cssText = 'background:#fff3cd;color:#856404;padding:0.5rem 1rem;font-size:0.85rem;text-align:center;border-bottom:1px solid #ffc107;';
+        bar.innerHTML = '<strong>Hinweis:</strong> Ihr Browser kann auf file://-Seiten nicht dauerhaft speichern. Einträge bleiben nur bis zum Schließen erhalten. <br>Lösung: <a href="https://jako-odyc.github.io/prompt-dash/" style="color:#1e3a5f;font-weight:bold;">Online-Version nutzen</a> oder vor dem Schließen eine <strong>Offline-Kopie herunterladen</strong> (Karte 7).';
+        document.body.insertBefore(bar, document.body.firstChild);
+      }
+    }
+  }
+};
+
 /* ─── Mega-Prompt: Zeichenzähler + Kopieren + Profile ─── */
 const MEGA_KEY = 'workshop-mega-profiles';
-function getMegaProfiles() { try { return JSON.parse(localStorage.getItem(MEGA_KEY)) || []; } catch { return []; } }
+function getMegaProfiles() { try { return JSON.parse(store.get(MEGA_KEY)) || []; } catch { return []; } }
 
 function updateMegaCount() {
   const ta = document.getElementById('mega-prompt');
@@ -743,7 +811,7 @@ function saveMegaProfile() {
   const profiles = getMegaProfiles();
   const idx = profiles.findIndex(p => p.name === name);
   if (idx >= 0) { profiles[idx].prompt = prompt; } else { profiles.push({ name, prompt }); }
-  localStorage.setItem(MEGA_KEY, JSON.stringify(profiles));
+  store.set(MEGA_KEY, JSON.stringify(profiles));
   document.getElementById('mega-name').value = '';
   renderMegaProfiles();
 }
@@ -757,7 +825,7 @@ function loadMegaProfile(name) {
 }
 function deleteMegaProfile(name) {
   const profiles = getMegaProfiles().filter(p => p.name !== name);
-  localStorage.setItem(MEGA_KEY, JSON.stringify(profiles));
+  store.set(MEGA_KEY, JSON.stringify(profiles));
   renderMegaProfiles();
 }
 function renderMegaProfiles() {
@@ -773,6 +841,20 @@ function renderMegaProfiles() {
 
 /* ─── Schnellstart-Buttons (Rolle) ─── */
 const rolePresets = {
+  bergmann: {
+    rolle: 'Sachbearbeiterin Kundenservice',
+    branche: 'Spedition und Logistik',
+    abteilung: 'Auftragsabwicklung / Kundenservice',
+    aufgaben: 'Reklamationsbearbeitung, Kundenkorrespondenz, Sendungsverfolgung',
+    ton: 'direkt, persönlich, lösungsorientiert'
+  },
+  novak: {
+    rolle: 'Sachbearbeiter Auftragsabwicklung',
+    branche: 'Spedition und Logistik',
+    abteilung: 'Auftragsabwicklung',
+    aufgaben: 'Auftragsprüfung, Kundenrückfragen, Transportplanung',
+    ton: 'freundlich und direkt'
+  },
   disponent: {
     rolle: 'Disponent/in',
     branche: 'Spedition und Lagerlogistik',
@@ -815,6 +897,8 @@ function fillRole(preset) {
 
 /* ─── Szenarien-Dropdown (Presets) ─── */
 const scenarioPresets = {
+  ws1: { title: 'Workshop: Bergmann — Reklamationsantwort', prompt: 'Kundenreklamation: [FIRMA] meldet zu Sendung [NR]:\n- Lieferung 2 Tage verspätet\n- 1 Palette beschädigt angekommen\n\nStammkunde, gute Beziehung, sachlicher Ton in der Beschwerde.\nUnser Angebot: Ersatzlieferung oder Gutschrift — Kunde entscheidet.\n\nSchreib eine Antwortmail: persönlich, lösungsorientiert, max. 80 Wörter.\nKein Passiv. Keine inhaltsleeren Wendungen. Höflichkeitsformeln dürfen bleiben.\nMit Sendungsbezug.' },
+  ws2: { title: 'Workshop: Novak — Rückfrage Auftragsabwicklung', prompt: 'Situation: Ein Neukunde hat über das Online-Portal einen unvollständigen\nAuftrag eingereicht. Es fehlen: Wunsch-Abholtermin, Sendungsgewicht,\nAnsprechpartner am Empfangsort für die Lieferankündigung.\n\nAufgabe: Schreibe eine Rückfrage-E-Mail mit Betreffzeile. Bestätige den\nAuftragseingang, frage die fehlenden Angaben ab und setze eine Frist.\n\nVorgaben:\n- Maximal 5 Sätze (Aufzählungspunkte zählen einzeln)\n- Fehlende Angaben als nummerierte Liste\n- Keine inhaltsleeren Wendungen. Höflichkeitsformeln dürfen bleiben.\n- Frist als Platzhalter: [DATUM]' },
   s1: { title: 'Reklamationsantwort', prompt: 'Schreibe eine Antwort auf folgende Kundenreklamation:\n\nSachverhalt: [WAS IST PASSIERT? z.B. Lieferung 3 Tage verspätet, Ware teilweise beschädigt]\nKunde: [KUNDENTYP, z.B. Stammkunde / Neukunde / Großabnehmer]\nGewünschter Ton: [z.B. sachlich-lösungsorientiert / entschuldigend / verbindlich]\nLösung die angeboten wird: [z.B. Ersatzlieferung bis Freitag, 10% Gutschrift]\n\nFormat: Geschäftsbrief, maximal 150 Wörter.\nKeine Floskeln wie "Ihre Zufriedenheit liegt uns am Herzen".' },
   s2: { title: 'Angebotskorrespondenz', prompt: 'Erstelle ein Angebot / eine Angebotsantwort:\n\nLeistung: [WAS WIRD ANGEBOTEN? z.B. Lagerung von 200 Paletten, Kommissionierung, Versandabwicklung]\nKonditionen: [PREIS / LAUFZEIT / BESONDERHEITEN, z.B. 4,50 EUR/Palette/Monat, Mindestlaufzeit 6 Monate]\nEmpfänger: [WER BEKOMMT DAS? z.B. Einkaufsleiter eines mittelständischen Unternehmens]\nFrist: [BIS WANN GÜLTIG? z.B. 14 Tage]\n\nFormat: Geschäftsbrief. Klar strukturiert: Leistung, Konditionen, nächste Schritte.\nTon: professionell, verbindlich, nicht aufdringlich.' },
   s3: { title: 'Besprechungsprotokoll', prompt: 'Erstelle ein Besprechungsprotokoll aus folgenden Notizen:\n\nTeilnehmer: [WER WAR DABEI? z.B. Lagerleitung, Disposition, QM]\nDatum: [WANN?]\nThemen: [STICHPUNKTE, z.B. - Inventurdifferenzen Q1 besprechen - Neue Kommissionierstrategie - Azubi-Einsatzplan]\nBeschlüsse: [WAS WURDE ENTSCHIEDEN?]\nOffene Punkte: [WAS IST NOCH ZU KLÄREN?]\n\nFormat: Tabelle mit Spalten: Thema | Ergebnis | Verantwortlich | Frist.\nKurz und präzise. Kein Fließtext.' },
@@ -874,10 +958,10 @@ const ROLE_KEY = 'workshop-custom-roles';
 const SCENARIO_KEY = 'workshop-custom-scenarios';
 
 function getCustomRoles() {
-  try { return JSON.parse(localStorage.getItem(ROLE_KEY)) || []; } catch { return []; }
+  try { return JSON.parse(store.get(ROLE_KEY)) || []; } catch { return []; }
 }
 function getCustomScenarios() {
-  try { return JSON.parse(localStorage.getItem(SCENARIO_KEY)) || []; } catch { return []; }
+  try { return JSON.parse(store.get(SCENARIO_KEY)) || []; } catch { return []; }
 }
 
 function showRoleForm() { document.getElementById('role-form').classList.add('open'); document.getElementById('rf-name').focus(); }
@@ -896,7 +980,7 @@ function saveCustomRole() {
   };
   const roles = getCustomRoles();
   roles.push(role);
-  localStorage.setItem(ROLE_KEY, JSON.stringify(roles));
+  store.set(ROLE_KEY, JSON.stringify(roles));
   renderCustomRoles();
   hideRoleForm();
   ['rf-name','rf-rolle','rf-branche','rf-abteilung','rf-aufgaben','rf-ton'].forEach(id => document.getElementById(id).value = '');
@@ -906,7 +990,7 @@ function deleteCustomRole(i) {
   if (!confirm('Rolle "' + getCustomRoles()[i].name + '" löschen?')) return;
   const roles = getCustomRoles();
   roles.splice(i, 1);
-  localStorage.setItem(ROLE_KEY, JSON.stringify(roles));
+  store.set(ROLE_KEY, JSON.stringify(roles));
   renderCustomRoles();
 }
 
@@ -945,7 +1029,7 @@ function saveCustomScenario() {
   if (!title || !prompt) { (title ? document.getElementById('sf-prompt') : document.getElementById('sf-title')).focus(); return; }
   const scenarios = getCustomScenarios();
   scenarios.push({ title, prompt });
-  localStorage.setItem(SCENARIO_KEY, JSON.stringify(scenarios));
+  store.set(SCENARIO_KEY, JSON.stringify(scenarios));
   renderCustomScenarios();
   hideScenarioForm();
   document.getElementById('sf-title').value = '';
@@ -956,7 +1040,7 @@ function deleteCustomScenario(i) {
   if (!confirm('Szenario "' + getCustomScenarios()[i].title + '" löschen?')) return;
   const scenarios = getCustomScenarios();
   scenarios.splice(i, 1);
-  localStorage.setItem(SCENARIO_KEY, JSON.stringify(scenarios));
+  store.set(SCENARIO_KEY, JSON.stringify(scenarios));
   renderCustomScenarios();
 }
 
@@ -1034,8 +1118,8 @@ function downloadOfflineCopy() {
     // Offline-Datum im Footer
     const today = new Date().toLocaleDateString('de-DE');
     html = html.replace(
-      '1.1.0 | März 2026',
-      '1.1.0 | März 2026 | Offline-Kopie vom ' + today
+      '1.2.0 | März 2026',
+      '1.2.0 | März 2026 | Offline-Kopie vom ' + today
     );
     const blob = new Blob([html], { type: 'text/html; charset=utf-8' });
     const a = document.createElement('a');
@@ -1049,6 +1133,8 @@ function downloadOfflineCopy() {
 /* ─── Beispiel-Prompts laden ─── */
 function loadExampleData() {
   const exampleRoles = [
+    { name: 'Frau Bergmann', rolle: 'Sachbearbeiterin Kundenservice', branche: 'Spedition und Logistik', abteilung: 'Auftragsabwicklung / Kundenservice', aufgaben: 'Reklamationsbearbeitung, Kundenkorrespondenz, Sendungsverfolgung', ton: 'direkt, persönlich, lösungsorientiert' },
+    { name: 'Herr Novak', rolle: 'Sachbearbeiter Auftragsabwicklung', branche: 'Spedition und Logistik', abteilung: 'Auftragsabwicklung', aufgaben: 'Auftragsprüfung, Kundenrückfragen, Transportplanung', ton: 'freundlich und direkt' },
     { name: 'Speditionskaufmann', rolle: 'Speditionskaufmann/frau', branche: 'Spedition und Logistik', abteilung: 'Disposition / Kundenservice', aufgaben: 'Transportplanung, Kundenkorrespondenz, Reklamationsbearbeitung, Angebotserstellung', ton: 'professionell, klar, lösungsorientiert' },
     { name: 'Lagerlogistik', rolle: 'Fachkraft für Lagerlogistik', branche: 'Logistik', abteilung: 'Lager / Versand', aufgaben: 'Wareneingang, Kommissionierung, Bestandskontrolle, Versandvorbereitung', ton: 'präzise, sachlich' }
   ];
@@ -1068,11 +1154,11 @@ function loadExampleData() {
     if (!scenarios.some(e => e.title === s.title)) { scenarios.push(s); count++; }
   });
   if (count === 0) { alert('Alle Beispiele sind bereits vorhanden.'); return; }
-  localStorage.setItem(ROLE_KEY, JSON.stringify(roles));
-  localStorage.setItem(SCENARIO_KEY, JSON.stringify(scenarios));
+  store.set(ROLE_KEY, JSON.stringify(roles));
+  store.set(SCENARIO_KEY, JSON.stringify(scenarios));
   renderCustomRoles();
   renderCustomScenarios();
-  alert(count + ' Beispiel-Einträge geladen. Sie finden sie auf Karte 2 (Rollen) und Karte 3 (Szenarien).');
+  alert(count + ' Beispiel-Einträge geladen. Sie finden sie auf Karte 2 (Rollen) und Karte 4 (Szenarien).');
 }
 
 // Gespeicherte Einträge beim Laden rendern
