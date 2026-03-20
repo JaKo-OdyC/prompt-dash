@@ -94,13 +94,29 @@
   .method-grid { display: grid; grid-template-columns: auto 1fr; gap: 0.3rem 1rem; margin: 0.5rem 0; font-size: 0.9rem; }
   .method-num { background: var(--accent); color: white; width: 1.5rem; height: 1.5rem; border-radius: 50%; text-align: center; line-height: 1.5rem; font-size: 0.8rem; font-weight: bold; }
 
-  /* Tool-Modus: Workshop-Elemente ausblenden */
+  /* Tool-Modus: Radikal auf tägliche Nutzung ausgerichtet */
   body.tool-mode .workshop-intro { display: none; }
   body.tool-mode .subtitle { display: none; }
   body.tool-mode #situationen { display: none; }
+  body.tool-mode #werkstatt { display: none; }
+  body.tool-mode #datenschutz { display: none; }
+  body.tool-mode #speicherung { display: none; }
+  body.tool-mode #ki-profile { display: none; }
   body.tool-mode .compare { display: none; }
   body.tool-mode .custom-scenarios-area { display: none; }
   body.tool-mode .custom-roles-area { display: none; }
+  body.tool-mode .info-box { display: none; }
+  body.tool-mode .card > p { display: none; }
+  body.tool-mode .toggle-section { display: none; }
+  body.tool-mode .nav a[href="#werkstatt"],
+  body.tool-mode .nav a[href="#datenschutz"],
+  body.tool-mode .nav a[href="#speicherung"],
+  body.tool-mode .nav a[href="#ki-profile"] { display: none; }
+  /* Karte 6 (Prompt-Editor) nach oben via flexbox order */
+  body.tool-mode .container { display: flex; flex-direction: column; }
+  body.tool-mode .container > h1 { order: -3; }
+  body.tool-mode #fortgeschritten { order: -2; }
+  body.tool-mode #fortgeschritten .toggle-section { display: none; }
   .tool-btn { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.3); padding: 0.2rem 0.5rem; border-radius: 3px; cursor: pointer; font-size: 0.75rem; white-space: nowrap; }
   .tool-btn:hover { background: rgba(255,255,255,0.25); color: white; }
   body.tool-mode .tool-btn { background: var(--green); color: white; border-color: var(--green); }
@@ -188,7 +204,7 @@
   <a href="#datenschutz">Datenschutz</a>
   <a href="#szenarien">Szenarien</a>
   <a href="#logik">Stil</a>
-  <a href="#fortgeschritten">Fortgeschritten</a>
+  <a href="#fortgeschritten">Prompt-Editor</a>
   <a href="#speicherung">Speicherung</a>
   <a href="#ki-profile">KI-Profile</a>
   <button class="info-btn" onclick="document.getElementById('info-modal').classList.add('open')" title="Funktionsübersicht &amp; Hinweise">&#9432; Info</button>
@@ -356,7 +372,7 @@
 
 <select class="preset-dropdown" id="role-dropdown" onchange="fillRole(this.value)">
   <option value="">— Rolle wählen —</option>
-  <optgroup label="Workshop-Situationen">
+  <optgroup label="Workshop-Situationen" data-workshop>
     <option value="bergmann">Frau Bergmann (Reklamation)</option>
     <option value="novak">Herr Novak (Rückfrage)</option>
   </optgroup>
@@ -389,7 +405,7 @@
   <label>Tonalität:</label>
   <input type="text" id="rf-ton" placeholder="z.B. direkt und kollegial">
   <div class="custom-form-btns">
-    <button class="save-btn" onclick="saveCustomRole()">Speichern</button>
+    <button class="save-btn" onclick="saveCustomRole()">Im Browser merken</button>
     <button onclick="hideRoleForm()">Abbrechen</button>
   </div>
 </div>
@@ -486,7 +502,7 @@ Antworte in meinem Stil — nicht im KI-Stil.<button class="copy-btn" onclick="c
 
 <select class="preset-dropdown" id="scenario-dropdown" onchange="showPresetScenario(this.value)">
   <option value="">— Szenario wählen —</option>
-  <optgroup label="Workshop-Situationen">
+  <optgroup label="Workshop-Situationen" data-workshop>
     <option value="ws1">Workshop: Bergmann — Reklamationsantwort</option>
     <option value="ws2">Workshop: Novak — Rückfrage Auftragsabwicklung</option>
   </optgroup>
@@ -512,7 +528,7 @@ Antworte in meinem Stil — nicht im KI-Stil.<button class="copy-btn" onclick="c
   <label>Prompt-Vorlage:</label>
   <textarea id="sf-prompt" placeholder="Schreibe hier deinen Prompt...&#10;&#10;Tipp: Nutze [PLATZHALTER] für variable Teile."></textarea>
   <div class="custom-form-btns">
-    <button class="save-btn" onclick="saveCustomScenario()">Speichern</button>
+    <button class="save-btn" onclick="saveCustomScenario()">Im Browser merken</button>
     <button onclick="hideScenarioForm()">Abbrechen</button>
   </div>
 </div>
@@ -556,28 +572,12 @@ Orientiere dich an folgendem Beispiel für meinen Schreibstil:
 <!-- CARD 6: FORTGESCHRITTEN -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div class="card" id="fortgeschritten">
-<h2><span class="card-number">6</span> Fortgeschritten — Mehr als Copy-Paste</h2>
+<h2><span class="card-number">6</span> Prompt-Editor</h2>
+<p>Freies Textfeld für beliebige Prompts. Im Browser merken, laden, anpassen, kopieren.</p>
 
-<div class="toggle-section">
-  <div class="toggle-header" onclick="toggleSection(this)">
-    4-Lösungen-Systematik — für komplexe Aufgaben <span class="arrow">&#9654;</span>
-  </div>
-  <div class="toggle-body">
-    <p>Für wichtige Texte können Sie vier Qualitätsmechanismen kombinieren:</p>
+<div id="mega-profiles" style="margin-bottom:0.5rem;"></div>
 
-    <h3>1. Best-Practice mitgeben</h3>
-    <p>Zeigen Sie der KI ein Beispiel, das funktioniert hat. "Orientiere dich an diesem Format: ..."</p>
-
-    <h3>2. Rückfragen zulassen</h3>
-    <p>"Bevor du antwortest: Stelle mir maximal 3 Rückfragen, wenn etwas unklar ist."</p>
-
-    <h3>3. Selbstvalidierung</h3>
-    <p>"Prüfe selbst vor der Ausgabe, ob Thema, Zielgruppe, Format und Vollständigkeit stimmen."</p>
-
-    <h3>4. Simulation</h3>
-    <p>"Simuliere typische Missverständnisse: Wo könnte der Empfänger etwas falsch verstehen?"</p>
-
-    <textarea id="mega-prompt" oninput="updateMegaCount()" style="width:100%; min-height:280px; padding:0.8rem; border:1px solid var(--blue-border); border-radius:6px; font-family:'Consolas','Courier New',monospace; font-size:0.88rem; line-height:1.5; resize:vertical; color:var(--accent); background:var(--blue-light);">Du bist [ROLLE] in der [BRANCHE].
+<textarea id="mega-prompt" oninput="updateMegaCount()" placeholder="Prompt hier schreiben oder einfügen..." style="width:100%; min-height:220px; padding:0.8rem; border:1px solid var(--blue-border); border-radius:6px; font-family:'Consolas','Courier New',monospace; font-size:0.88rem; line-height:1.5; resize:vertical; color:var(--accent); background:var(--blue-light);">Du bist [ROLLE] in der [BRANCHE].
 
 Erstelle [AUFGABE, z.B. eine Antwort auf folgende Kundenreklamation].
 
@@ -593,19 +593,32 @@ Falls Fehler: Überarbeite.
 
 LÖSUNG 4: Nach der Ausgabe:
 Simuliere typische Missverständnisse und gib Hinweise.</textarea>
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.4rem;">
-      <span id="mega-count" style="font-size:0.82rem;">0 / 4.000 Zeichen</span>
-      <button class="copy-btn" onclick="copyMegaPrompt()" style="position:static;">Kopieren</button>
-    </div>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.4rem;">
+  <span id="mega-count" style="font-size:0.82rem;">0 / 4.000 Zeichen</span>
+  <button class="copy-btn" onclick="copyMegaPrompt()" style="position:static;">Kopieren</button>
+</div>
 
-    <div style="display:flex; gap:0.5rem; margin-top:0.6rem; align-items:center;">
-      <input id="mega-name" type="text" placeholder="Name für diesen Prompt (z.B. Reklamation komplex)" style="flex:1; padding:0.4rem; border:1px solid #ccc; border-radius:4px; font-size:0.88rem; font-family:inherit;">
-      <button class="save-btn" onclick="saveMegaProfile()" style="padding:0.35rem 0.8rem; border-radius:4px; font-size:0.85rem; cursor:pointer;">Speichern</button>
-    </div>
+<div style="display:flex; gap:0.5rem; margin-top:0.6rem; align-items:center;">
+  <input id="mega-name" type="text" placeholder="Name für diesen Prompt (z.B. Reklamation komplex)" style="flex:1; padding:0.4rem; border:1px solid #ccc; border-radius:4px; font-size:0.88rem; font-family:inherit;">
+  <button class="save-btn" onclick="saveMegaProfile()" style="padding:0.35rem 0.8rem; border-radius:4px; font-size:0.85rem; cursor:pointer;">Im Browser merken</button>
+</div>
 
-    <div id="mega-profiles" style="margin-top:0.5rem;"></div>
+<div class="info-box"><strong>Hinweis:</strong> Gespeicherte Prompts bleiben nur in diesem Browser auf diesem Gerät. Für dauerhafte Sicherung: Offline-Kopie herunterladen (Karte 7).</div>
 
-    <div class="info-box"><strong>Hinweis:</strong> Überschreiben Sie die Platzhalter direkt mit Ihrem Text. Speichern Sie verschiedene Prompts unter eigenen Namen — sie bleiben im Browser erhalten.</div>
+<div class="toggle-section" style="margin-top: 0.5rem;">
+  <div class="toggle-header" onclick="toggleSection(this)">
+    4-Lösungen-Systematik — Vorlage für komplexe Aufgaben <span class="arrow">&#9654;</span>
+  </div>
+  <div class="toggle-body">
+    <p>Für wichtige Texte können Sie vier Qualitätsmechanismen kombinieren:</p>
+    <h3>1. Best-Practice mitgeben</h3>
+    <p>Zeigen Sie der KI ein Beispiel, das funktioniert hat. "Orientiere dich an diesem Format: ..."</p>
+    <h3>2. Rückfragen zulassen</h3>
+    <p>"Bevor du antwortest: Stelle mir maximal 3 Rückfragen, wenn etwas unklar ist."</p>
+    <h3>3. Selbstvalidierung</h3>
+    <p>"Prüfe selbst vor der Ausgabe, ob Thema, Zielgruppe, Format und Vollständigkeit stimmen."</p>
+    <h3>4. Simulation</h3>
+    <p>"Simuliere typische Missverständnisse: Wo könnte der Empfänger etwas falsch verstehen?"</p>
   </div>
 </div>
 
@@ -683,11 +696,9 @@ Formuliere aus diesen Elementen einen wiederverwendbaren Prompt, den ich künfti
     <p>Ihre selbst erstellten Rollen und Szenarien (Karte 2 + 4) leben im Browser. Hier können Sie sie sichern oder mit Kollegen teilen.</p>
 
     <div class="quick-btns" style="margin: 0.8rem 0;">
-      <button class="quick-btn" onclick="loadExampleData()" style="background:var(--green); color:white; border-color:var(--green);">Beispiel-Prompts laden</button>
       <button class="quick-btn" onclick="downloadOfflineCopy()" style="background:var(--accent); color:white; border-color:var(--accent);">Offline-Kopie herunterladen</button>
     </div>
-    <p style="font-size:0.82rem; color:var(--grey); margin-bottom:0.5rem;"><strong>Beispiel-Prompts laden</strong> = fertige Rollen und Szenarien aus dem Workshop als Startpaket. Bereits vorhandene Einträge werden nicht überschrieben.</p>
-    <p style="font-size:0.82rem; color:var(--grey); margin-bottom:0.5rem;"><strong>Offline-Kopie</strong> = diese Seite + Ihre Rollen/Szenarien in einer HTML-Datei. Funktioniert ohne Internet.</p>
+    <p style="font-size:0.82rem; color:var(--grey); margin-bottom:0.5rem;"><strong>Offline-Kopie</strong> = diese Seite + Ihre gespeicherten Prompts in einer HTML-Datei. Funktioniert ohne Internet.</p>
 
     <div class="info-box" style="margin-top:0.5rem;">
       <strong>Tipp für Teams:</strong> Offline-Kopie herunterladen → auf ein gemeinsames Laufwerk legen → alle öffnen dieselbe Datei.
@@ -973,13 +984,26 @@ function toggleAccordion(header) {
 /* ─── Tool-Modus ─── */
 function toggleToolMode() {
   document.body.classList.toggle('tool-mode');
-  const btn = document.querySelector('.tool-btn');
   const active = document.body.classList.contains('tool-mode');
-  btn.innerHTML = active ? '&#9881; Workshop' : '&#9881; Tool-Modus';
+  document.querySelector('.tool-btn').innerHTML = active ? '&#9881; Workshop' : '&#9881; Tool-Modus';
+  // Workshop-Optgroups per JS togglen (CSS display:none wirkt nicht auf optgroup)
+  document.querySelectorAll('optgroup[data-workshop]').forEach(og => {
+    if (active) {
+      og.querySelectorAll('option').forEach(o => o.style.display = 'none');
+      og.style.display = 'none';
+    } else {
+      og.querySelectorAll('option').forEach(o => o.style.display = '');
+      og.style.display = '';
+    }
+  });
 }
 if (new URLSearchParams(window.location.search).get('tool') === '1') {
   document.body.classList.add('tool-mode');
   document.querySelector('.tool-btn').innerHTML = '&#9881; Workshop';
+  document.querySelectorAll('optgroup[data-workshop]').forEach(og => {
+    og.querySelectorAll('option').forEach(o => o.style.display = 'none');
+    og.style.display = 'none';
+  });
 }
 
 /* ─── Toggle-Sektionen ─── */
