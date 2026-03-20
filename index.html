@@ -94,9 +94,13 @@
   .method-grid { display: grid; grid-template-columns: auto 1fr; gap: 0.3rem 1rem; margin: 0.5rem 0; font-size: 0.9rem; }
   .method-num { background: var(--accent); color: white; width: 1.5rem; height: 1.5rem; border-radius: 50%; text-align: center; line-height: 1.5rem; font-size: 0.8rem; font-weight: bold; }
 
-  /* Tool-Modus: Workshop-Einführung ausblenden */
+  /* Tool-Modus: Workshop-Elemente ausblenden */
   body.tool-mode .workshop-intro { display: none; }
   body.tool-mode .subtitle { display: none; }
+  body.tool-mode #situationen { display: none; }
+  body.tool-mode .compare { display: none; }
+  body.tool-mode .custom-scenarios-area { display: none; }
+  body.tool-mode .custom-roles-area { display: none; }
   .tool-btn { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.3); padding: 0.2rem 0.5rem; border-radius: 3px; cursor: pointer; font-size: 0.75rem; white-space: nowrap; }
   .tool-btn:hover { background: rgba(255,255,255,0.25); color: white; }
   body.tool-mode .tool-btn { background: var(--green); color: white; border-color: var(--green); }
@@ -178,7 +182,7 @@
 <nav class="nav">
   <span class="nav-title">Prompt-Dash</span>
   <a href="#problem" class="workshop-intro">Problem</a>
-  <a href="#situationen">Situationen</a>
+  <a href="#situationen" class="workshop-intro">Situationen</a>
   <a href="#rolle">Rolle</a>
   <a href="#datenschutz">Datenschutz</a>
   <a href="#szenarien">Szenarien</a>
