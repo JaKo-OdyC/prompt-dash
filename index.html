@@ -182,6 +182,7 @@
 <nav class="nav">
   <span class="nav-title">Prompt-Dash</span>
   <a href="#problem" class="workshop-intro">Problem</a>
+  <a href="#werkstatt">Werkstatt</a>
   <a href="#situationen" class="workshop-intro">Situationen</a>
   <a href="#rolle">Rolle</a>
   <a href="#datenschutz">Datenschutz</a>
@@ -243,7 +244,7 @@
       <li>Drucken: Alle Akkordeons werden automatisch aufgeklappt, Buttons ausgeblendet</li>
     </ul>
 
-    <p style="margin-top:1rem; font-size:0.85rem; color:var(--grey)">Prompt-Dash v1.1 | Prompting im Büroalltag</p>
+    <p style="margin-top:1rem; font-size:0.85rem; color:var(--grey)">Prompt-Dash v1.3 | Prompting im Büroalltag</p>
   </div>
 </div>
 
@@ -286,6 +287,19 @@
 </div>
 
 <div class="quote">Die KI ist nicht schlecht — sie hat nur zu wenig von Ihnen bekommen.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- PROMPT-WERKSTATT -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card" id="werkstatt">
+<h2>&#9998; Prompt-Werkstatt</h2>
+<p style="font-size:0.9rem; color:var(--grey); margin-bottom:0.5rem;">Schreiben Sie hier Ihren Prompt — frei, ohne Vorlage. Kopieren und direkt in die KI einfügen.</p>
+<textarea id="werkstatt-prompt" oninput="updateWerkstattCount()" placeholder="Ihren Prompt hier schreiben oder einfügen..." style="width:100%; min-height:180px; padding:0.8rem; border:1px solid var(--blue-border); border-radius:6px; font-family:'Consolas','Courier New',monospace; font-size:0.88rem; line-height:1.5; resize:vertical; color:var(--accent); background:var(--blue-light);"></textarea>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.4rem;">
+  <span id="werkstatt-count" style="font-size:0.82rem; color:var(--green);">0 Zeichen</span>
+  <button class="copy-btn" onclick="copyWerkstatt()" style="position:static;">Kopieren</button>
+</div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -786,6 +800,25 @@ const store = {
     }
   }
 };
+
+/* ─── Prompt-Werkstatt ─── */
+function updateWerkstattCount() {
+  const ta = document.getElementById('werkstatt-prompt');
+  const counter = document.getElementById('werkstatt-count');
+  const len = ta.value.length;
+  counter.textContent = len.toLocaleString('de-DE') + ' Zeichen';
+  counter.style.color = len > 4000 ? 'var(--red)' : len > 3000 ? '#b8860b' : 'var(--green)';
+}
+function copyWerkstatt() {
+  const ta = document.getElementById('werkstatt-prompt');
+  if (!ta.value.trim()) { ta.focus(); return; }
+  navigator.clipboard.writeText(ta.value.trim()).then(() => {
+    const btn = event.target;
+    btn.textContent = 'Kopiert!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Kopieren'; btn.classList.remove('copied'); }, 2000);
+  });
+}
 
 /* ─── Mega-Prompt: Zeichenzähler + Kopieren + Profile ─── */
 const MEGA_KEY = 'workshop-mega-profiles';
