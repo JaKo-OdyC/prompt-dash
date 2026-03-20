@@ -102,19 +102,19 @@
   body.tool-mode #speicherung { display: none; }
   body.tool-mode #ki-profile { display: none; }
   body.tool-mode .compare { display: none; }
-  body.tool-mode .custom-scenarios-area { display: none; }
-  body.tool-mode .custom-roles-area { display: none; }
   body.tool-mode .info-box { display: none; }
   body.tool-mode .card > p { display: none; }
   body.tool-mode .toggle-section { display: none; }
   body.tool-mode .nav a[href="#datenschutz"],
   body.tool-mode .nav a[href="#speicherung"],
   body.tool-mode .nav a[href="#ki-profile"] { display: none; }
-  /* Karte 6 (Prompt-Editor) nach oben via flexbox order */
+  /* Karte 6 (Prompt-Editor): vollständig zeigen, nach oben */
   body.tool-mode .container { display: flex; flex-direction: column; }
   body.tool-mode .container > h1 { order: -3; }
   body.tool-mode #fortgeschritten { order: -2; }
-  body.tool-mode #fortgeschritten .toggle-section { display: none; }
+  body.tool-mode #fortgeschritten > p { display: block; }
+  body.tool-mode #fortgeschritten .toggle-section { display: block; }
+  body.tool-mode #fortgeschritten .info-box { display: block; }
   .tool-btn { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.3); padding: 0.2rem 0.5rem; border-radius: 3px; cursor: pointer; font-size: 0.75rem; white-space: nowrap; }
   .tool-btn:hover { background: rgba(255,255,255,0.25); color: white; }
   body.tool-mode .tool-btn { background: var(--green); color: white; border-color: var(--green); }
@@ -373,7 +373,7 @@
     <option value="bergmann">Frau Bergmann (Reklamation)</option>
     <option value="novak">Herr Novak (Rückfrage)</option>
   </optgroup>
-  <optgroup label="Weitere Rollen">
+  <optgroup label="Weitere Rollen" data-further="Weitere Rollen">
     <option value="disponent">Disponent/in</option>
     <option value="lagerleiter">Lagerleiter/in</option>
     <option value="ausbilder">Ausbilder/in</option>
@@ -503,7 +503,7 @@ Antworte in meinem Stil — nicht im KI-Stil.<button class="copy-btn" onclick="c
     <option value="ws1">Workshop: Bergmann — Reklamationsantwort</option>
     <option value="ws2">Workshop: Novak — Rückfrage Auftragsabwicklung</option>
   </optgroup>
-  <optgroup label="Weitere Szenarien">
+  <optgroup label="Weitere Szenarien" data-further="Weitere Szenarien">
     <option value="s1">Reklamationsantwort (allgemein)</option>
     <option value="s2">Angebotskorrespondenz</option>
     <option value="s3">Besprechungsprotokoll</option>
@@ -598,9 +598,10 @@ Simuliere typische Missverständnisse und gib Hinweise.</textarea>
 <div style="display:flex; gap:0.5rem; margin-top:0.6rem; align-items:center;">
   <input id="mega-name" type="text" placeholder="Name für diesen Prompt (z.B. Reklamation komplex)" style="flex:1; padding:0.4rem; border:1px solid #ccc; border-radius:4px; font-size:0.88rem; font-family:inherit;">
   <button class="save-btn" onclick="saveMegaProfile()" style="padding:0.35rem 0.8rem; border-radius:4px; font-size:0.85rem; cursor:pointer;">Im Browser merken</button>
+  <button onclick="downloadOfflineCopy()" style="padding:0.35rem 0.8rem; border-radius:4px; font-size:0.85rem; cursor:pointer; background:var(--accent); color:white; border:1px solid var(--accent);">&#11015; Offline-Kopie</button>
 </div>
 
-<div class="info-box"><strong>Hinweis:</strong> Gespeicherte Prompts bleiben nur in diesem Browser auf diesem Gerät. Für dauerhafte Sicherung: Offline-Kopie herunterladen (Karte 7).</div>
+<div class="info-box"><strong>Hinweis:</strong> „Im Browser merken" speichert nur in diesem Browser. „Offline-Kopie" sichert alles als HTML-Datei auf Ihrem Rechner.</div>
 
 <div class="toggle-section" style="margin-top: 0.5rem;">
   <div class="toggle-header" onclick="toggleSection(this)">
@@ -993,6 +994,10 @@ function toggleToolMode() {
       og.style.display = '';
     }
   });
+  // "Weitere Rollen/Szenarien" Labels im Tool-Modus entfernen
+  document.querySelectorAll('optgroup[data-further]').forEach(og => {
+    og.label = active ? '' : og.dataset.further;
+  });
 }
 if (new URLSearchParams(window.location.search).get('tool') === '1') {
   document.body.classList.add('tool-mode');
@@ -1001,6 +1006,7 @@ if (new URLSearchParams(window.location.search).get('tool') === '1') {
     og.querySelectorAll('option').forEach(o => o.style.display = 'none');
     og.style.display = 'none';
   });
+  document.querySelectorAll('optgroup[data-further]').forEach(og => { og.label = ''; });
 }
 
 /* ─── Toggle-Sektionen ─── */
