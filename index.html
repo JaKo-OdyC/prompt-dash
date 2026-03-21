@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <!--
   SYNC-HINWEIS: Diese Datei existiert in zwei Repos.
-  - Entwicklung: odyc-monorepo/docs/prompt-dash.html  (dort aendern!)
-  - GitHub Pages: prompt-dash/index.html               (dieses Repo, jako-odyc.github.io/prompt-dash/)
+  - Entwicklung: odyc-monorepo/docs/prompt-dash.html  (dieses Repo)
+  - GitHub Pages: prompt-dash/index.html               (jako-odyc.github.io/prompt-dash/)
   Nach Aenderungen BEIDE Kopien committen und pushen.
 -->
 <html lang="de">
@@ -1092,21 +1092,47 @@ function toggleAccordion(header) {
 }
 
 /* ─── Tool-Modus ─── */
+var _removedOptgroups = [];
 function applyToolModeDropdowns(active) {
-  document.querySelectorAll('optgroup[data-workshop]').forEach(og => {
-    if (active) {
-      // Komplett entfernen statt verstecken (verhindert Lücke)
-      og.dataset.removedHtml = og.innerHTML;
-      og.innerHTML = '';
-      og.style.display = 'none';
-    } else {
-      if (og.dataset.removedHtml) { og.innerHTML = og.dataset.removedHtml; delete og.dataset.removedHtml; }
-      og.style.display = '';
-    }
-  });
-  document.querySelectorAll('optgroup[data-further]').forEach(og => {
-    og.label = active ? '' : og.dataset.further;
-  });
+  if (active) {
+    // Workshop-Optgroups komplett aus dem DOM entfernen (verhindert Lücke)
+    document.querySelectorAll('optgroup[data-workshop]').forEach(og => {
+      _removedOptgroups.push({ el: og, parent: og.parentNode, next: og.nextSibling });
+      og.parentNode.removeChild(og);
+    });
+    // "Vorlagen"-Label entfernen — Optionen bleiben direkt im Select
+    document.querySelectorAll('optgroup[data-further]').forEach(og => {
+      og.label = '';
+      // Optionen aus Optgroup direkt in Select verschieben
+      var parent = og.parentNode;
+      while (og.firstChild) { parent.insertBefore(og.firstChild, og); }
+      _removedOptgroups.push({ el: og, parent: parent, next: og.nextSibling });
+      parent.removeChild(og);
+    });
+  } else {
+    // Alles wiederherstellen
+    _removedOptgroups.reverse().forEach(function(item) {
+      // Optionen zurück in Vorlagen-Optgroup sammeln
+      if (item.el.dataset.further) {
+        item.el.label = item.el.dataset.further;
+      }
+      if (item.next && item.next.parentNode === item.parent) {
+        item.parent.insertBefore(item.el, item.next);
+      } else {
+        item.parent.appendChild(item.el);
+      }
+      // Für Vorlagen: nachfolgende lose Options einsammeln
+      if (item.el.dataset.further) {
+        var node = item.el.nextSibling;
+        while (node && node.nodeName === 'OPTION') {
+          var next = node.nextSibling;
+          item.el.appendChild(node);
+          node = next;
+        }
+      }
+    });
+    _removedOptgroups = [];
+  }
 }
 function toggleToolMode() {
   document.body.classList.toggle('tool-mode');
