@@ -590,6 +590,29 @@ Vermeide: <span class="placeholder">[z.B. Floskeln, Passivkonstruktionen, "wir w
 
 Orientiere dich an folgendem Beispiel für meinen Schreibstil:
 <span class="placeholder">[OPTIONAL: Fügen Sie hier 2-3 Sätze ein, die Sie tatsächlich so geschrieben haben]</span><button class="copy-btn" onclick="copyPrompt('prompt-stil')">Kopieren</button></div>
+
+<!-- DIN 5008 Toggle -->
+<div class="toggle-section" style="margin-top:1rem;">
+  <div class="toggle-header" onclick="toggleSection(this)">
+    DIN 5008 — Formvorgaben für Brief oder E-Mail <span class="arrow">&#9654;</span>
+  </div>
+  <div class="toggle-body">
+    <p style="font-size:0.9rem; margin-bottom:0.6rem;">Wählen Sie den Dokumenttyp. Der Prompt-Zusatz enthält die passenden DIN-5008-Regeln — kopieren Sie ihn in <strong>Karte 6</strong> und löschen Sie dort Zeilen, die Sie nicht brauchen.</p>
+
+    <div style="display:flex; gap:0.8rem; margin-bottom:0.8rem;">
+      <button class="quick-btn" id="din-btn-brief" onclick="dinSelect('brief')">Brief</button>
+      <button class="quick-btn" id="din-btn-mail" onclick="dinSelect('mail')">E-Mail</button>
+    </div>
+
+    <div class="prompt-box" id="din-prompt" style="display:none;"><button class="copy-btn" onclick="copyPrompt('din-prompt')">Kopieren</button></div>
+
+    <div class="info-box" style="margin-top:0.5rem;">
+      <strong>Was der Filter kann:</strong> Betreff, Anrede, Datum, Zahlenformate, Grußformel, Signatur — alles was die KI im Text umsetzen kann.<br>
+      <strong>Was er nicht kann:</strong> Seitenränder, Briefkopf-Layout, Schriftgröße — das ist Aufgabe Ihrer Word-/Outlook-Vorlage.
+    </div>
+  </div>
+</div>
+
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -1155,6 +1178,57 @@ function toggleSection(header) {
   const isOpen = body.classList.contains('open');
   header.querySelector('.arrow').style.transform = isOpen ? '' : 'rotate(90deg)';
   body.classList.toggle('open');
+}
+
+/* ─── DIN 5008 ─── */
+var _dinBasis = [
+  'Beachte folgende Schreibregeln nach DIN 5008:2020:',
+  '',
+  '- Datum: TT.MM.JJJJ (z.B. 22.03.2026), Jahreszahl immer vierstellig',
+  '- Uhrzeiten: HH:MM Uhr (z.B. 15:45 Uhr)',
+  '- Telefonnummern: Vorwahl und Rufnummer mit Leerzeichen (z.B. 06151 123456)',
+  '- IBAN: in Vierergruppen von links (z.B. DE89 3704 0044 0532 0130 00)',
+  '- Geldbeträge: einheitlich mit Tausenderpunkt und Dezimalkomma (z.B. 1.250,00 EUR)',
+  '- Postfach: zweistellig von rechts gliedern (z.B. Postfach 12 34 56)',
+  '- Abkürzungen mit geschütztem Leerzeichen (z. B., u. a., Prof. Dr.)',
+  '- Zahlen mit Einheiten: Leerzeichen dazwischen (10 km, 250 g, 3 %)',
+  '- Hervorhebungen durch Fettschrift — Unterstreichungen nur für Links',
+  '- Absätze durch je eine Leerzeile trennen'
+];
+var _dinBrief = [
+  '',
+  'Zusätzlich für den Geschäftsbrief:',
+  '',
+  '- Betreff: ohne das Wort „Betreff", fett, kein Punkt am Ende, eine Leerzeile zum Fließtext',
+  '- Anrede: z.B. „Sehr geehrte Frau [NAME]," — nach der Anrede Komma, kein Ausrufezeichen',
+  '- Kein Einzug am Absatzanfang',
+  '- Eine Leerzeile zwischen Brieftext und Grußformel',
+  '- Grußformel: ohne Satzzeichen danach, mehrere Leerzeilen Abstand vor dem gedruckten Namen',
+  '- Steuernummer / USt-IdNr.: falls vorhanden, im Fußbereich'
+];
+var _dinMail = [
+  '',
+  'Zusätzlich für die E-Mail:',
+  '',
+  '- Betreffzeile: präzise und aussagekräftig, kein „AW:" wenn es keine Antwort ist',
+  '- Anrede: z.B. „Sehr geehrte Frau [NAME]," — nach der Anrede Komma, kein Ausrufezeichen',
+  '- Fließtext einzeilig, keine Silbentrennung am Zeilenende',
+  '- Grußformel: ohne Satzzeichen, z.B. „Mit freundlichen Grüßen"',
+  '- Signatur: Name, Anschrift, Telefon, E-Mail-Adresse',
+  '- Geschäftlich zusätzlich: Unternehmensname, Rechtsform, Sitz, Registergericht, HRB-Nr., Geschäftsführer'
+];
+function dinSelect(typ) {
+  var btnBrief = document.getElementById('din-btn-brief');
+  var btnMail = document.getElementById('din-btn-mail');
+  var box = document.getElementById('din-prompt');
+  btnBrief.classList.toggle('active', typ === 'brief');
+  btnMail.classList.toggle('active', typ === 'mail');
+  var lines = _dinBasis.concat(typ === 'brief' ? _dinBrief : _dinMail);
+  // Text setzen — Kopieren-Button bleibt erhalten
+  var btn = box.querySelector('.copy-btn');
+  box.textContent = lines.join('\n');
+  box.appendChild(btn);
+  box.style.display = '';
 }
 
 /* ─── Eigene Rollen (localStorage) ─── */
