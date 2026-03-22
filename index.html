@@ -268,7 +268,7 @@
       <li>Drucken: Alle Akkordeons werden automatisch aufgeklappt, Buttons ausgeblendet</li>
     </ul>
 
-    <p style="margin-top:1rem; font-size:0.85rem; color:var(--grey)">Prompt-Dash v1.5 | Prompting im Büroalltag</p>
+    <p style="margin-top:1rem; font-size:0.85rem; color:var(--grey)">Prompt-Dash v1.7.0 | Prompting im Büroalltag</p>
   </div>
 </div>
 
@@ -852,7 +852,7 @@ Formuliere aus diesen Elementen einen wiederverwendbaren Prompt, den ich künfti
   <p><strong>Kontakt:</strong> Jaroslav Kois | jaroslav.kois@fls-da.de</p>
   <p><strong>Dokumentation:</strong> <a href="WORKSHOP-DOKUMENTATION.pdf" target="_blank">Workshop-Dokumentation</a> — Nachschlagewerk mit allen Tabellen und Beispielen</p>
   <p><strong>Vertiefung:</strong> <a href="https://jako-odyc.github.io/prompt-dash/operator-card.html">Prüfmodus-Karte</a> — Multi-KI-Validierung</p>
-  <p><strong>Version:</strong> 1.6.0 | März 2026</p>
+  <p><strong>Version:</strong> 1.7.0 | März 2026</p>
 
   <div style="margin-top:1.5rem; display:flex; gap:1.5rem; align-items:flex-start; flex-wrap:wrap;">
     <!-- QR-Code inline (kein externer Datei-Verweis) -->
@@ -1539,8 +1539,8 @@ function downloadOfflineCopy() {
     // Offline-Datum im Footer
     const today = new Date().toLocaleDateString('de-DE');
     html = html.replace(
-      '1.6.0 | M\u00E4rz 2026',
-      '1.6.0 | M\u00E4rz 2026 | Offline-Kopie vom ' + today
+      '1.7.0 | M\u00E4rz 2026',
+      '1.7.0 | M\u00E4rz 2026 | Offline-Kopie vom ' + today
     );
     const blob = new Blob([html], { type: 'text/html; charset=utf-8' });
     const a = document.createElement('a');
