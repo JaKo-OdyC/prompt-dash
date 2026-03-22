@@ -599,18 +599,31 @@ Orientiere dich an folgendem Beispiel für meinen Schreibstil:
     DIN 5008 — Formvorgaben für Brief oder E-Mail <span class="arrow">&#9654;</span>
   </div>
   <div class="toggle-body">
-    <p style="font-size:0.9rem; margin-bottom:0.6rem;">Wählen Sie den Dokumenttyp. Der Prompt-Zusatz enthält die passenden DIN-5008-Regeln — kopieren Sie ihn in <strong>Karte 6</strong> und löschen Sie dort Zeilen, die Sie nicht brauchen.</p>
+    <p style="font-size:0.9rem; margin-bottom:0.6rem;">Wählen Sie Dokumenttyp und Formalitätsstufe. Der Prompt-Zusatz enthält DIN-5008-Regeln mit passender Anrede und Grußformel — kopieren Sie ihn in <strong>Karte 6</strong> und löschen Sie dort Zeilen, die Sie nicht brauchen.</p>
 
+    <p style="font-size:0.85rem; font-weight:600; margin-bottom:0.3rem;">1. Dokumenttyp:</p>
     <div style="display:flex; gap:0.8rem; margin-bottom:0.8rem;">
       <button class="quick-btn" id="din-btn-brief" onclick="dinSelect('brief')">Brief</button>
       <button class="quick-btn" id="din-btn-mail" onclick="dinSelect('mail')">E-Mail</button>
+    </div>
+
+    <div id="din-stufe-area" style="display:none;">
+      <p style="font-size:0.85rem; font-weight:600; margin-bottom:0.3rem;">2. Formalitätsstufe:</p>
+      <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.8rem;">
+        <button class="quick-btn" id="din-stufe-1" onclick="dinStufe(1)">Sehr förmlich</button>
+        <button class="quick-btn" id="din-stufe-2" onclick="dinStufe(2)">Sachlich-freundlich</button>
+        <button class="quick-btn" id="din-stufe-3" onclick="dinStufe(3)">Freundlich</button>
+        <button class="quick-btn" id="din-stufe-4" onclick="dinStufe(4)">Vertraut</button>
+        <button class="quick-btn" id="din-stufe-5" onclick="dinStufe(5)">Kollegial-direkt</button>
+      </div>
     </div>
 
     <div class="prompt-box" id="din-prompt" style="display:none;"><button class="copy-btn" onclick="copyPrompt('din-prompt')">Kopieren</button></div>
 
     <div class="info-box" style="margin-top:0.5rem;">
       <strong>Was der Filter kann:</strong> Betreff, Anrede, Datum, Zahlenformate, Grußformel, Signatur — alles was die KI im Text umsetzen kann.<br>
-      <strong>Was er nicht kann:</strong> Seitenränder, Briefkopf-Layout, Schriftgröße — das ist Aufgabe Ihrer Word-/Outlook-Vorlage.
+      <strong>Was er nicht kann:</strong> Seitenränder, Briefkopf-Layout, Schriftgröße — das ist Aufgabe Ihrer Word-/Outlook-Vorlage.<br>
+      <strong>Mehr Varianten?</strong> Eine vollständige Liste mit Anreden, Grußformeln, Tonalitäten und Kombinationsbeispielen finden Sie in der <strong>Workshop-Dokumentation</strong> (Kapitel „Tonalitäten und Schreibstile").
     </div>
   </div>
 </div>
@@ -1202,7 +1215,6 @@ var _dinBrief = [
   'Zusätzlich für den Geschäftsbrief:',
   '',
   '- Betreff: ohne das Wort „Betreff", fett, kein Punkt am Ende, eine Leerzeile zum Fließtext',
-  '- Anrede: z.B. „Sehr geehrte Frau [NAME]," — nach der Anrede Komma, kein Ausrufezeichen',
   '- Kein Einzug am Absatzanfang',
   '- Eine Leerzeile zwischen Brieftext und Grußformel',
   '- Grußformel: ohne Satzzeichen danach, mehrere Leerzeilen Abstand vor dem gedruckten Namen',
@@ -1213,20 +1225,41 @@ var _dinMail = [
   'Zusätzlich für die E-Mail:',
   '',
   '- Betreffzeile: präzise und aussagekräftig, kein „AW:" wenn es keine Antwort ist',
-  '- Anrede: z.B. „Sehr geehrte Frau [NAME]," — nach der Anrede Komma, kein Ausrufezeichen',
   '- Fließtext einzeilig, keine Silbentrennung am Zeilenende',
-  '- Grußformel: ohne Satzzeichen, z.B. „Mit freundlichen Grüßen"',
   '- Signatur: Name, Anschrift, Telefon, E-Mail-Adresse',
   '- Geschäftlich zusätzlich: Unternehmensname, Rechtsform, Sitz, Registergericht, HRB-Nr., Geschäftsführer'
 ];
+var _dinStufen = {
+  1: { label: 'Sehr förmlich', anrede: '„Sehr geehrte Frau/Herr [NAME],"', gruss: '„Mit freundlichen Grüßen"', ton: 'formell und sachlich' },
+  2: { label: 'Sachlich-freundlich', anrede: '„Guten Tag, Frau/Herr [NAME],"', gruss: '„Freundliche Grüße"', ton: 'sachlich-freundlich' },
+  3: { label: 'Freundlich', anrede: '„Hallo Frau/Herr [NAME],"', gruss: '„Beste Grüße"', ton: 'freundlich-professionell' },
+  4: { label: 'Vertraut', anrede: '„Liebe Frau/Lieber Herr [NAME],"', gruss: '„Herzliche Grüße"', ton: 'persönlich und warm' },
+  5: { label: 'Kollegial-direkt', anrede: '„Hallo [VORNAME],"', gruss: '„Viele Grüße"', ton: 'locker und direkt' }
+};
+var _dinTyp = null;
 function dinSelect(typ) {
-  var btnBrief = document.getElementById('din-btn-brief');
-  var btnMail = document.getElementById('din-btn-mail');
+  _dinTyp = typ;
+  document.getElementById('din-btn-brief').classList.toggle('active', typ === 'brief');
+  document.getElementById('din-btn-mail').classList.toggle('active', typ === 'mail');
+  document.getElementById('din-stufe-area').style.display = '';
+  // Stufe zurücksetzen
+  for (var i = 1; i <= 5; i++) document.getElementById('din-stufe-' + i).classList.remove('active');
+  document.getElementById('din-prompt').style.display = 'none';
+}
+function dinStufe(n) {
+  for (var i = 1; i <= 5; i++) document.getElementById('din-stufe-' + i).classList.toggle('active', i === n);
+  var s = _dinStufen[n];
+  var typLines = _dinTyp === 'brief' ? _dinBrief : _dinMail;
+  var anredeGruss = [
+    '',
+    'Anrede und Grußformel (Stufe ' + n + ': ' + s.label + '):',
+    '',
+    '- Anrede: ' + s.anrede + ' — nach der Anrede Komma, kein Ausrufezeichen',
+    '- Grußformel: ' + s.gruss + ' — ohne Satzzeichen danach',
+    '- Ton: ' + s.ton
+  ];
+  var lines = _dinBasis.concat(typLines).concat(anredeGruss);
   var box = document.getElementById('din-prompt');
-  btnBrief.classList.toggle('active', typ === 'brief');
-  btnMail.classList.toggle('active', typ === 'mail');
-  var lines = _dinBasis.concat(typ === 'brief' ? _dinBrief : _dinMail);
-  // Text setzen — Kopieren-Button bleibt erhalten
   var btn = box.querySelector('.copy-btn');
   box.textContent = lines.join('\n');
   box.appendChild(btn);
