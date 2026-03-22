@@ -111,6 +111,8 @@
   body.tool-mode .info-box { display: none; }
   body.tool-mode .card > p { display: none; }
   body.tool-mode .toggle-section { display: none; }
+  body.tool-mode #din5008-toggle { display: block; }
+  body.tool-mode #din5008-toggle .info-box { display: block; }
   body.tool-mode .nav a[href="#datenschutz"],
   body.tool-mode .nav a[href="#speicherung"],
   body.tool-mode .nav a[href="#ki-profile"] { display: none; }
@@ -592,7 +594,7 @@ Orientiere dich an folgendem Beispiel für meinen Schreibstil:
 <span class="placeholder">[OPTIONAL: Fügen Sie hier 2-3 Sätze ein, die Sie tatsächlich so geschrieben haben]</span><button class="copy-btn" onclick="copyPrompt('prompt-stil')">Kopieren</button></div>
 
 <!-- DIN 5008 Toggle -->
-<div class="toggle-section" style="margin-top:1rem;">
+<div class="toggle-section" id="din5008-toggle" style="margin-top:1rem;">
   <div class="toggle-header" onclick="toggleSection(this)">
     DIN 5008 — Formvorgaben für Brief oder E-Mail <span class="arrow">&#9654;</span>
   </div>
