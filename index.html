@@ -645,6 +645,8 @@ Orientiere dich an folgendem Beispiel für meinen Schreibstil:
 <h2><span class="card-number">6</span> Prompt-Editor</h2>
 <p>Freies Textfeld für beliebige Prompts. Im Browser merken, laden, anpassen, kopieren.</p>
 
+<button class="quick-btn" id="btn-zusammenstellen" onclick="buildCombinedPrompt()" style="width:100%; padding:0.6rem; font-size:0.95rem; font-weight:600; margin-bottom:0.6rem; background:var(--accent); color:white; border-color:var(--accent);">&#9889; Aus Karten zusammenstellen (Rolle + Stil + DIN)</button>
+
 <div id="mega-profiles" style="margin-bottom:0.5rem;"></div>
 
 <textarea id="mega-prompt" oninput="updateMegaCount()" placeholder="Prompt hier schreiben oder einfügen..." style="width:100%; min-height:220px; padding:0.8rem; border:1px solid var(--blue-border); border-radius:6px; font-family:'Consolas','Courier New',monospace; font-size:0.88rem; line-height:1.5; resize:vertical; color:var(--accent); background:var(--blue-light);">Du bist [ROLLE] in der [BRANCHE].
@@ -664,7 +666,7 @@ Falls Fehler: Überarbeite.
 LÖSUNG 4: Nach der Ausgabe:
 Simuliere typische Missverständnisse und gib Hinweise.</textarea>
 <div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.4rem;">
-  <span id="mega-count" style="font-size:0.82rem;">0 / 4.000 Zeichen</span>
+  <span style="display:flex; align-items:center; gap:0.6rem;"><span id="mega-count" style="font-size:0.82rem;">0 / 4.000 Zeichen</span><button onclick="clearMegaPrompt()" style="background:none; border:none; color:var(--red); cursor:pointer; font-size:0.82rem; padding:0; text-decoration:underline;" title="Textfeld leeren">Leeren</button></span>
   <button class="copy-btn" onclick="copyMegaPrompt()" style="position:static;">Kopieren</button>
 </div>
 
@@ -995,6 +997,48 @@ function copyWerkstatt() {
 }
 
 /* ─── Mega-Prompt: Zeichenzähler + Kopieren + Profile ─── */
+/* ─── Prompt zusammenstellen ─── */
+function buildCombinedPrompt() {
+  var parts = [];
+  // Rolle (Karte 2)
+  var rolleBox = document.getElementById('prompt-rolle');
+  var rolleText = rolleBox.textContent.replace('Kopieren', '').trim();
+  var hasPlaceholder = /\[IHRE ROLLE/.test(rolleText);
+  if (!hasPlaceholder && rolleText) { parts.push('--- ROLLE ---\n' + rolleText); }
+  // Stil (Karte 5)
+  var stilBox = document.getElementById('prompt-stil');
+  var stilText = stilBox.textContent.replace('Kopieren', '').trim();
+  if (stilText) { parts.push('--- STIL ---\n' + stilText); }
+  // DIN 5008 (falls generiert)
+  var dinBox = document.getElementById('din-prompt');
+  if (dinBox && dinBox.style.display !== 'none') {
+    var dinText = dinBox.textContent.replace('Kopieren', '').trim();
+    if (dinText) { parts.push('--- FORMATIERUNG (DIN 5008) ---\n' + dinText); }
+  }
+  if (!parts.length) {
+    parts.push('Tipp: Füllen Sie zuerst Karte 2 (Rolle) und Karte 5 (Stil) aus, dann stellt dieser Button alles zusammen.');
+  }
+  var ta = document.getElementById('mega-prompt');
+  ta.value = parts.join('\n\n');
+  updateMegaCount();
+  ta.focus();
+  ta.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/* ─── Sofort-Szenarien (Komplett-Prompts) ─── */
+var _sofortSzenarien = [
+  { name: '▹ Reklamationsantwort',
+    prompt: 'Du bist Sachbearbeiter/in im Kundenservice eines mittelständischen Unternehmens.\n\nSchreibe eine Antwort auf folgende Kundenreklamation:\n[REKLAMATION HIER EINFÜGEN]\n\nAnforderungen:\n- Sachlich-freundlicher Ton\n- Entschuldigung ohne Schuldzuweisung\n- Konkrete Lösung oder nächsten Schritt benennen\n- Maximal 150 Wörter\n- Anrede: "Guten Tag, [NAME],"\n- Grußformel: "Freundliche Grüße"' },
+  { name: '▹ Meeting-Protokoll',
+    prompt: 'Du bist Protokollführer/in in einem Unternehmen.\n\nErstelle aus folgenden Notizen ein strukturiertes Besprechungsprotokoll:\n[NOTIZEN HIER EINFÜGEN]\n\nFormat:\n- Kopf: Datum, Teilnehmer, Thema\n- Nummerierte Tagesordnungspunkte\n- Pro Punkt: Ergebnis/Beschluss + Verantwortlich + Termin\n- Offene Punkte am Ende\n- Sachlich-knapper Stil, keine Prosa' },
+  { name: '▹ Angebots-E-Mail',
+    prompt: 'Du bist im Vertrieb/Auftragsmanagement.\n\nSchreibe eine E-Mail mit einem Angebot an:\n[EMPFÄNGER UND KONTEXT HIER EINFÜGEN]\n\nInhalt des Angebots:\n[LEISTUNG/PRODUKT, PREIS, KONDITIONEN]\n\nAnforderungen:\n- Professionell-freundlicher Ton\n- Klare Gliederung: Bezug → Angebot → Konditionen → nächster Schritt\n- Maximal 200 Wörter\n- Gültigkeit und Ansprechpartner nennen' },
+  { name: '▹ Terminverschiebung',
+    prompt: 'Du bist Bürokraft/Assistenz.\n\nSchreibe eine höfliche E-Mail zur Verschiebung eines Termins:\n\nUrsprünglicher Termin: [DATUM, UHRZEIT]\nNeuer Terminvorschlag: [DATUM, UHRZEIT]\nGrund (kurz): [GRUND ODER WEGLASSEN]\nEmpfänger: [NAME/ANREDE]\n\nAnforderungen:\n- Kurz und verbindlich (max. 80 Wörter)\n- Entschuldigung für die Umstände\n- Alternativtermin vorschlagen\n- Um Bestätigung bitten' },
+  { name: '▹ Text zusammenfassen',
+    prompt: 'Fasse den folgenden Text zusammen:\n[TEXT HIER EINFÜGEN]\n\nAnforderungen:\n- Maximal 5 Stichpunkte\n- Nur Kernaussagen, keine Wiederholungen\n- Fachbegriffe beibehalten\n- Sachlicher Stil\n- Am Ende: eine Zeile "Fazit:" mit dem wichtigsten Punkt' }
+];
+
 const MEGA_KEY = 'workshop-mega-profiles';
 function getMegaProfiles() { try { return JSON.parse(store.get(MEGA_KEY)) || []; } catch { return []; } }
 
@@ -1010,6 +1054,11 @@ function copyMegaPrompt() {
   const btn = ta.parentElement.querySelector('.copy-btn') || event.target;
   clipCopy(ta.value.trim()).then(function() { showCopied(btn); });
 }
+function clearMegaPrompt() {
+  document.getElementById('mega-prompt').value = '';
+  document.getElementById('mega-name').value = '';
+  updateMegaCount();
+}
 function saveMegaProfile() {
   const name = document.getElementById('mega-name').value.trim();
   const prompt = document.getElementById('mega-prompt').value.trim();
@@ -1017,7 +1066,7 @@ function saveMegaProfile() {
   if (!prompt) { document.getElementById('mega-prompt').focus(); return; }
   const profiles = getMegaProfiles();
   const idx = profiles.findIndex(p => p.name === name);
-  if (idx >= 0) { profiles[idx].prompt = prompt; } else { profiles.push({ name, prompt }); }
+  if (idx >= 0) { profiles[idx].prompt = prompt; } else { profiles.unshift({ name, prompt }); }
   store.set(MEGA_KEY, JSON.stringify(profiles));
   document.getElementById('mega-name').value = '';
   renderMegaProfiles();
@@ -1036,14 +1085,33 @@ function deleteMegaProfile(name) {
   renderMegaProfiles();
 }
 function renderMegaProfiles() {
-  const container = document.getElementById('mega-profiles');
-  const profiles = getMegaProfiles();
-  if (!profiles.length) { container.innerHTML = ''; return; }
-  container.innerHTML = '<p style="font-size:0.85rem; font-weight:600; margin-bottom:0.3rem;">Gespeicherte Prompts:</p>' +
-    profiles.map(p => '<div style="display:flex; justify-content:space-between; align-items:center; padding:0.35rem 0.6rem; margin:0.2rem 0; background:var(--blue-light); border:1px solid var(--blue-border); border-radius:4px; cursor:pointer;" onclick="loadMegaProfile(\'' + p.name.replace(/'/g, "\\'") + '\')">' +
-      '<span style="font-size:0.88rem;">' + p.name + ' <span style="color:var(--grey); font-size:0.78rem;">(' + p.prompt.length + ' Zeichen)</span></span>' +
-      '<button onclick="event.stopPropagation(); deleteMegaProfile(\'' + p.name.replace(/'/g, "\\'") + '\')" style="background:none; border:none; color:var(--red); cursor:pointer; font-size:1rem; padding:0 0.3rem;" title="Löschen">&times;</button>' +
-    '</div>').join('');
+  var container = document.getElementById('mega-profiles');
+  var profiles = getMegaProfiles();
+  var html = '';
+  // Eigene Prompts (neueste zuerst)
+  if (profiles.length) {
+    html += '<p style="font-size:0.85rem; font-weight:600; margin-bottom:0.3rem;">Eigene Prompts:</p>';
+    html += profiles.map(function(p) {
+      var esc = p.name.replace(/'/g, "\\'");
+      return '<div style="display:flex; justify-content:space-between; align-items:center; padding:0.35rem 0.6rem; margin:0.2rem 0; background:var(--blue-light); border:1px solid var(--blue-border); border-radius:4px; cursor:pointer;" onclick="loadMegaProfile(\'' + esc + '\')">' +
+        '<span style="font-size:0.88rem;">' + p.name + ' <span style="color:var(--grey); font-size:0.78rem;">(' + p.prompt.length + ' Zeichen)</span></span>' +
+        '<button onclick="event.stopPropagation(); deleteMegaProfile(\'' + esc + '\')" style="background:none; border:none; color:var(--red); cursor:pointer; font-size:1rem; padding:0 0.3rem;" title="Löschen">&times;</button></div>';
+    }).join('');
+  }
+  // Sofort-Szenarien
+  html += '<p style="font-size:0.85rem; font-weight:600; margin:0.6rem 0 0.3rem; color:var(--grey);">Sofort-Szenarien (Komplett-Prompts):</p>';
+  html += _sofortSzenarien.map(function(s, i) {
+    return '<div style="display:flex; align-items:center; padding:0.35rem 0.6rem; margin:0.2rem 0; background:#f0f4f0; border:1px solid #c8d8c8; border-radius:4px; cursor:pointer;" onclick="loadSofortSzenario(' + i + ')">' +
+      '<span style="font-size:0.88rem;">' + s.name + '</span></div>';
+  }).join('');
+  container.innerHTML = html;
+}
+function loadSofortSzenario(idx) {
+  var s = _sofortSzenarien[idx];
+  if (!s) return;
+  document.getElementById('mega-prompt').value = s.prompt;
+  document.getElementById('mega-name').value = '';
+  updateMegaCount();
 }
 
 /* ─── Schnellstart-Buttons (Rolle) ─── */
