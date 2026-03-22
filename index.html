@@ -656,8 +656,6 @@ Orientiere dich an folgendem Beispiel für meinen Schreibstil:
   <button class="quick-btn" id="btn-zusammenstellen" onclick="buildCombinedPrompt()" style="width:100%; padding:0.5rem; font-size:0.92rem; font-weight:600; background:var(--accent); color:white; border-color:var(--accent);">Zusammenstellen</button>
 </div>
 
-<div id="mega-profiles" style="margin-bottom:0.5rem;"></div>
-
 <textarea id="mega-prompt" oninput="updateMegaCount()" placeholder="Prompt hier schreiben oder einfügen..." style="width:100%; min-height:220px; padding:0.8rem; border:1px solid var(--blue-border); border-radius:6px; font-family:'Consolas','Courier New',monospace; font-size:0.88rem; line-height:1.5; resize:vertical; color:var(--accent); background:var(--blue-light);">Du bist [ROLLE] in der [BRANCHE].
 
 Erstelle [AUFGABE, z.B. eine Antwort auf folgende Kundenreklamation].
@@ -684,6 +682,8 @@ Simuliere typische Missverständnisse und gib Hinweise.</textarea>
   <button class="save-btn" onclick="saveMegaProfile()" style="padding:0.35rem 0.8rem; border-radius:4px; font-size:0.85rem; cursor:pointer;">Im Browser merken</button>
   <button onclick="downloadOfflineCopy()" style="padding:0.35rem 0.8rem; border-radius:4px; font-size:0.85rem; cursor:pointer; background:var(--accent); color:white; border:1px solid var(--accent);">&#11015; Offline-Kopie</button>
 </div>
+
+<div id="mega-profiles" style="margin-top:0.6rem;"></div>
 
 <div class="info-box"><strong>Hinweis:</strong> „Im Browser merken" speichert nur in diesem Browser. „Offline-Kopie" sichert alles als HTML-Datei auf Ihrem Rechner.</div>
 
@@ -1136,14 +1136,17 @@ function renderMegaProfiles() {
       var esc = p.name.replace(/'/g, "\\'");
       return '<div style="display:flex; justify-content:space-between; align-items:center; padding:0.35rem 0.6rem; margin:0.2rem 0; background:var(--blue-light); border:1px solid var(--blue-border); border-radius:4px; cursor:pointer;" onclick="loadMegaProfile(\'' + esc + '\')">' +
         '<span style="font-size:0.88rem;">' + p.name + ' <span style="color:var(--grey); font-size:0.78rem;">(' + p.prompt.length + ' Zeichen)</span></span>' +
-        '<button onclick="event.stopPropagation(); deleteMegaProfile(\'' + esc + '\')" style="background:none; border:none; color:var(--red); cursor:pointer; font-size:1rem; padding:0 0.3rem;" title="Löschen">&times;</button></div>';
+        '<span style="display:flex; align-items:center; gap:0.3rem;">' +
+        '<span style="font-size:0.78rem; color:var(--accent);">laden</span>' +
+        '<button onclick="event.stopPropagation(); deleteMegaProfile(\'' + esc + '\')" style="background:none; border:none; color:var(--red); cursor:pointer; font-size:1rem; padding:0 0.3rem;" title="Löschen">&times;</button></span></div>';
     }).join('');
   }
   // Sofort-Szenarien
   html += '<p style="font-size:0.85rem; font-weight:600; margin:0.6rem 0 0.3rem; color:var(--grey);">Sofort-Szenarien (Komplett-Prompts):</p>';
   html += _sofortSzenarien.map(function(s, i) {
-    return '<div style="display:flex; align-items:center; padding:0.35rem 0.6rem; margin:0.2rem 0; background:#f0f4f0; border:1px solid #c8d8c8; border-radius:4px; cursor:pointer;" onclick="loadSofortSzenario(' + i + ')">' +
-      '<span style="font-size:0.88rem;">' + s.name + '</span></div>';
+    return '<div style="display:flex; justify-content:space-between; align-items:center; padding:0.35rem 0.6rem; margin:0.2rem 0; background:#f0f4f0; border:1px solid #c8d8c8; border-radius:4px; cursor:pointer;" onclick="loadSofortSzenario(' + i + ')">' +
+      '<span style="font-size:0.88rem;">' + s.name + '</span>' +
+      '<span style="font-size:0.78rem; color:var(--accent);">laden</span></div>';
   }).join('');
   container.innerHTML = html;
 }
@@ -1560,10 +1563,30 @@ function showRoleManager() {
   mgr.innerHTML = roles.map((r, i) =>
     '<div style="display:flex; justify-content:space-between; align-items:center; padding:0.3rem 0.5rem; margin:0.2rem 0; background:#f8d7da; border:1px solid #e0b0b0; border-radius:4px; font-size:0.85rem;">' +
     '<span>' + escapeHtml(r.name) + '</span>' +
+    '<span style="display:flex; align-items:center; gap:0.3rem;">' +
+    '<button onclick="editCustomRole(' + i + ');" style="background:none; border:none; color:var(--accent); cursor:pointer; font-size:0.82rem; text-decoration:underline;">bearbeiten</button>' +
     '<button onclick="deleteCustomRole(' + i + '); showRoleManager();" style="background:none; border:none; color:var(--red); cursor:pointer; font-size:1rem;">&times;</button>' +
-    '</div>'
+    '</span></div>'
   ).join('');
   if (!roles.length) mgr.innerHTML = '<p style="font-size:0.85rem; color:var(--grey);">Keine gespeicherten Rollen.</p>';
+}
+function editCustomRole(i) {
+  var roles = getCustomRoles();
+  var r = roles[i];
+  if (!r) return;
+  document.getElementById('rf-name').value = r.name || '';
+  document.getElementById('rf-rolle').value = r.rolle || '';
+  document.getElementById('rf-branche').value = r.branche || '';
+  document.getElementById('rf-abteilung').value = r.abteilung || '';
+  document.getElementById('rf-aufgaben').value = r.aufgaben || '';
+  document.getElementById('rf-ton').value = r.ton || '';
+  document.getElementById('role-form').classList.add('open');
+  roles.splice(i, 1);
+  store.set(ROLE_KEY, JSON.stringify(roles));
+  renderCustomRoles();
+  updateManagerButtons();
+  document.getElementById('role-manager').style.display = 'none';
+  document.getElementById('rf-rolle').focus();
 }
 function showScenarioManager() {
   const mgr = document.getElementById('scenario-manager');
@@ -1572,11 +1595,28 @@ function showScenarioManager() {
   mgr.style.display = 'block';
   mgr.innerHTML = scenarios.map((s, i) =>
     '<div style="display:flex; justify-content:space-between; align-items:center; padding:0.3rem 0.5rem; margin:0.2rem 0; background:#f8d7da; border:1px solid #e0b0b0; border-radius:4px; font-size:0.85rem;">' +
-    '<span>' + escapeHtml(s.title) + '</span>' +
+    '<span>' + escapeHtml(s.title) + ' <span style="color:var(--grey); font-size:0.78rem;">(' + s.prompt.length + ' Zeichen)</span></span>' +
+    '<span style="display:flex; align-items:center; gap:0.3rem;">' +
+    '<button onclick="editCustomScenario(' + i + ');" style="background:none; border:none; color:var(--accent); cursor:pointer; font-size:0.82rem; text-decoration:underline;">bearbeiten</button>' +
     '<button onclick="deleteCustomScenario(' + i + '); showScenarioManager();" style="background:none; border:none; color:var(--red); cursor:pointer; font-size:1rem;">&times;</button>' +
-    '</div>'
+    '</span></div>'
   ).join('');
   if (!scenarios.length) mgr.innerHTML = '<p style="font-size:0.85rem; color:var(--grey);">Keine gespeicherten Szenarien.</p>';
+}
+function editCustomScenario(i) {
+  var scenarios = getCustomScenarios();
+  var s = scenarios[i];
+  if (!s) return;
+  document.getElementById('sf-title').value = s.title;
+  document.getElementById('sf-prompt').value = s.prompt;
+  document.getElementById('scenario-form').classList.add('open');
+  // Altes Szenario entfernen, wird beim Speichern neu angelegt
+  scenarios.splice(i, 1);
+  store.set(SCENARIO_KEY, JSON.stringify(scenarios));
+  renderCustomScenarios();
+  updateManagerButtons();
+  document.getElementById('scenario-manager').style.display = 'none';
+  document.getElementById('sf-prompt').focus();
 }
 
 // Verwalten-Buttons nur anzeigen wenn Einträge existieren
