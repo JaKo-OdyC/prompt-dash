@@ -287,6 +287,7 @@
   <a href="https://edupad.ch/p/RRexBTwtiU" target="_blank" class="quick-btn" style="text-decoration:none; background:var(--accent); color:white; border-color:var(--accent); font-size:0.95rem; padding:0.5rem 1.2rem;">EDUPAD öffnen &#8599;</a>
 </div>
 <p style="font-size:0.85rem; color:var(--grey); margin-top:0.3rem;">Link: <a href="https://edupad.ch/p/RRexBTwtiU" target="_blank" style="color:var(--accent);">edupad.ch/p/RRexBTwtiU</a></p>
+<p style="font-size:0.9rem; margin-top:0.6rem;">&#9658; <strong>Workshop-Dokumentation:</strong> Alle Inhalte, Tabellen und Nachschlagewerke zum Nachlesen — <a href="WORKSHOP-DOKUMENTATION.pdf" target="_blank" style="color:var(--accent); font-weight:600;">Dokumentation öffnen &#8599;</a></p>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -534,7 +535,6 @@ Antworte in meinem Stil — nicht im KI-Stil.<button class="copy-btn" onclick="c
     <option value="s2">Angebotskorrespondenz</option>
     <option value="s3">Besprechungsprotokoll</option>
     <option value="s4">Meetingvorbereitung</option>
-    <option value="s5">Sicherheitsunterweisung</option>
   </optgroup>
 </select>
 
@@ -827,9 +827,19 @@ Formuliere aus diesen Elementen einen wiederverwendbaren Prompt, den ich künfti
     </ul>
     <p style="font-size:0.85rem; color:var(--grey)">Ideal für: Formeln, Checklisten, Analysen</p>
   </div>
+  <div class="ki-card">
+    <h4>Perplexity <span class="badge badge-green">Recherche</span></h4>
+    <p><em>Der quellengestützte Rechercheur</em></p>
+    <ul>
+      <li>Sucht live im Internet</li>
+      <li>Nennt und verlinkt Quellen</li>
+      <li>Antwortet mit Belegen</li>
+    </ul>
+    <p style="font-size:0.85rem; color:var(--grey)">Ideal für: Faktencheck, Marktrecherche, aktuelle Informationen</p>
+  </div>
 </div>
 
-<div class="info-box"><strong>Empfehlung zum Einstieg:</strong> Starten Sie mit <strong>ChatGPT</strong> für den Alltag (Mails, Protokolle). Wenn ein Text wichtig ist: Lassen Sie <strong>Claude</strong> gegenlesen. Für Checklisten und technische Fragen: Probieren Sie <strong>DeepSeek</strong> (kostenlos).</div>
+<div class="info-box"><strong>Empfehlung zum Einstieg:</strong> Starten Sie mit <strong>ChatGPT</strong> für den Alltag (Mails, Protokolle). Wenn ein Text wichtig ist: Lassen Sie <strong>Claude</strong> gegenlesen. Für Checklisten und technische Fragen: Probieren Sie <strong>DeepSeek</strong> (kostenlos). Für Recherche mit Quellenangaben: <strong>Perplexity</strong>.</div>
 
 <div class="quote">KIs unterscheiden sich weniger im Wissen als im Umgang mit Wissen. Nutzen Sie das.</div>
 </div>
@@ -840,6 +850,7 @@ Formuliere aus diesen Elementen einen wiederverwendbaren Prompt, den ich künfti
 <div class="ref">
   <p><strong>Workshop:</strong> Prompt-Dash — Prompting im Büroalltag</p>
   <p><strong>Kontakt:</strong> Jaroslav Kois | jaroslav.kois@fls-da.de</p>
+  <p><strong>Dokumentation:</strong> <a href="WORKSHOP-DOKUMENTATION.pdf" target="_blank">Workshop-Dokumentation</a> — Nachschlagewerk mit allen Tabellen und Beispielen</p>
   <p><strong>Vertiefung:</strong> <a href="https://jako-odyc.github.io/prompt-dash/operator-card.html">Prüfmodus-Karte</a> — Multi-KI-Validierung</p>
   <p><strong>Version:</strong> 1.6.0 | März 2026</p>
 
@@ -1208,7 +1219,6 @@ const scenarioPresets = {
   s2: { title: 'Angebotskorrespondenz', prompt: 'Erstelle ein Angebot / eine Angebotsantwort:\n\nLeistung: [WAS WIRD ANGEBOTEN? z.B. Lagerung von 200 Paletten, Kommissionierung, Versandabwicklung]\nKonditionen: [PREIS / LAUFZEIT / BESONDERHEITEN, z.B. 4,50 EUR/Palette/Monat, Mindestlaufzeit 6 Monate]\nEmpfänger: [WER BEKOMMT DAS? z.B. Einkaufsleiter eines mittelständischen Unternehmens]\nFrist: [BIS WANN GÜLTIG? z.B. 14 Tage]\n\nFormat: Geschäftsbrief. Klar strukturiert: Leistung, Konditionen, nächste Schritte.\nTon: professionell, verbindlich, nicht aufdringlich.' },
   s3: { title: 'Besprechungsprotokoll', prompt: 'Erstelle ein Besprechungsprotokoll aus folgenden Notizen:\n\nTeilnehmer: [WER WAR DABEI? z.B. Lagerleitung, Disposition, QM]\nDatum: [WANN?]\nThemen: [STICHPUNKTE, z.B. - Inventurdifferenzen Q1 besprechen - Neue Kommissionierstrategie - Azubi-Einsatzplan]\nBeschlüsse: [WAS WURDE ENTSCHIEDEN?]\nOffene Punkte: [WAS IST NOCH ZU KLÄREN?]\n\nFormat: Tabelle mit Spalten: Thema | Ergebnis | Verantwortlich | Frist.\nKurz und präzise. Kein Fließtext.' },
   s4: { title: 'Meetingvorbereitung', prompt: 'Bereite folgendes Meeting vor:\n\nZiel des Meetings: [WAS SOLL ERREICHT WERDEN? z.B. Entscheidung über neues WMS-System]\nTeilnehmer: [WER KOMMT? z.B. Geschäftsführung, IT, Lagerleitung, Betriebsrat]\nZeitrahmen: [WIE LANGE? z.B. 60 Minuten]\nVorgeschichte: [KONTEXT, z.B. Zwei Anbieter wurden bereits vorgestellt, Testphase läuft]\n\nErstelle:\n1. Agenda mit Zeitblöcken\n2. Je Agendapunkt: 2-3 Leitfragen\n3. Liste: Was muss VOR dem Meeting vorbereitet werden?' },
-  s5: { title: 'Sicherheitsunterweisung', prompt: 'Erstelle eine Sicherheitsunterweisung:\n\nThema: [z.B. Staplerfahren - Rückwärtsfahren / Gefahrstoffe im Lager / PSA-Pflicht]\nZielgruppe: [z.B. Lagermitarbeiter, 1. Lehrjahr, Sprachniveau A2-B1]\nDauer: [z.B. 15 Minuten]\n\nFormat:\n- Sicherheitshinweise: 3-4 Stichpunkte\n- Arbeitsschritte: nummeriert, max. 15 Wörter pro Schritt, aktive Sprache\n- Kontrolle: Checkliste mit 5-7 Punkten (Ja/Nein)\n\nEinfache Sprache. Keine Fachwörter ohne Erklärung.' }
 };
 
 function showPresetScenario(key) {
