@@ -645,7 +645,16 @@ Orientiere dich an folgendem Beispiel für meinen Schreibstil:
 <h2><span class="card-number">6</span> Prompt-Editor</h2>
 <p>Freies Textfeld für beliebige Prompts. Im Browser merken, laden, anpassen, kopieren.</p>
 
-<button class="quick-btn" id="btn-zusammenstellen" onclick="buildCombinedPrompt()" style="width:100%; padding:0.6rem; font-size:0.95rem; font-weight:600; margin-bottom:0.6rem; background:var(--accent); color:white; border-color:var(--accent);">&#9889; Aus Karten zusammenstellen (Rolle + Stil + DIN)</button>
+<div style="margin-bottom:0.6rem;">
+  <p style="font-size:0.85rem; font-weight:600; margin-bottom:0.3rem;">Bausteine wählen:</p>
+  <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.5rem;">
+    <button class="quick-btn active" id="cb-rolle" onclick="this.classList.toggle('active')">Rolle</button>
+    <button class="quick-btn" id="cb-szenario" onclick="this.classList.toggle('active')">Szenario</button>
+    <button class="quick-btn active" id="cb-stil" onclick="this.classList.toggle('active')">Stil</button>
+    <button class="quick-btn" id="cb-din" onclick="this.classList.toggle('active')">DIN 5008</button>
+  </div>
+  <button class="quick-btn" id="btn-zusammenstellen" onclick="buildCombinedPrompt()" style="width:100%; padding:0.5rem; font-size:0.92rem; font-weight:600; background:var(--accent); color:white; border-color:var(--accent);">Zusammenstellen</button>
+</div>
 
 <div id="mega-profiles" style="margin-bottom:0.5rem;"></div>
 
@@ -1000,23 +1009,38 @@ function copyWerkstatt() {
 /* ─── Prompt zusammenstellen ─── */
 function buildCombinedPrompt() {
   var parts = [];
+  var isActive = function(id) { return document.getElementById(id).classList.contains('active'); };
   // Rolle (Karte 2)
-  var rolleBox = document.getElementById('prompt-rolle');
-  var rolleText = rolleBox.textContent.replace('Kopieren', '').trim();
-  var hasPlaceholder = /\[IHRE ROLLE/.test(rolleText);
-  if (!hasPlaceholder && rolleText) { parts.push('--- ROLLE ---\n' + rolleText); }
+  if (isActive('cb-rolle')) {
+    var rolleBox = document.getElementById('prompt-rolle');
+    var rolleText = rolleBox.textContent.replace('Kopieren', '').trim();
+    if (rolleText) { parts.push(rolleText); }
+  }
+  // Szenario (Karte 4)
+  if (isActive('cb-szenario')) {
+    var scenarioDisplay = document.getElementById('scenario-display');
+    var scenarioText = scenarioDisplay ? scenarioDisplay.textContent.replace('Kopieren', '').trim() : '';
+    if (scenarioText) { parts.push(scenarioText); }
+    else { parts.push('[SZENARIO: Wählen Sie zuerst ein Szenario in Karte 4]'); }
+  }
   // Stil (Karte 5)
-  var stilBox = document.getElementById('prompt-stil');
-  var stilText = stilBox.textContent.replace('Kopieren', '').trim();
-  if (stilText) { parts.push('--- STIL ---\n' + stilText); }
-  // DIN 5008 (falls generiert)
-  var dinBox = document.getElementById('din-prompt');
-  if (dinBox && dinBox.style.display !== 'none') {
-    var dinText = dinBox.textContent.replace('Kopieren', '').trim();
-    if (dinText) { parts.push('--- FORMATIERUNG (DIN 5008) ---\n' + dinText); }
+  if (isActive('cb-stil')) {
+    var stilBox = document.getElementById('prompt-stil');
+    var stilText = stilBox.textContent.replace('Kopieren', '').trim();
+    if (stilText) { parts.push(stilText); }
+  }
+  // DIN 5008 (Karte 5 Toggle)
+  if (isActive('cb-din')) {
+    var dinBox = document.getElementById('din-prompt');
+    if (dinBox && dinBox.style.display !== 'none') {
+      var dinText = dinBox.textContent.replace('Kopieren', '').trim();
+      if (dinText) { parts.push(dinText); }
+    } else {
+      parts.push('[DIN 5008: Wählen Sie zuerst Dokumenttyp und Formalitätsstufe in Karte 5]');
+    }
   }
   if (!parts.length) {
-    parts.push('Tipp: Füllen Sie zuerst Karte 2 (Rolle) und Karte 5 (Stil) aus, dann stellt dieser Button alles zusammen.');
+    parts.push('Wählen Sie mindestens einen Baustein aus (Rolle, Szenario, Stil oder DIN 5008).');
   }
   var ta = document.getElementById('mega-prompt');
   ta.value = parts.join('\n\n');
