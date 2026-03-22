@@ -607,24 +607,15 @@ Orientiere dich an folgendem Beispiel für meinen Schreibstil:
     DIN 5008 — Formvorgaben für Brief oder E-Mail <span class="arrow">&#9654;</span>
   </div>
   <div class="toggle-body">
-    <p style="font-size:0.9rem; margin-bottom:0.6rem;">Wählen Sie Dokumenttyp und Formalitätsstufe. Der Prompt-Zusatz enthält DIN-5008-Regeln mit passender Anrede und Grußformel — kopieren Sie ihn in <strong>Karte 6</strong> und löschen Sie dort Zeilen, die Sie nicht brauchen.</p>
+    <p style="font-size:0.9rem; margin-bottom:0.6rem;">Wählen Sie den Dokumenttyp. Anrede und Grußformel richten sich nach der oben gewählten Formalitätsstufe.</p>
 
-    <p style="font-size:0.85rem; font-weight:600; margin-bottom:0.3rem;">1. Dokumenttyp:</p>
+    <p style="font-size:0.85rem; font-weight:600; margin-bottom:0.3rem;">Dokumenttyp:</p>
     <div style="display:flex; gap:0.8rem; margin-bottom:0.8rem;">
       <button class="quick-btn" id="din-btn-brief" onclick="dinSelect('brief')">Brief</button>
       <button class="quick-btn" id="din-btn-mail" onclick="dinSelect('mail')">E-Mail</button>
     </div>
 
-    <div id="din-stufe-area" style="display:none;">
-      <p style="font-size:0.85rem; font-weight:600; margin-bottom:0.3rem;">2. Formalitätsstufe:</p>
-      <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.8rem;">
-        <button class="quick-btn" id="din-stufe-1" onclick="dinStufe(1)">Sehr förmlich</button>
-        <button class="quick-btn" id="din-stufe-2" onclick="dinStufe(2)">Sachlich-freundlich</button>
-        <button class="quick-btn" id="din-stufe-3" onclick="dinStufe(3)">Freundlich</button>
-        <button class="quick-btn" id="din-stufe-4" onclick="dinStufe(4)">Vertraut</button>
-        <button class="quick-btn" id="din-stufe-5" onclick="dinStufe(5)">Kollegial-direkt</button>
-      </div>
-    </div>
+    <p id="din-stufe-hint" style="display:none; font-size:0.85rem; color:var(--red); margin-bottom:0.5rem;">Bitte wählen Sie zuerst oben eine Formalitätsstufe.</p>
 
     <div class="prompt-box" id="din-prompt" style="display:none;"><button class="copy-btn" onclick="copyPrompt('din-prompt')">Kopieren</button></div>
 
@@ -1044,6 +1035,12 @@ function buildCombinedPrompt() {
   if (isActive('cb-stil')) {
     var stilBox = document.getElementById('prompt-stil');
     var stilText = stilBox.textContent.replace('Kopieren', '').trim();
+    // Wenn DIN auch aktiv: Anrede und Ton aus Stil entfernen (DIN deckt das ab)
+    if (isActive('cb-din') && stilText) {
+      stilText = stilText.replace(/\n*Anrede:[^\n]*/g, '');
+      stilText = stilText.replace(/\n*Ton:[^\n]*/g, '');
+      stilText = stilText.trim();
+    }
     if (stilText) { parts.push(stilText); }
   }
   // DIN 5008 (Karte 5 Toggle)
@@ -1141,13 +1138,15 @@ function renderMegaProfiles() {
         '<button onclick="event.stopPropagation(); deleteMegaProfile(\'' + esc + '\')" style="background:none; border:none; color:var(--red); cursor:pointer; font-size:1rem; padding:0 0.3rem;" title="Löschen">&times;</button></span></div>';
     }).join('');
   }
-  // Sofort-Szenarien
-  html += '<p style="font-size:0.85rem; font-weight:600; margin:0.6rem 0 0.3rem; color:var(--grey);">Sofort-Szenarien (Komplett-Prompts):</p>';
-  html += _sofortSzenarien.map(function(s, i) {
-    return '<div style="display:flex; justify-content:space-between; align-items:center; padding:0.35rem 0.6rem; margin:0.2rem 0; background:#f0f4f0; border:1px solid #c8d8c8; border-radius:4px; cursor:pointer;" onclick="loadSofortSzenario(' + i + ')">' +
-      '<span style="font-size:0.88rem;">' + s.name + '</span>' +
-      '<span style="font-size:0.78rem; color:var(--accent);">laden</span></div>';
-  }).join('');
+  // Sofort-Szenarien (nur im Tool-Modus)
+  if (document.body.classList.contains('tool-mode')) {
+    html += '<p style="font-size:0.85rem; font-weight:600; margin:0.6rem 0 0.3rem; color:var(--grey);">Sofort-Szenarien (Komplett-Prompts):</p>';
+    html += _sofortSzenarien.map(function(s, i) {
+      return '<div style="display:flex; justify-content:space-between; align-items:center; padding:0.35rem 0.6rem; margin:0.2rem 0; background:#f0f4f0; border:1px solid #c8d8c8; border-radius:4px; cursor:pointer;" onclick="loadSofortSzenario(' + i + ')">' +
+        '<span style="font-size:0.88rem;">' + s.name + '</span>' +
+        '<span style="font-size:0.78rem; color:var(--accent);">laden</span></div>';
+    }).join('');
+  }
   container.innerHTML = html;
 }
 function loadSofortSzenario(idx) {
@@ -1299,6 +1298,7 @@ function toggleToolMode() {
   const active = document.body.classList.contains('tool-mode');
   document.querySelector('.tool-btn').textContent = active ? 'Tool-Modus' : 'Workshop-Modus';
   applyToolModeDropdowns(active);
+  renderMegaProfiles();
 }
 if (new URLSearchParams(window.location.search).get('tool') === '1') {
   document.body.classList.add('tool-mode');
@@ -1360,13 +1360,17 @@ function dinSelect(typ) {
   _dinTyp = typ;
   document.getElementById('din-btn-brief').classList.toggle('active', typ === 'brief');
   document.getElementById('din-btn-mail').classList.toggle('active', typ === 'mail');
-  document.getElementById('din-stufe-area').style.display = '';
-  // Stufe zurücksetzen
-  for (var i = 1; i <= 5; i++) document.getElementById('din-stufe-' + i).classList.remove('active');
-  document.getElementById('din-prompt').style.display = 'none';
+  var hint = document.getElementById('din-stufe-hint');
+  if (!_currentStufe) {
+    hint.style.display = '';
+    document.getElementById('din-prompt').style.display = 'none';
+    return;
+  }
+  hint.style.display = 'none';
+  dinBuildPrompt();
 }
-function dinStufe(n) {
-  for (var i = 1; i <= 5; i++) document.getElementById('din-stufe-' + i).classList.toggle('active', i === n);
+function dinBuildPrompt() {
+  var n = _currentStufe;
   var s = _dinStufen[n];
   var typLines = _dinTyp === 'brief' ? _dinBrief : _dinMail;
   var anredeGruss = [
@@ -1386,6 +1390,7 @@ function dinStufe(n) {
 }
 
 /* ─── Stil-Prompt: Formalitätsstufen-Auswahl ─── */
+var _currentStufe = null;
 var _stilStufen = {
   1: { anrede: '"Sehr geehrte Frau/Herr [NAME]," / "Sehr geehrte Damen und Herren,"', ton: 'formell und sachlich', vermeide: 'Umgangssprache, Abkürzungen, lockere Wendungen' },
   2: { anrede: '"Guten Tag, Frau/Herr [NAME],"', ton: 'sachlich-freundlich', vermeide: 'Floskeln, übertriebene Höflichkeit, Passivkonstruktionen' },
@@ -1394,6 +1399,7 @@ var _stilStufen = {
   5: { anrede: '"Hallo [VORNAME]," (Du-Form)', ton: 'locker und direkt', vermeide: 'Floskeln, Passiv, umständliche Höflichkeitsformeln' }
 };
 function stilStufe(n) {
+  _currentStufe = n;
   for (var i = 1; i <= 5; i++) document.getElementById('stil-stufe-' + i).classList.toggle('active', i === n);
   var s = _stilStufen[n];
   var phAnrede = document.getElementById('stil-ph-anrede');
@@ -1405,6 +1411,11 @@ function stilStufe(n) {
   phTon.classList.remove('placeholder'); phTon.style.color = 'var(--text)';
   phVermeide.textContent = s.vermeide;
   phVermeide.classList.remove('placeholder'); phVermeide.style.color = 'var(--text)';
+  // DIN-Prompt aktualisieren falls Dokumenttyp bereits gewählt
+  if (_dinTyp) {
+    document.getElementById('din-stufe-hint').style.display = 'none';
+    dinBuildPrompt();
+  }
 }
 
 /* ─── Eigene Rollen (localStorage) ─── */
