@@ -1014,6 +1014,12 @@ function buildCombinedPrompt() {
   if (isActive('cb-rolle')) {
     var rolleBox = document.getElementById('prompt-rolle');
     var rolleText = rolleBox.textContent.replace('Kopieren', '').trim();
+    // Wenn Stil auch aktiv: Tonalitäts-Zeilen aus Rolle entfernen (Stil deckt das ab)
+    if (isActive('cb-stil') && rolleText) {
+      rolleText = rolleText.replace(/\n*Ich kommuniziere[^\n]*\.\n*/g, '\n');
+      rolleText = rolleText.replace(/\n*Antworte in meinem Stil[^\n]*/g, '');
+      rolleText = rolleText.trim();
+    }
     if (rolleText) { parts.push(rolleText); }
   }
   // Szenario (Karte 4)
