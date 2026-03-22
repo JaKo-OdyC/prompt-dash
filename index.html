@@ -582,13 +582,21 @@ Antworte in meinem Stil — nicht im KI-Stil.<button class="copy-btn" onclick="c
   </div>
 </div>
 
+<p style="font-size:0.85rem; font-weight:600; margin-bottom:0.3rem;">Formalitätsstufe wählen (optional):</p>
+<div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.8rem;">
+  <button class="quick-btn" id="stil-stufe-1" onclick="stilStufe(1)">Sehr förmlich</button>
+  <button class="quick-btn" id="stil-stufe-2" onclick="stilStufe(2)">Sachlich-freundlich</button>
+  <button class="quick-btn" id="stil-stufe-3" onclick="stilStufe(3)">Freundlich</button>
+  <button class="quick-btn" id="stil-stufe-4" onclick="stilStufe(4)">Vertraut</button>
+  <button class="quick-btn" id="stil-stufe-5" onclick="stilStufe(5)">Kollegial-direkt</button>
+</div>
 <div class="prompt-box" id="prompt-stil">Stil-Anweisungen für alle folgenden Antworten:
 
-Anrede: <span class="placeholder">[z.B. "Hallo Herr/Frau..." / "Sehr geehrte..." / Du-Form]</span>
+Anrede: <span class="placeholder" id="stil-ph-anrede">[z.B. "Hallo Herr/Frau..." / "Sehr geehrte..." / Du-Form]</span>
 Länge: <span class="placeholder">[z.B. maximal 100 Wörter / 3-5 Sätze / eine halbe Seite]</span>
-Ton: <span class="placeholder">[z.B. sachlich-direkt / freundlich-verbindlich / formell]</span>
+Ton: <span class="placeholder" id="stil-ph-ton">[z.B. sachlich-direkt / freundlich-verbindlich / formell]</span>
 Struktur: <span class="placeholder">[z.B. Stichpunkte / Fließtext / nummerierte Liste]</span>
-Vermeide: <span class="placeholder">[z.B. Floskeln, Passivkonstruktionen, "wir würden uns freuen"]</span>
+Vermeide: <span class="placeholder" id="stil-ph-vermeide">[z.B. Floskeln, Passivkonstruktionen, "wir würden uns freuen"]</span>
 
 Orientiere dich an folgendem Beispiel für meinen Schreibstil:
 <span class="placeholder">[OPTIONAL: Fügen Sie hier 2-3 Sätze ein, die Sie tatsächlich so geschrieben haben]</span><button class="copy-btn" onclick="copyPrompt('prompt-stil')">Kopieren</button></div>
@@ -1264,6 +1272,28 @@ function dinStufe(n) {
   box.textContent = lines.join('\n');
   box.appendChild(btn);
   box.style.display = '';
+}
+
+/* ─── Stil-Prompt: Formalitätsstufen-Auswahl ─── */
+var _stilStufen = {
+  1: { anrede: '"Sehr geehrte Frau/Herr [NAME]," / "Sehr geehrte Damen und Herren,"', ton: 'formell und sachlich', vermeide: 'Umgangssprache, Abkürzungen, lockere Wendungen' },
+  2: { anrede: '"Guten Tag, Frau/Herr [NAME],"', ton: 'sachlich-freundlich', vermeide: 'Floskeln, übertriebene Höflichkeit, Passivkonstruktionen' },
+  3: { anrede: '"Hallo Frau/Herr [NAME],"', ton: 'freundlich-professionell', vermeide: 'Passivkonstruktionen, Bürokratendeutsch, "wir würden uns freuen"' },
+  4: { anrede: '"Liebe Frau/Lieber Herr [NAME],"', ton: 'persönlich und warm', vermeide: 'steife Formulierungen, Distanzsprache, Nominalstil' },
+  5: { anrede: '"Hallo [VORNAME]," (Du-Form)', ton: 'locker und direkt', vermeide: 'Floskeln, Passiv, umständliche Höflichkeitsformeln' }
+};
+function stilStufe(n) {
+  for (var i = 1; i <= 5; i++) document.getElementById('stil-stufe-' + i).classList.toggle('active', i === n);
+  var s = _stilStufen[n];
+  var phAnrede = document.getElementById('stil-ph-anrede');
+  var phTon = document.getElementById('stil-ph-ton');
+  var phVermeide = document.getElementById('stil-ph-vermeide');
+  phAnrede.textContent = s.anrede;
+  phAnrede.classList.remove('placeholder'); phAnrede.style.color = 'var(--text)';
+  phTon.textContent = s.ton;
+  phTon.classList.remove('placeholder'); phTon.style.color = 'var(--text)';
+  phVermeide.textContent = s.vermeide;
+  phVermeide.classList.remove('placeholder'); phVermeide.style.color = 'var(--text)';
 }
 
 /* ─── Eigene Rollen (localStorage) ─── */
