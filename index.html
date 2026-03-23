@@ -309,7 +309,7 @@
   <div class="compare-box compare-good">
     <strong>Versuch 2 — Mit Rolle + Kontext:</strong><br>
     <em style="color:var(--grey)">"Ich bin Disponent bei einer Spedition. Kunde [KUNDE] reklamiert: Lieferung 3 Tage verspätet, Ware teilweise beschädigt. Wir bieten Ersatzlieferung bis Freitag. Schreib eine sachlich-lösungsorientierte Antwort, max. 80 Wörter."</em><br><br>
-    <strong>KI-Ergebnis:</strong> "Hallo Herr [KUNDE], die Verzögerung und die beschädigte Ware tun uns leid. Die Ersatzlieferung geht morgen raus und ist bis Freitag bei Ihnen. Falls etwas fehlt, melden Sie sich direkt bei mir unter 069-1234. Wir kümmern uns darum."<br><br>
+    <strong>KI-Ergebnis:</strong> "Hallo Herr [KUNDE], die Verzögerung und die beschädigte Ware tun uns leid. Die Ersatzlieferung geht morgen raus und ist bis Freitag bei Ihnen. Falls etwas fehlt, melden Sie sich direkt bei mir. Wir kümmern uns darum."<br><br>
     <em style="color:var(--green)">Direkt, kurz, klingt nach einem Disponenten.</em>
   </div>
 </div>
@@ -1227,7 +1227,6 @@ const rolePresets = {
 function fillRole(preset) {
   const data = rolePresets[preset];
   if (!data) return;
-  document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
   document.querySelectorAll('#prompt-rolle .placeholder').forEach(span => {
     const field = span.dataset.field;
     if (data[field]) span.textContent = data[field];
