@@ -523,7 +523,7 @@ Antworte in meinem Stil — nicht im KI-Stil.<button class="copy-btn" onclick="c
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <div class="card" id="szenarien">
 <h2><span class="card-number">4</span> Prompt-Vorlagen für 5 Szenarien</h2>
-<p>Wählen Sie ein Szenario. Ersetzen Sie die <span style="color:#b5830b; font-weight:bold;">[PLATZHALTER]</span>. Kopieren. Einfügen in den Chat.</p>
+<p>Wählen Sie ein Szenario. Die <span style="color:#b5830b; font-weight:bold;">[PLATZHALTER]</span> bleiben im Prompt — echte Daten setzen Sie erst im fertigen Ergebnis ein (siehe Karte 3). Kopieren. Einfügen in den Chat.</p>
 
 <select class="preset-dropdown" id="scenario-dropdown" onchange="showPresetScenario(this.value)">
   <option value="">— Szenario wählen —</option>
@@ -579,7 +579,7 @@ Antworte in meinem Stil — nicht im KI-Stil.<button class="copy-btn" onclick="c
   <div class="compare-box compare-good">
     <strong>Mit Steuerung:</strong><br>
     "Hallo Herr Müller,<br>
-    die verspätete Lieferung tut uns leid. Ersatzlieferung kommt Freitag. Bei Fragen: 069-1234."<br>
+    die verspätete Lieferung tut uns leid. Ersatzlieferung kommt Freitag. Bei Fragen melden Sie sich direkt bei mir."<br>
     <em style="color:var(--green)">Direkt, kurz, klingt nach Ihnen</em>
   </div>
 </div>
@@ -592,16 +592,43 @@ Antworte in meinem Stil — nicht im KI-Stil.<button class="copy-btn" onclick="c
   <button class="quick-btn" id="stil-stufe-4" onclick="stilStufe(4)">Vertraut</button>
   <button class="quick-btn" id="stil-stufe-5" onclick="stilStufe(5)">Kollegial-direkt</button>
 </div>
+
+<div class="custom-form" id="stil-form" style="display:block; margin-bottom:0.5rem;">
+  <label>Anrede:</label>
+  <input type="text" id="sf-anrede" placeholder='z.B. "Hallo Herr/Frau [NAME],"' oninput="updateStilPrompt()">
+  <label>Länge:</label>
+  <input type="text" id="sf-laenge" placeholder="z.B. maximal 100 Wörter / 3-5 Sätze" oninput="updateStilPrompt()">
+  <label>Ton:</label>
+  <input type="text" id="sf-ton" placeholder="z.B. sachlich-direkt / freundlich-verbindlich" oninput="updateStilPrompt()">
+  <label>Struktur:</label>
+  <input type="text" id="sf-struktur" placeholder="z.B. Fließtext / Stichpunkte / nummerierte Liste" oninput="updateStilPrompt()">
+  <label>Vermeide:</label>
+  <input type="text" id="sf-vermeide" placeholder='z.B. Floskeln, Passivkonstruktionen, "wir würden uns freuen"' oninput="updateStilPrompt()">
+  <label>Beispiel für Ihren Schreibstil (optional):</label>
+  <textarea id="sf-beispiel" placeholder="2-3 Sätze, die Sie tatsächlich so geschrieben haben" oninput="updateStilPrompt()" style="min-height:60px;"></textarea>
+  <div class="custom-form-btns" style="margin-top:0.5rem;">
+    <input type="text" id="sf-name" placeholder="Name für dieses Stilprofil (z.B. Sachlich kurz)" style="flex:1; padding:0.4rem; border:1px solid #ccc; border-radius:4px; font-size:0.88rem; margin-right:0.5rem;">
+    <button class="save-btn" onclick="saveCustomStil()">Im Browser merken</button>
+  </div>
+</div>
+
+<div class="custom-scenarios-area">
+  <div class="quick-btns" style="margin-top:0.3rem;">
+    <button class="quick-btn" id="manage-stile-btn" onclick="showStilManager()" style="display:none; font-size:0.8rem; color:var(--red); border-color:var(--red);">Stilprofile verwalten</button>
+  </div>
+  <div id="stil-manager" style="display:none; margin-top:0.5rem;"></div>
+</div>
+
 <div class="prompt-box" id="prompt-stil">Stil-Anweisungen für alle folgenden Antworten:
 
 Anrede: <span class="placeholder" id="stil-ph-anrede">[z.B. "Hallo Herr/Frau..." / "Sehr geehrte..." / Du-Form]</span>
-Länge: <span class="placeholder">[z.B. maximal 100 Wörter / 3-5 Sätze / eine halbe Seite]</span>
+Länge: <span class="placeholder" id="stil-ph-laenge">[z.B. maximal 100 Wörter / 3-5 Sätze / eine halbe Seite]</span>
 Ton: <span class="placeholder" id="stil-ph-ton">[z.B. sachlich-direkt / freundlich-verbindlich / formell]</span>
-Struktur: <span class="placeholder">[z.B. Stichpunkte / Fließtext / nummerierte Liste]</span>
+Struktur: <span class="placeholder" id="stil-ph-struktur">[z.B. Stichpunkte / Fließtext / nummerierte Liste]</span>
 Vermeide: <span class="placeholder" id="stil-ph-vermeide">[z.B. Floskeln, Passivkonstruktionen, "wir würden uns freuen"]</span>
 
 Orientiere dich an folgendem Beispiel für meinen Schreibstil:
-<span class="placeholder">[OPTIONAL: Fügen Sie hier 2-3 Sätze ein, die Sie tatsächlich so geschrieben haben]</span><button class="copy-btn" onclick="copyPrompt('prompt-stil')">Kopieren</button></div>
+<span class="placeholder" id="stil-ph-beispiel">[OPTIONAL: Fügen Sie hier 2-3 Sätze ein, die Sie tatsächlich so geschrieben haben]</span><button class="copy-btn" onclick="copyPrompt('prompt-stil')">Kopieren</button></div>
 
 <!-- DIN 5008 Toggle -->
 <div class="toggle-section" id="din5008-toggle" style="margin-top:1rem;">
@@ -687,13 +714,22 @@ Simuliere typische Missverständnisse und gib Hinweise.</textarea>
   <div class="toggle-body">
     <p>Für wichtige Texte können Sie vier Qualitätsmechanismen kombinieren:</p>
     <h3>1. Best-Practice mitgeben</h3>
-    <p>Zeigen Sie der KI ein Beispiel, das funktioniert hat. "Orientiere dich an diesem Format: ..."</p>
+    <p>Zeigen Sie der KI ein Beispiel, das funktioniert hat.</p>
+    <div class="prompt-box" id="loesung-1">LÖSUNG 1: Orientiere dich an diesem Format:
+[BEISPIEL EINFÜGEN ODER BESCHREIBEN]<button class="copy-btn" onclick="copyPrompt('loesung-1')">Kopieren</button></div>
+
     <h3>2. Rückfragen zulassen</h3>
-    <p>"Bevor du antwortest: Stelle mir maximal 3 Rückfragen, wenn etwas unklar ist."</p>
+    <div class="prompt-box" id="loesung-2">LÖSUNG 2: Falls etwas unklar ist:
+Stelle maximal 3 Rückfragen, bevor du die Antwort erstellst.<button class="copy-btn" onclick="copyPrompt('loesung-2')">Kopieren</button></div>
+
     <h3>3. Selbstvalidierung</h3>
-    <p>"Prüfe selbst vor der Ausgabe, ob Thema, Zielgruppe, Format und Vollständigkeit stimmen."</p>
+    <div class="prompt-box" id="loesung-3">LÖSUNG 3: Vor der Ausgabe:
+Prüfe selbst, ob Ton, Zielgruppe, Format und Vollständigkeit stimmen.
+Falls Fehler: Überarbeite.<button class="copy-btn" onclick="copyPrompt('loesung-3')">Kopieren</button></div>
+
     <h3>4. Simulation</h3>
-    <p>"Simuliere typische Missverständnisse: Wo könnte der Empfänger etwas falsch verstehen?"</p>
+    <div class="prompt-box" id="loesung-4">LÖSUNG 4: Nach der Ausgabe:
+Simuliere typische Missverständnisse und gib Hinweise.<button class="copy-btn" onclick="copyPrompt('loesung-4')">Kopieren</button></div>
   </div>
 </div>
 
@@ -760,26 +796,9 @@ Formuliere aus diesen Elementen einen wiederverwendbaren Prompt, den ich künfti
   <div class="method-num">2</div>
   <div><strong>Eigene Textdatei</strong> — Legen Sie eine Datei an: <code>Meine-Prompts.txt</code>. Kopieren Sie funktionierende Prompts dort hinein.</div>
   <div class="method-num">3</div>
-  <div><strong>Offline-Kopie herunterladen</strong> — Am Seitenende finden Sie den Button. Ihre gesamte Prompt-Bibliothek wird als einzelne Datei gespeichert — funktioniert ohne Internet.</div>
+  <div><strong>Offline-Kopie herunterladen</strong> — In Karte 6 (Prompt-Editor) finden Sie den Button. Ihre gesamte Prompt-Bibliothek wird als einzelne Datei gespeichert — funktioniert ohne Internet.</div>
 </div>
 
-<div class="toggle-section">
-  <div class="toggle-header" onclick="toggleSection(this)">
-    Eigene Einträge sichern &amp; teilen <span class="arrow">&#9654;</span>
-  </div>
-  <div class="toggle-body">
-    <p>Ihre selbst erstellten Rollen und Szenarien (Karte 2 + 4) leben im Browser. Hier können Sie sie sichern oder mit Kollegen teilen.</p>
-
-    <div class="quick-btns" style="margin: 0.8rem 0;">
-      <button class="quick-btn" onclick="downloadOfflineCopy()" style="background:var(--accent); color:white; border-color:var(--accent);">Offline-Kopie herunterladen</button>
-    </div>
-    <p style="font-size:0.82rem; color:var(--grey); margin-bottom:0.5rem;"><strong>Offline-Kopie</strong> = diese Seite + Ihre gespeicherten Prompts in einer HTML-Datei. Funktioniert ohne Internet.</p>
-
-    <div class="info-box" style="margin-top:0.5rem;">
-      <strong>Tipp für Teams:</strong> Offline-Kopie herunterladen → auf ein gemeinsames Laufwerk legen → alle öffnen dieselbe Datei.
-    </div>
-  </div>
-</div>
 </div>
 
 <!-- ═══════════════════════════════════════════════════════════════ -->
@@ -1398,31 +1417,119 @@ function stilStufe(n) {
   _currentStufe = n;
   for (var i = 1; i <= 5; i++) document.getElementById('stil-stufe-' + i).classList.toggle('active', i === n);
   var s = _stilStufen[n];
-  var phAnrede = document.getElementById('stil-ph-anrede');
-  var phTon = document.getElementById('stil-ph-ton');
-  var phVermeide = document.getElementById('stil-ph-vermeide');
-  phAnrede.textContent = s.anrede;
-  phAnrede.classList.remove('placeholder'); phAnrede.style.color = 'var(--text)';
-  phTon.textContent = s.ton;
-  phTon.classList.remove('placeholder'); phTon.style.color = 'var(--text)';
-  phVermeide.textContent = s.vermeide;
-  phVermeide.classList.remove('placeholder'); phVermeide.style.color = 'var(--text)';
+  // Felder vorbefuellen
+  document.getElementById('sf-anrede').value = s.anrede;
+  document.getElementById('sf-ton').value = s.ton;
+  document.getElementById('sf-vermeide').value = s.vermeide;
+  updateStilPrompt();
   // DIN-Prompt aktualisieren falls Dokumenttyp bereits gewählt
   if (_dinTyp) {
     document.getElementById('din-stufe-hint').style.display = 'none';
     dinBuildPrompt();
   }
 }
+function updateStilPrompt() {
+  var fields = [
+    { id: 'sf-anrede', ph: 'stil-ph-anrede', fallback: '[z.B. "Hallo Herr/Frau..." / "Sehr geehrte..." / Du-Form]' },
+    { id: 'sf-laenge', ph: 'stil-ph-laenge', fallback: '[z.B. maximal 100 Wörter / 3-5 Sätze / eine halbe Seite]' },
+    { id: 'sf-ton', ph: 'stil-ph-ton', fallback: '[z.B. sachlich-direkt / freundlich-verbindlich / formell]' },
+    { id: 'sf-struktur', ph: 'stil-ph-struktur', fallback: '[z.B. Stichpunkte / Fließtext / nummerierte Liste]' },
+    { id: 'sf-vermeide', ph: 'stil-ph-vermeide', fallback: '[z.B. Floskeln, Passivkonstruktionen, "wir würden uns freuen"]' },
+    { id: 'sf-beispiel', ph: 'stil-ph-beispiel', fallback: '[OPTIONAL: Fügen Sie hier 2-3 Sätze ein, die Sie tatsächlich so geschrieben haben]' }
+  ];
+  fields.forEach(function(f) {
+    var val = document.getElementById(f.id).value.trim();
+    var ph = document.getElementById(f.ph);
+    if (val) {
+      ph.textContent = val;
+      ph.classList.remove('placeholder'); ph.style.color = 'var(--text)';
+    } else {
+      ph.textContent = f.fallback;
+      ph.classList.add('placeholder'); ph.style.color = '';
+    }
+  });
+}
+
+/* ─── Eigene Stilprofile (localStorage) ─── */
+var _editingStilIdx = -1;
+function saveCustomStil() {
+  var name = document.getElementById('sf-name').value.trim();
+  if (!name) { document.getElementById('sf-name').focus(); return; }
+  var entry = {
+    name: name,
+    anrede: document.getElementById('sf-anrede').value.trim(),
+    laenge: document.getElementById('sf-laenge').value.trim(),
+    ton: document.getElementById('sf-ton').value.trim(),
+    struktur: document.getElementById('sf-struktur').value.trim(),
+    vermeide: document.getElementById('sf-vermeide').value.trim(),
+    beispiel: document.getElementById('sf-beispiel').value.trim()
+  };
+  var styles = getCustomStyles();
+  if (_editingStilIdx >= 0) { styles.splice(_editingStilIdx, 1); _editingStilIdx = -1; }
+  styles.push(entry);
+  store.set(STYLE_KEY, JSON.stringify(styles));
+  document.getElementById('sf-name').value = '';
+  renderStilManager();
+}
+function loadCustomStil(i) {
+  var styles = getCustomStyles();
+  var s = styles[i]; if (!s) return;
+  document.getElementById('sf-anrede').value = s.anrede || '';
+  document.getElementById('sf-laenge').value = s.laenge || '';
+  document.getElementById('sf-ton').value = s.ton || '';
+  document.getElementById('sf-struktur').value = s.struktur || '';
+  document.getElementById('sf-vermeide').value = s.vermeide || '';
+  document.getElementById('sf-beispiel').value = s.beispiel || '';
+  updateStilPrompt();
+}
+function editCustomStil(i) {
+  loadCustomStil(i);
+  var styles = getCustomStyles();
+  document.getElementById('sf-name').value = styles[i].name;
+  _editingStilIdx = i;
+  document.getElementById('sf-name').focus();
+}
+function deleteCustomStil(i) {
+  var styles = getCustomStyles();
+  styles.splice(i, 1);
+  store.set(STYLE_KEY, JSON.stringify(styles));
+  renderStilManager();
+}
+function showStilManager() {
+  var mgr = document.getElementById('stil-manager');
+  mgr.style.display = mgr.style.display === 'none' ? '' : 'none';
+  renderStilManager();
+}
+function renderStilManager() {
+  var styles = getCustomStyles();
+  var mgr = document.getElementById('stil-manager');
+  var btn = document.getElementById('manage-stile-btn');
+  btn.style.display = styles.length > 0 ? '' : 'none';
+  if (styles.length === 0) { mgr.innerHTML = ''; mgr.style.display = 'none'; return; }
+  var html = '';
+  styles.forEach(function(s, i) {
+    html += '<div style="display:flex; justify-content:space-between; align-items:center; padding:0.35rem 0.6rem; margin:0.2rem 0; background:#fef3e0; border:1px solid #e8c87a; border-radius:4px;">';
+    html += '<span style="font-size:0.88rem; cursor:pointer;" onclick="loadCustomStil(' + i + ')">' + s.name + '</span>';
+    html += '<span><a href="#" onclick="editCustomStil(' + i + '); return false;" style="font-size:0.78rem; color:var(--accent); margin-right:0.5rem;">bearbeiten</a>';
+    html += '<a href="#" onclick="deleteCustomStil(' + i + '); return false;" style="font-size:0.78rem; color:var(--red);">&times;</a></span>';
+    html += '</div>';
+  });
+  mgr.innerHTML = html;
+}
 
 /* ─── Eigene Rollen (localStorage) ─── */
 const ROLE_KEY = 'workshop-custom-roles';
 const SCENARIO_KEY = 'workshop-custom-scenarios';
+const STYLE_KEY = 'workshop-custom-styles';
 
 function getCustomRoles() {
   try { return JSON.parse(store.get(ROLE_KEY)) || []; } catch { return []; }
 }
 function getCustomScenarios() {
   try { return JSON.parse(store.get(SCENARIO_KEY)) || []; } catch { return []; }
+}
+function getCustomStyles() {
+  try { return JSON.parse(store.get(STYLE_KEY)) || []; } catch { return []; }
 }
 
 function showRoleForm() { document.getElementById('role-form').classList.add('open'); document.getElementById('rf-name').focus(); }
@@ -1548,6 +1655,7 @@ var _originalHTML = null;
 function downloadOfflineCopy() {
   var roles = getCustomRoles();
   var scenarios = getCustomScenarios();
+  var styles = getCustomStyles();
   var megaProfiles = getMegaProfiles();
   function buildOffline(html) {
     // Alten Seed-Code entfernen (falls Offline-Kopie von Offline-Kopie)
@@ -1562,11 +1670,14 @@ function downloadOfflineCopy() {
     if (scenarios.length) {
       seedCode += 'localStorage.setItem("workshop-custom-scenarios", ' + JSON.stringify(JSON.stringify(scenarios)) + ');\n';
     }
+    if (styles.length) {
+      seedCode += 'localStorage.setItem("workshop-custom-styles", ' + JSON.stringify(JSON.stringify(styles)) + ');\n';
+    }
     if (megaProfiles.length) {
       seedCode += 'localStorage.setItem("workshop-mega-profiles", ' + JSON.stringify(JSON.stringify(megaProfiles)) + ');\n';
     }
-    if (roles.length || scenarios.length || megaProfiles.length) {
-      seedCode += 'renderCustomRoles(); renderCustomScenarios(); renderMegaProfiles(); updateManagerButtons();\n';
+    if (roles.length || scenarios.length || styles.length || megaProfiles.length) {
+      seedCode += 'renderCustomRoles(); renderCustomScenarios(); renderStilManager(); renderMegaProfiles(); updateManagerButtons();\n';
       var lastScript = html.lastIndexOf('<\/script>');
       html = html.substring(0, lastScript) + seedCode + html.substring(lastScript);
     }
@@ -1686,6 +1797,7 @@ renderCustomScenarios = function() { _origRenderScenarios(); updateManagerButton
 // Gespeicherte Einträge beim Laden rendern
 renderCustomRoles();
 renderCustomScenarios();
+renderStilManager();
 updateMegaCount();
 renderMegaProfiles();
 updateManagerButtons();
