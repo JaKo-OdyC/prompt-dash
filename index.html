@@ -1550,6 +1550,10 @@ function downloadOfflineCopy() {
   var scenarios = getCustomScenarios();
   var megaProfiles = getMegaProfiles();
   function buildOffline(html) {
+    // Alten Seed-Code entfernen (falls Offline-Kopie von Offline-Kopie)
+    html = html.replace(/\n\/\/ Eingebettete Daten \(Offline-Kopie\)\n[\s\S]*?(?=<\/script>)/, '');
+    // Altes Offline-Datum entfernen
+    html = html.replace(/ \| Offline-Kopie vom [\d.]+/g, '');
     // Alle eigenen Daten als localStorage-Seed einbetten
     var seedCode = '\n// Eingebettete Daten (Offline-Kopie)\n';
     if (roles.length) {
