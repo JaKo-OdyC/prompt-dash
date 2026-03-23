@@ -1537,40 +1537,72 @@ function escapeHtml(text) {
 }
 
 /* ─── Offline-Kopie ─── */
+// Original-Quelltext beim Laden sichern (sauberer HTML ohne DOM-Aenderungen)
+var _originalHTML = null;
+(function() {
+  // fetch funktioniert auf https://, nicht auf file://
+  if (location.protocol !== 'file:') {
+    fetch(location.href).then(function(r) { return r.text(); }).then(function(t) { _originalHTML = t; }).catch(function() {});
+  }
+})();
 function downloadOfflineCopy() {
-  const roles = getCustomRoles();
-  const scenarios = getCustomScenarios();
-  const megaProfiles = getMegaProfiles();
-  // document.documentElement.outerHTML statt fetch — funktioniert auch auf file://
-  var html = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-  // Alle eigenen Daten als localStorage-Seed einbetten
-  var seedCode = '\n// Eingebettete Daten (Offline-Kopie)\n';
-  if (roles.length) {
-    seedCode += 'localStorage.setItem("workshop-custom-roles", ' + JSON.stringify(JSON.stringify(roles)) + ');\n';
+  var roles = getCustomRoles();
+  var scenarios = getCustomScenarios();
+  var megaProfiles = getMegaProfiles();
+  function buildOffline(html) {
+    // Alle eigenen Daten als localStorage-Seed einbetten
+    var seedCode = '\n// Eingebettete Daten (Offline-Kopie)\n';
+    if (roles.length) {
+      seedCode += 'localStorage.setItem("workshop-custom-roles", ' + JSON.stringify(JSON.stringify(roles)) + ');\n';
+    }
+    if (scenarios.length) {
+      seedCode += 'localStorage.setItem("workshop-custom-scenarios", ' + JSON.stringify(JSON.stringify(scenarios)) + ');\n';
+    }
+    if (megaProfiles.length) {
+      seedCode += 'localStorage.setItem("workshop-mega-profiles", ' + JSON.stringify(JSON.stringify(megaProfiles)) + ');\n';
+    }
+    if (roles.length || scenarios.length || megaProfiles.length) {
+      seedCode += 'renderCustomRoles(); renderCustomScenarios(); renderMegaProfiles(); updateManagerButtons();\n';
+      var lastScript = html.lastIndexOf('<\/script>');
+      html = html.substring(0, lastScript) + seedCode + html.substring(lastScript);
+    }
+    // Offline-Datum im Footer
+    var today = new Date().toLocaleDateString('de-DE');
+    html = html.replace(
+      '1.7.0 | M\u00E4rz 2026',
+      '1.7.0 | M\u00E4rz 2026 | Offline-Kopie vom ' + today
+    );
+    var blob = new Blob([html], { type: 'text/html; charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'prompt-dash-offline.html';
+    a.click();
+    URL.revokeObjectURL(a.href);
   }
-  if (scenarios.length) {
-    seedCode += 'localStorage.setItem("workshop-custom-scenarios", ' + JSON.stringify(JSON.stringify(scenarios)) + ');\n';
+  if (_originalHTML) {
+    // Sauberer Quelltext verfuegbar (HTTPS)
+    buildOffline(_originalHTML);
+  } else {
+    // Fallback fuer file:// — Original per fetch vom eigenen Pfad versuchen, sonst outerHTML bereinigen
+    fetch(location.href).then(function(r) { return r.text(); }).then(function(t) {
+      buildOffline(t);
+    }).catch(function() {
+      // Letzter Fallback: outerHTML mit Bereinigung
+      var clone = document.documentElement.cloneNode(true);
+      // Dynamisch erzeugte Inhalte zuruecksetzen
+      var promptBoxes = clone.querySelectorAll('.prompt-box');
+      promptBoxes.forEach(function(b) { b.style.display = 'none'; b.textContent = ''; });
+      var activeBtns = clone.querySelectorAll('.quick-btn.active');
+      activeBtns.forEach(function(b) { b.classList.remove('active'); });
+      var managers = clone.querySelectorAll('#role-manager, #scenario-manager');
+      managers.forEach(function(m) { m.style.display = 'none'; m.innerHTML = ''; });
+      var megaDiv = clone.querySelector('#mega-profiles');
+      if (megaDiv) megaDiv.innerHTML = '';
+      var fileBar = clone.querySelector('#file-warning-bar');
+      if (fileBar) fileBar.remove();
+      buildOffline('<!DOCTYPE html>\n' + clone.outerHTML);
+    });
   }
-  if (megaProfiles.length) {
-    seedCode += 'localStorage.setItem("workshop-mega-profiles", ' + JSON.stringify(JSON.stringify(megaProfiles)) + ');\n';
-  }
-  if (roles.length || scenarios.length || megaProfiles.length) {
-    seedCode += 'renderCustomRoles(); renderCustomScenarios(); renderMegaProfiles(); updateManagerButtons();\n';
-    var lastScript = html.lastIndexOf('<\/script>');
-    html = html.substring(0, lastScript) + seedCode + html.substring(lastScript);
-  }
-  // Offline-Datum im Footer
-  var today = new Date().toLocaleDateString('de-DE');
-  html = html.replace(
-    '1.7.0 | M\u00E4rz 2026',
-    '1.7.0 | M\u00E4rz 2026 | Offline-Kopie vom ' + today
-  );
-  var blob = new Blob([html], { type: 'text/html; charset=utf-8' });
-  var a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'prompt-dash-offline.html';
-  a.click();
-  URL.revokeObjectURL(a.href);
 }
 
 /* ─── Rollen-/Szenarien-Verwaltung ─── */
