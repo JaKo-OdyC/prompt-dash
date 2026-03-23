@@ -174,8 +174,10 @@
     .nav { gap: 0.2rem; }
     .nav a { font-size: 0.7rem; padding: 0.2rem 0.3rem; }
   }
+  /* iOS Safari: font-size >= 16px auf Inputs verhindert Auto-Zoom bei Fokus */
   @media (max-width: 480px) {
     body { font-size: 13px; line-height: 1.4; }
+    textarea, input[type="text"], select { font-size: 16px !important; }
     .container { padding: 0.3rem; }
     .card { padding: 0.6rem; margin-bottom: 0.5rem; }
     h1 { font-size: 1.1rem; }
@@ -209,7 +211,7 @@
   <a href="#rolle">Rolle</a>
   <a href="#datenschutz">Datenschutz</a>
   <a href="#szenarien">Szenarien</a>
-  <a href="#logik">Stil</a>
+  <a href="#stil">Stil</a>
   <a href="#fortgeschritten">Prompt-Editor</a>
   <a href="#speicherung">Speicherung</a>
   <a href="#ki-profile">KI-Profile</a>
@@ -563,7 +565,7 @@ Antworte in meinem Stil — nicht im KI-Stil.<button class="copy-btn" onclick="c
 <!-- ═══════════════════════════════════════════════════════════════ -->
 <!-- CARD 5: LOGIK STATT LAYOUT -->
 <!-- ═══════════════════════════════════════════════════════════════ -->
-<div class="card" id="logik">
+<div class="card" id="stil">
 <h2><span class="card-number">5</span> Stil — Die KI spricht wie SIE</h2>
 <p>Die KI hat keinen eigenen Stil. Sie nimmt den an, den Sie ihr geben.</p>
 
@@ -1259,35 +1261,29 @@ function applyToolModeDropdowns(active) {
       _removedOptgroups.push({ el: og, parent: og.parentNode, next: og.nextSibling });
       og.parentNode.removeChild(og);
     });
-    // "Vorlagen"-Label entfernen — Optionen bleiben direkt im Select
+    // "Vorlagen"-Optgroup: Optionen herausnehmen und Optgroup entfernen
     document.querySelectorAll('optgroup[data-further]').forEach(og => {
-      og.label = '';
-      // Optionen aus Optgroup direkt in Select verschieben
+      var options = Array.from(og.children);
       var parent = og.parentNode;
-      while (og.firstChild) { parent.insertBefore(og.firstChild, og); }
-      _removedOptgroups.push({ el: og, parent: parent, next: og.nextSibling });
+      options.forEach(function(opt) { parent.insertBefore(opt, og); });
+      _removedOptgroups.push({ el: og, parent: parent, next: og.nextSibling, options: options });
       parent.removeChild(og);
     });
   } else {
-    // Alles wiederherstellen
+    // Alles wiederherstellen (umgekehrte Reihenfolge)
     _removedOptgroups.reverse().forEach(function(item) {
-      // Optionen zurück in Vorlagen-Optgroup sammeln
+      // Vorlagen-Optgroup: gespeicherte Options zuruecklegen
       if (item.el.dataset.further) {
         item.el.label = item.el.dataset.further;
+        (item.options || []).forEach(function(opt) {
+          if (opt.parentNode) opt.parentNode.removeChild(opt);
+          item.el.appendChild(opt);
+        });
       }
       if (item.next && item.next.parentNode === item.parent) {
         item.parent.insertBefore(item.el, item.next);
       } else {
         item.parent.appendChild(item.el);
-      }
-      // Für Vorlagen: nachfolgende lose Options einsammeln
-      if (item.el.dataset.further) {
-        var node = item.el.nextSibling;
-        while (node && node.nodeName === 'OPTION') {
-          var next = node.nextSibling;
-          item.el.appendChild(node);
-          node = next;
-        }
       }
     });
     _removedOptgroups = [];
@@ -1430,7 +1426,7 @@ function getCustomScenarios() {
 }
 
 function showRoleForm() { document.getElementById('role-form').classList.add('open'); document.getElementById('rf-name').focus(); }
-function hideRoleForm() { document.getElementById('role-form').classList.remove('open'); }
+function hideRoleForm() { document.getElementById('role-form').classList.remove('open'); _editingRoleIdx = -1; }
 
 function saveCustomRole() {
   const name = document.getElementById('rf-name').value.trim();
@@ -1444,7 +1440,13 @@ function saveCustomRole() {
     ton: document.getElementById('rf-ton').value.trim()
   };
   const roles = getCustomRoles();
-  roles.push(role);
+  if (_editingRoleIdx >= 0 && _editingRoleIdx < roles.length) {
+    roles[_editingRoleIdx] = role;
+    _editingRoleIdx = -1;
+  } else {
+    roles.push(role);
+    _editingRoleIdx = -1;
+  }
   store.set(ROLE_KEY, JSON.stringify(roles));
   renderCustomRoles();
   hideRoleForm();
@@ -1481,14 +1483,20 @@ function renderCustomRoles() {
 
 /* ─── Eigene Szenarien (localStorage) ─── */
 function showScenarioForm() { document.getElementById('scenario-form').classList.add('open'); document.getElementById('sf-title').focus(); }
-function hideScenarioForm() { document.getElementById('scenario-form').classList.remove('open'); }
+function hideScenarioForm() { document.getElementById('scenario-form').classList.remove('open'); _editingScenarioIdx = -1; }
 
 function saveCustomScenario() {
   const title = document.getElementById('sf-title').value.trim();
   const prompt = document.getElementById('sf-prompt').value.trim();
   if (!title || !prompt) { (title ? document.getElementById('sf-prompt') : document.getElementById('sf-title')).focus(); return; }
   const scenarios = getCustomScenarios();
-  scenarios.push({ title, prompt });
+  if (_editingScenarioIdx >= 0 && _editingScenarioIdx < scenarios.length) {
+    scenarios[_editingScenarioIdx] = { title, prompt };
+    _editingScenarioIdx = -1;
+  } else {
+    scenarios.push({ title, prompt });
+    _editingScenarioIdx = -1;
+  }
   store.set(SCENARIO_KEY, JSON.stringify(scenarios));
   renderCustomScenarios();
   hideScenarioForm();
@@ -1581,10 +1589,12 @@ function showRoleManager() {
   ).join('');
   if (!roles.length) mgr.innerHTML = '<p style="font-size:0.85rem; color:var(--grey);">Keine gespeicherten Rollen.</p>';
 }
+var _editingRoleIdx = -1;
 function editCustomRole(i) {
   var roles = getCustomRoles();
   var r = roles[i];
   if (!r) return;
+  _editingRoleIdx = i;
   document.getElementById('rf-name').value = r.name || '';
   document.getElementById('rf-rolle').value = r.rolle || '';
   document.getElementById('rf-branche').value = r.branche || '';
@@ -1592,10 +1602,6 @@ function editCustomRole(i) {
   document.getElementById('rf-aufgaben').value = r.aufgaben || '';
   document.getElementById('rf-ton').value = r.ton || '';
   document.getElementById('role-form').classList.add('open');
-  roles.splice(i, 1);
-  store.set(ROLE_KEY, JSON.stringify(roles));
-  renderCustomRoles();
-  updateManagerButtons();
   document.getElementById('role-manager').style.display = 'none';
   document.getElementById('rf-rolle').focus();
 }
@@ -1614,18 +1620,15 @@ function showScenarioManager() {
   ).join('');
   if (!scenarios.length) mgr.innerHTML = '<p style="font-size:0.85rem; color:var(--grey);">Keine gespeicherten Szenarien.</p>';
 }
+var _editingScenarioIdx = -1;
 function editCustomScenario(i) {
   var scenarios = getCustomScenarios();
   var s = scenarios[i];
   if (!s) return;
+  _editingScenarioIdx = i;
   document.getElementById('sf-title').value = s.title;
   document.getElementById('sf-prompt').value = s.prompt;
   document.getElementById('scenario-form').classList.add('open');
-  // Altes Szenario entfernen, wird beim Speichern neu angelegt
-  scenarios.splice(i, 1);
-  store.set(SCENARIO_KEY, JSON.stringify(scenarios));
-  renderCustomScenarios();
-  updateManagerButtons();
   document.getElementById('scenario-manager').style.display = 'none';
   document.getElementById('sf-prompt').focus();
 }
