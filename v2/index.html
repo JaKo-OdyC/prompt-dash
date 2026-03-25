@@ -1,0 +1,1840 @@
+<!DOCTYPE html>
+<!--
+  Prompt-Dash v1.8.0
+  Ablage: prompt-dash/v2/index.html (jako-odyc.github.io/prompt-dash/v2/)
+  Basis: prompt-dash v1.7.0 (eingefroren in prompt-dash/index.html)
+-->
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prompt-Dash — Prompting im Büroalltag</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Prompt-Dash">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1e3a5f">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon-180.png">
+<style>
+  :root {
+    --bg: #f0f4f8; --card: #fff; --accent: #1e3a5f; --accent-light: #2d5986;
+    --green: #2d6a4f; --yellow: #b5830b; --red: #9b2226; --grey: #666;
+    --blue-light: #e8f0fe; --blue-border: #4a90d9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 17px; background: var(--bg); color: var(--accent); line-height: 1.6; padding: 0; }
+
+  /* Navigation */
+  .nav { background: var(--accent); color: white; padding: 0.5rem 1rem; position: sticky; top: 0; z-index: 100; display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .nav a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.8rem; padding: 0.25rem 0.5rem; border-radius: 3px; white-space: nowrap; }
+  .nav a:hover { background: rgba(255,255,255,0.15); color: white; }
+  .nav .nav-title { font-weight: bold; font-size: 0.9rem; color: white; margin-right: 0.5rem; }
+
+  .container { max-width: 820px; margin: 0 auto; padding: 1rem; }
+  h1 { font-size: 1.7rem; margin-bottom: 0.3rem; }
+  h2 { font-size: 1.25rem; margin: 1.5rem 0 0.5rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.25rem; }
+  h3 { font-size: 1.05rem; margin: 1rem 0 0.3rem; }
+  .subtitle { color: var(--grey); font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+  .card { background: var(--card); border-radius: 8px; padding: 1.2rem; margin-bottom: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .card-number { display: inline-block; background: var(--accent); color: white; width: 1.8rem; height: 1.8rem; border-radius: 50%; text-align: center; line-height: 1.8rem; font-weight: bold; font-size: 0.85rem; margin-right: 0.5rem; vertical-align: middle; }
+
+  /* Prompt-Boxen */
+  .prompt-box { background: #1e3a5f; color: #e0e8f0; border-radius: 6px; padding: 1rem; font-family: 'Consolas', 'Courier New', monospace; font-size: 0.88rem; white-space: pre-wrap; margin: 0.5rem 0; position: relative; line-height: 1.5; }
+  .prompt-box .placeholder { color: #ffd166; font-weight: bold; }
+  .copy-btn { position: absolute; top: 0.5rem; right: 0.5rem; background: rgba(255,255,255,0.15); color: #ccc; border: none; padding: 0.3rem 0.7rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
+  .copy-btn:hover { background: rgba(255,255,255,0.25); color: white; }
+  .copy-btn.copied { background: var(--green); color: white; }
+
+  /* Schnellstart-Buttons */
+  .quick-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.8rem 0; }
+  .quick-btn { background: var(--blue-light); border: 1px solid var(--blue-border); color: var(--accent); padding: 0.4rem 0.8rem; border-radius: 5px; cursor: pointer; font-size: 0.85rem; transition: all 0.2s; }
+  .quick-btn:hover { background: var(--blue-border); color: white; }
+  .quick-btn.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+  /* Ampel */
+  .traffic { display: flex; gap: 0.5rem; margin: 0.5rem 0; }
+  .light { padding: 0.8rem; border-radius: 6px; flex: 1; }
+  .light-green { background: #d8f3dc; border: 2px solid var(--green); }
+  .light-yellow { background: #fff3cd; border: 2px solid var(--yellow); }
+  .light-red { background: #f8d7da; border: 2px solid var(--red); }
+  .light h4 { font-size: 0.95rem; margin-bottom: 0.3rem; }
+  .light p, .light ul { font-size: 0.88rem; }
+
+  /* KI-Grid */
+  .ki-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem; margin: 0.5rem 0; }
+  .ki-card { border: 1px solid #ddd; border-radius: 6px; padding: 0.8rem; }
+  .ki-card h4 { margin-bottom: 0.3rem; }
+  .badge { display: inline-block; padding: 0.1rem 0.4rem; border-radius: 3px; font-size: 0.8rem; font-weight: bold; color: white; }
+  .badge-green { background: var(--green); }
+  .badge-yellow { background: var(--yellow); }
+
+  /* Akkordeon */
+  .accordion-header { background: var(--blue-light); border: 1px solid #c8d8e8; border-radius: 6px; padding: 0.7rem 1rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; font-weight: 600; font-size: 0.95rem; transition: background 0.2s; }
+  .accordion-header:hover { background: #d4e4f4; }
+  .accordion-header .arrow { transition: transform 0.3s; font-size: 0.8rem; }
+  .accordion-header.open .arrow { transform: rotate(90deg); }
+  .accordion-body { display: none; padding: 0.5rem 0; }
+  .accordion-body.open { display: block; }
+
+  /* Toggle */
+  .toggle-section { border: 1px dashed #b0b0b0; border-radius: 6px; margin-top: 0.5rem; }
+  .toggle-header { padding: 0.7rem 1rem; cursor: pointer; color: var(--accent-light); font-weight: 600; display: flex; justify-content: space-between; align-items: center; }
+  .toggle-header:hover { color: var(--accent); }
+  .toggle-body { display: none; padding: 0 1rem 1rem; }
+  .toggle-body.open { display: block; }
+
+  /* Sonstige */
+  .info-box { background: var(--blue-light); border: 1px solid #b3cce6; border-radius: 6px; padding: 0.8rem; margin: 0.5rem 0; font-size: 0.9rem; }
+  .quote { border-left: 3px solid var(--accent); padding-left: 1rem; font-style: italic; color: var(--grey); margin: 0.8rem 0; }
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin: 0.5rem 0; }
+  .compare-box { border-radius: 6px; padding: 0.8rem; font-size: 0.88rem; }
+  .compare-bad { background: #f8d7da; border: 1px solid #e0b0b0; }
+  .compare-good { background: #d8f3dc; border: 1px solid #a0d0a0; }
+  ul { padding-left: 1.2rem; margin: 0.3rem 0; }
+  li { margin: 0.2rem 0; }
+  .ref { font-size: 0.85rem; color: var(--grey); margin-top: 2rem; border-top: 1px solid #ddd; padding-top: 0.5rem; }
+  .method-grid { display: grid; grid-template-columns: auto 1fr; gap: 0.3rem 1rem; margin: 0.5rem 0; font-size: 0.9rem; }
+  .method-num { background: var(--accent); color: white; width: 1.5rem; height: 1.5rem; border-radius: 50%; text-align: center; line-height: 1.5rem; font-size: 0.8rem; font-weight: bold; }
+
+  /* Tool-Modus: Radikal auf tägliche Nutzung ausgerichtet */
+  body.tool-mode .workshop-intro { display: none; }
+  body.tool-mode .subtitle { display: none; }
+  body.tool-mode #situationen { display: none; }
+  body.tool-mode #datenschutz { display: none; }
+  body.tool-mode #speicherung { display: none; }
+  body.tool-mode #ki-profile { display: none; }
+  body.tool-mode .compare { display: none; }
+  body.tool-mode .info-box { display: none; }
+  body.tool-mode .card > p { display: none; }
+  body.tool-mode .toggle-section { display: none; }
+  body.tool-mode #din5008-toggle { display: block; }
+  body.tool-mode #din5008-toggle .info-box { display: block; }
+  body.tool-mode .nav a[href="#datenschutz"],
+  body.tool-mode .nav a[href="#speicherung"],
+  body.tool-mode .nav a[href="#ki-profile"] { display: none; }
+  /* Karte 6 (Prompt-Editor): vollständig zeigen, nach oben */
+  body.tool-mode .container { display: flex; flex-direction: column; }
+  body.tool-mode .container > h1 { order: -3; }
+  body.tool-mode #fortgeschritten { order: -2; }
+  body.tool-mode #fortgeschritten > p { display: block; }
+  body.tool-mode #fortgeschritten .toggle-section { display: block; }
+  body.tool-mode #fortgeschritten .info-box { display: block; }
+  .nav-spacer { flex: 1; }
+  .tool-btn { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.3); padding: 0.2rem 0.5rem; border-radius: 3px; cursor: pointer; font-size: 0.75rem; white-space: nowrap; }
+  .tool-btn:hover { background: rgba(255,255,255,0.25); color: white; }
+  body.tool-mode .tool-btn { background: var(--green); color: white; border-color: var(--green); }
+
+  /* Preset-Dropdown */
+  .preset-dropdown { width: 100%; padding: 0.5rem; border: 1px solid var(--blue-border); border-radius: 5px; font-size: 0.9rem; font-family: inherit; color: var(--accent); background: var(--blue-light); cursor: pointer; margin: 0.5rem 0; }
+  .preset-dropdown:focus { outline: 2px solid var(--blue-border); outline-offset: 1px; }
+  .preset-display { margin: 0.5rem 0; }
+  .custom-roles-area, .custom-scenarios-area { margin-top: 0.5rem; }
+  .custom-roles-area h4, .custom-scenarios-area h4 { font-size: 0.9rem; color: var(--grey); margin-bottom: 0.3rem; }
+
+  /* Custom-Einträge (eigene Rollen/Szenarien) */
+  .custom-form { background: var(--blue-light); border: 1px solid var(--blue-border); border-radius: 6px; padding: 0.8rem; margin: 0.5rem 0; display: none; }
+  .custom-form.open { display: block; }
+  .custom-form label { display: block; font-size: 0.85rem; font-weight: 600; margin: 0.4rem 0 0.15rem; }
+  .custom-form input, .custom-form textarea { width: 100%; padding: 0.4rem; border: 1px solid #ccc; border-radius: 4px; font-size: 0.88rem; font-family: inherit; }
+  .custom-form textarea { min-height: 100px; resize: vertical; font-family: 'Consolas', 'Courier New', monospace; }
+  .custom-form-btns { display: flex; gap: 0.5rem; margin-top: 0.6rem; }
+  .custom-form-btns button { padding: 0.35rem 0.8rem; border-radius: 4px; border: 1px solid #ccc; cursor: pointer; font-size: 0.85rem; }
+  .save-btn { background: var(--green); color: white; border-color: var(--green) !important; }
+  .save-btn:hover { background: #245a42; }
+  .delete-custom { background: none; border: none; color: var(--red); cursor: pointer; font-size: 1rem; padding: 0 0.3rem; opacity: 0.5; vertical-align: middle; }
+  .delete-custom:hover { opacity: 1; }
+  .add-custom-btn { border-style: dashed !important; }
+
+  /* Info-Modal */
+  .info-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: flex-start; padding: 2rem 1rem; overflow-y: auto; }
+  .info-modal-overlay.open { display: flex; }
+  .info-modal { background: white; border-radius: 10px; max-width: 640px; width: 100%; padding: 1.5rem; position: relative; box-shadow: 0 8px 32px rgba(0,0,0,0.25); max-height: 90vh; overflow-y: auto; }
+  .info-modal h2 { margin-bottom: 0.8rem; font-size: 1.2rem; border: none; }
+  .info-modal h3 { font-size: 0.95rem; margin: 1rem 0 0.3rem; color: var(--accent); }
+  .info-modal ul { margin: 0.3rem 0 0.5rem 1.2rem; font-size: 0.9rem; }
+  .info-modal li { margin-bottom: 0.25rem; }
+  .info-modal p { font-size: 0.9rem; margin: 0.3rem 0; }
+  .info-modal .close-modal { position: absolute; top: 0.8rem; right: 1rem; background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--grey); line-height: 1; }
+  .info-modal .close-modal:hover { color: var(--accent); }
+  .info-modal .feature-tag { display: inline-block; background: var(--blue-light); color: var(--accent); font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 3px; font-weight: 600; margin-right: 0.3rem; }
+  .info-modal .limit-tag { display: inline-block; background: #fff3cd; color: var(--yellow); font-size: 0.75rem; padding: 0.15rem 0.5rem; border-radius: 3px; font-weight: 600; margin-right: 0.3rem; }
+  .info-btn { background: rgba(255,255,255,0.15); color: rgba(255,255,255,0.85); border: 1px solid rgba(255,255,255,0.3); padding: 0.2rem 0.5rem; border-radius: 3px; cursor: pointer; font-size: 0.75rem; white-space: nowrap; }
+  .info-btn:hover { background: rgba(255,255,255,0.25); color: white; }
+
+  @media (max-width: 800px) {
+    .compare { grid-template-columns: 1fr; }
+    .ki-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .traffic { flex-direction: column; }
+    .nav { gap: 0.2rem; }
+    .nav a { font-size: 0.7rem; padding: 0.2rem 0.3rem; }
+  }
+  /* iOS Safari: font-size >= 16px auf Inputs verhindert Auto-Zoom bei Fokus */
+  @media (max-width: 480px) {
+    body { font-size: 13px; line-height: 1.4; }
+    textarea, input[type="text"], select { font-size: 16px !important; }
+    .container { padding: 0.3rem; }
+    .card { padding: 0.6rem; margin-bottom: 0.5rem; }
+    h1 { font-size: 1.1rem; }
+    h2 { font-size: 1rem; }
+    h3 { font-size: 0.9rem; }
+    .subtitle { font-size: 0.8rem; }
+    .nav { padding: 0.3rem 0.5rem; flex-wrap: wrap; }
+    .nav a { font-size: 0.65rem; padding: 0.15rem 0.3rem; }
+    .nav .nav-title { font-size: 0.75rem; }
+    .prompt-box { font-size: 0.78rem; padding: 0.5rem; }
+    .info-box { font-size: 0.8rem; padding: 0.5rem; }
+    .copy-btn { font-size: 0.7rem; padding: 0.2rem 0.4rem; }
+    .preset-dropdown { font-size: 0.85rem; }
+  }
+  @media print {
+    .nav { display: none; }
+    .copy-btn { display: none; }
+    .quick-btns { display: none; }
+    .accordion-body { display: block !important; }
+    .toggle-body { display: block !important; }
+    .card { break-inside: avoid; box-shadow: none; border: 1px solid #ddd; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <span class="nav-title">Prompt-Dash</span>
+  <a href="#problem" class="workshop-intro">Problem</a>
+  <a href="#situationen" class="workshop-intro">Situationen</a>
+  <a href="#rolle">Rolle</a>
+  <a href="#datenschutz">Datenschutz</a>
+  <a href="#szenarien">Szenarien</a>
+  <a href="#stil">Stil</a>
+  <a href="#fortgeschritten">Prompt-Editor</a>
+  <a href="#speicherung">Speicherung</a>
+  <a href="#ki-profile">KI-Profile</a>
+  <span class="nav-spacer"></span>
+  <button class="info-btn" onclick="document.getElementById('info-modal').classList.add('open')" title="Funktionsübersicht &amp; Hinweise">&#9432; Info</button>
+  <button class="tool-btn" onclick="toggleToolMode()" title="Aktueller Modus">Workshop-Modus</button>
+</nav>
+
+<!-- Info-Modal -->
+<div class="info-modal-overlay" id="info-modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="info-modal">
+    <button class="close-modal" onclick="document.getElementById('info-modal').classList.remove('open')">&times;</button>
+    <h2>Funktionsübersicht</h2>
+    <p>Prompt-Dash ist ein interaktives Werkzeug mit folgenden Funktionen:</p>
+
+    <h3><span class="feature-tag">Prompts</span> Kopierbare Prompt-Vorlagen</h3>
+    <ul>
+      <li>Jede Prompt-Box hat einen <strong>Kopieren</strong>-Button — ein Klick kopiert den Text in die Zwischenablage</li>
+      <li>Platzhalter in <strong style="color:#ffd166">[GELB]</strong> sollen durch Ihre echten Angaben ersetzt werden</li>
+    </ul>
+
+    <h3><span class="feature-tag">Rollen</span> Schnellstart-Rollen</h3>
+    <ul>
+      <li>4 vorgefertigte Rollen im Dropdown — wählen und der Rollenprompt wird automatisch ausgefüllt</li>
+      <li><strong>+ Eigene Rolle:</strong> Definieren Sie eigene Rollen mit Branche, Abteilung und Aufgaben</li>
+      <li>Eigene Rollen werden im Browser gespeichert und bleiben über Sitzungen erhalten</li>
+    </ul>
+
+    <h3><span class="feature-tag">Szenarien</span> Szenario-Prompts</h3>
+    <ul>
+      <li>5 Szenario-Vorlagen im Dropdown — auswählen zeigt den Prompt mit Kopieren-Button</li>
+      <li><strong>+ Eigenes Szenario:</strong> Eigene Prompts mit Titel speichern</li>
+      <li>Eigene Szenarien erscheinen als aufklappbare Einträge mit Kopieren-Button</li>
+    </ul>
+
+    <h3><span class="feature-tag">Sichern</span> Speichern &amp; Teilen</h3>
+    <ul>
+      <li><strong>Eigene Einträge:</strong> Gespeicherte Rollen und Szenarien erscheinen ganz oben im jeweiligen Dropdown</li>
+      <li><strong>Offline-Kopie:</strong> Lädt die komplette Seite MIT Ihren eigenen Einträgen als eigenständige HTML-Datei herunter — funktioniert ohne Internet</li>
+      <li><strong>Für Teams:</strong> Offline-Kopie auf ein gemeinsames Laufwerk legen — alle öffnen dieselbe Datei</li>
+      <li><strong>Verwalten:</strong> Gespeicherte Einträge löschen über "Rollen verwalten" / "Szenarien verwalten"</li>
+    </ul>
+
+    <h3><span class="feature-tag">Modi</span> Ansichtsoptionen</h3>
+    <ul>
+      <li><strong>Workshop-Modus / Tool-Modus:</strong> Button oben rechts zeigt den aktuellen Modus. Klick wechselt zwischen Workshop (alle Karten) und Tool (nur produktive Werkzeuge).</li>
+      <li>Auch per URL-Parameter: <code>?tool=1</code></li>
+    </ul>
+
+    <h3><span class="limit-tag">Hinweis</span> Grenzen &amp; Technik</h3>
+    <ul>
+      <li>Eigene Einträge liegen im <strong>Browser-Speicher (localStorage)</strong> — sie gelten nur für diesen Browser auf diesem Gerät</li>
+      <li>Privates/Inkognito-Fenster: Daten gehen beim Schließen verloren</li>
+      <li>Für dauerhafte Sicherung: <strong>Offline-Kopie</strong> herunterladen</li>
+      <li>Die Seite funktioniert komplett ohne externe Dienste — kein Tracking, keine Cookies, keine Anmeldung</li>
+      <li>Drucken: Alle Akkordeons werden automatisch aufgeklappt, Buttons ausgeblendet</li>
+    </ul>
+
+    <p style="margin-top:1rem; font-size:0.85rem; color:var(--grey)">Prompt-Dash v1.8.0 | Prompting im Büroalltag</p>
+  </div>
+</div>
+
+<div class="container">
+
+<h1>Prompt-Dash</h1>
+<p class="subtitle">Prompt-Dash — Prompting im Büroalltag | Lagerlogistik &amp; Spedition</p>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CARD 1: PROBLEMAUFRISS -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card workshop-intro" id="problem">
+<h2><span class="card-number">1</span> Dasselbe Problem — zwei Wege</h2>
+<p>Ein Kunde reklamiert eine verspätete Lieferung. Sie brauchen eine Antwort. Zwei Versuche:</p>
+
+<div class="compare">
+  <div class="compare-box compare-bad">
+    <strong>Versuch 1 — Ohne Kontext:</strong><br>
+    <em style="color:var(--grey)">"Schreib eine Antwort auf eine Reklamation."</em><br><br>
+    <strong>KI-Ergebnis:</strong> "Sehr geehrte Damen und Herren, vielen Dank für Ihre Nachricht. Wir bedauern die Unannehmlichkeiten und werden uns schnellstmöglich um Ihr Anliegen kümmern. Ihre Zufriedenheit liegt uns am Herzen..."<br><br>
+    <em style="color:var(--red)">Könnten Sie das so abschicken? Nein.</em>
+  </div>
+  <div class="compare-box compare-good">
+    <strong>Versuch 2 — Mit Rolle + Kontext:</strong><br>
+    <em style="color:var(--grey)">"Ich bin Disponent bei einer Spedition. Kunde [KUNDE] reklamiert: Lieferung 3 Tage verspätet, Ware teilweise beschädigt. Wir bieten Ersatzlieferung bis Freitag. Schreib eine sachlich-lösungsorientierte Antwort, max. 80 Wörter."</em><br><br>
+    <strong>KI-Ergebnis:</strong> "Hallo Herr [KUNDE], die Verzögerung und die beschädigte Ware tun uns leid. Die Ersatzlieferung geht morgen raus und ist bis Freitag bei Ihnen. Falls etwas fehlt, melden Sie sich direkt bei mir. Wir kümmern uns darum."<br><br>
+    <em style="color:var(--green)">Direkt, kurz, klingt nach einem Disponenten.</em>
+  </div>
+</div>
+
+<div class="info-box">
+  <strong>Was den Unterschied gemacht hat:</strong>
+  <ul>
+    <li><strong>Rolle</strong> — "Ich bin Disponent bei einer Spedition" <em>(→ Karte 2)</em></li>
+    <li><strong>Datenschutz</strong> — "[KUNDE]" statt echter Name <em>(→ Karte 3)</em></li>
+    <li><strong>Kontext</strong> — Was passiert ist, was angeboten wird <em>(→ Karte 4)</em></li>
+    <li><strong>Stil</strong> — "sachlich-lösungsorientiert, max. 80 Wörter" <em>(→ Karte 5)</em></li>
+  </ul>
+  <p style="margin-top:0.4rem; font-size:0.88rem;">Dieses Reklamations-Beispiel begleitet Sie durch alle Karten.</p>
+</div>
+
+<div class="quote">Die KI ist nicht schlecht — sie hat nur zu wenig von Ihnen bekommen.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- PROMPT-WERKSTATT (nur Workshop-Modus, im Tool-Modus ausgeblendet) -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card workshop-intro" id="werkstatt">
+<h2>&#9998; Prompt-Werkstatt</h2>
+<p style="font-size:0.9rem; color:var(--grey); margin-bottom:0.5rem;">Schreiben Sie hier Ihren Prompt — frei, ohne Vorlage. Kopieren und direkt in die KI einfügen.</p>
+<textarea id="werkstatt-prompt" oninput="updateWerkstattCount()" placeholder="Ihren Prompt hier schreiben oder einfügen..." style="width:100%; min-height:180px; padding:0.8rem; border:1px solid var(--blue-border); border-radius:6px; font-family:'Consolas','Courier New',monospace; font-size:0.88rem; line-height:1.5; resize:vertical; color:var(--accent); background:var(--blue-light);"></textarea>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.4rem;">
+  <span id="werkstatt-count" style="font-size:0.82rem; color:var(--green);">0 Zeichen</span>
+  <button class="copy-btn" onclick="copyWerkstatt()" style="position:static;">Kopieren</button>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- WORKSHOP-SITUATIONEN -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card" id="situationen">
+<h2>Workshop-Situationen</h2>
+<p>Diese zwei Situationen begleiten Sie durch alle Karten. Sie enthalten <strong>Originaldaten</strong> — pseudonymisieren Sie diese über Karte 3, bevor Sie sie in die KI eingeben.</p>
+
+<div class="toggle-section">
+  <div class="toggle-header" onclick="toggleSection(this)">
+    Situation 1: Frau Bergmann — Reklamationsantwort <span class="arrow">&#9654;</span>
+  </div>
+  <div class="toggle-body">
+    <p>Dienstagvormittag. Frau Bergmann öffnet ihren Posteingang. Zwischen zwei Auftragsbestätigungen: eine E-Mail von Firma Hartmann &amp; Sohn, einem Kunden den sie seit drei Jahren betreut. Zwei Sendungen pro Monat, immer reibungslos.</p>
+    <p>Diesmal nicht. Eine Palette kam beschädigt an, die Lieferung war zwei Tage später als vereinbart. Der Einkäufer, Herr Meier, schreibt knapp — kein Vorwurf, aber auch keine Entschuldigung für den Ton. Er bezieht sich auf Sendung SP-2026-04417. Er wartet auf eine Rückmeldung.</p>
+    <p>Frau Bergmann weiß was sie sagen will. Erklärung, Entschuldigung, konkretes Angebot. Sie kennt den Kunden, sie weiß wie er kommuniziert. Was sie nicht hat: Zeit. Und sie will, dass die Antwort so klingt wie von ihr — nicht wie ein Formbrief.</p>
+    <div class="info-box"><strong>Daten für Karte 3 (Pseudonymisierung):</strong> Hartmann &amp; Sohn → [FIRMA], SP-2026-04417 → [NR], Herr Meier → [NAME], 28. März 2026 → [DATUM], Lisa Bergmann → [FRAU BERGMANN]</div>
+  </div>
+</div>
+
+<div class="toggle-section" style="margin-top: 0.5rem;">
+  <div class="toggle-header" onclick="toggleSection(this)">
+    Situation 2: Herr Novak — Rückfrage Auftragsabwicklung <span class="arrow">&#9654;</span>
+  </div>
+  <div class="toggle-body">
+    <p>Montagmorgen. Herr Novak öffnet das Auftragspostfach. Drei neue Eingänge über Nacht, einer davon ein Neukunde — Radic Haustechnik, über das Online-Portal reingekommen. Absender: M. Radic, radic-haustechnik@web.de. Auftrag AE-0417, unvollständig: kein Wunschtermin, das Gewicht fehlt, kein Ansprechpartner für die Lieferankündigung am Zielort.</p>
+    <p>Herr Novak kennt das. Er tippt die Rückfrage, wie er es immer macht. Sachlich, höflich. Aber er merkt beim Schreiben: zu kurz wirkt schroff, zu lang wirkt bürokratisch. Der Kunde kennt ihn nicht, er kennt den Kunden nicht. Es ist der erste Kontakt.</p>
+    <p>Er schickt die Mail ab. Drei Minuten für einen Zweizeiler. Beim nächsten unvollständigen Auftrag fängt er wieder von vorne an.</p>
+    <div class="info-box"><strong>Daten für Karte 3 (Pseudonymisierung):</strong> Radic Haustechnik → [FIRMA], AE-0417 → [NR], M. Radic → [NAME], radic-haustechnik@web.de → ENTFERNEN, 23. März 2026 → [DATUM], Tomáš Novak → [HERR NOVAK]</div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CARD 2: ROLLENPROMPT -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card" id="rolle">
+<h2><span class="card-number">2</span> Rollenprompt — Wer bin ich für die KI?</h2>
+<p>Bevor Sie der KI eine Aufgabe geben: Sagen Sie ihr, wer Sie sind. Das ändert alles.</p>
+
+<div class="compare" style="margin-bottom: 0.8rem;">
+  <div class="compare-box compare-bad">
+    <strong>Ohne Rolle:</strong><br>
+    "Schreib eine Reklamationsantwort."<br>
+    → Generischer Text, den Sie nie abschicken würden.
+  </div>
+  <div class="compare-box compare-good">
+    <strong>Mit Rolle:</strong><br>
+    "Ich bin Disponent bei einer Spedition. Schreib eine Reklamationsantwort."<br>
+    → Fachlich passend, richtiger Ton.
+  </div>
+</div>
+
+<select class="preset-dropdown" id="role-dropdown" onchange="fillRole(this.value)">
+  <option value="">— Rolle wählen —</option>
+  <optgroup label="Gespeicherte Rollen" id="role-saved-group" style="display:none"></optgroup>
+  <optgroup label="Workshop-Situationen" data-workshop>
+    <option value="bergmann">Frau Bergmann (Reklamation)</option>
+    <option value="novak">Herr Novak (Rückfrage)</option>
+  </optgroup>
+  <optgroup label="Vorlagen" data-further="Vorlagen">
+    <option value="disponent">Disponent/in</option>
+    <option value="lagerleiter">Lagerleiter/in</option>
+    <option value="ausbilder">Ausbilder/in</option>
+    <option value="buero">Büroleitung</option>
+  </optgroup>
+</select>
+
+<div class="custom-roles-area">
+  <div class="quick-btns">
+    <button class="quick-btn add-custom-btn" onclick="showRoleForm()">+ Eigene Rolle</button>
+    <button class="quick-btn" id="manage-roles-btn" onclick="showRoleManager()" style="display:none; font-size:0.8rem; color:var(--red); border-color:var(--red);">Rollen verwalten</button>
+  </div>
+  <div id="role-manager" style="display:none; margin-top:0.5rem;"></div>
+</div>
+
+<div class="custom-form" id="role-form">
+  <label>Name (für den Button):</label>
+  <input type="text" id="rf-name" placeholder="z.B. Teamleiter Versand">
+  <label>Rolle:</label>
+  <input type="text" id="rf-rolle" placeholder="z.B. Teamleiter/in Versand">
+  <label>Branche:</label>
+  <input type="text" id="rf-branche" placeholder="z.B. Spedition und Lagerlogistik">
+  <label>Abteilung:</label>
+  <input type="text" id="rf-abteilung" placeholder="z.B. Versand / Warenausgang">
+  <label>Typische Aufgaben:</label>
+  <input type="text" id="rf-aufgaben" placeholder="z.B. Versandplanung, Personalführung">
+  <label>Tonalität:</label>
+  <input type="text" id="rf-ton" placeholder="z.B. direkt und kollegial">
+  <div class="custom-form-btns">
+    <button class="save-btn" onclick="saveCustomRole()">Im Browser merken</button>
+    <button onclick="hideRoleForm()">Abbrechen</button>
+  </div>
+</div>
+
+<div class="prompt-box" id="prompt-rolle">Ich bin <span class="placeholder" data-field="rolle">[IHRE ROLLE, z.B. Disponent]</span> in einem Unternehmen der <span class="placeholder" data-field="branche">[BRANCHE, z.B. Spedition und Lagerlogistik]</span>.
+Meine Abteilung: <span class="placeholder" data-field="abteilung">[ABTEILUNG, z.B. Disposition / Lager / Büro]</span>.
+Meine typischen Aufgaben: <span class="placeholder" data-field="aufgaben">[z.B. Tourenplanung, Kundenkorrespondenz, Reklamationsbearbeitung]</span>.
+
+Ich kommuniziere <span class="placeholder" data-field="ton">[TONALITÄT, z.B. sachlich und lösungsorientiert]</span>.
+Antworte in meinem Stil — nicht im KI-Stil.<button class="copy-btn" onclick="copyPrompt('prompt-rolle')">Kopieren</button></div>
+
+<div class="info-box"><strong>Tipp:</strong> Diesen Rollenprompt einmal am Anfang eines neuen Chats eingeben. Die KI merkt sich die Rolle für den gesamten Chatverlauf.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CARD 3: PSEUDONYMISIERUNG -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card" id="datenschutz">
+<h2><span class="card-number">3</span> Datenschutz — Was darf in den Prompt?</h2>
+<p>KI-Anbieter können Eingaben für Training nutzen. Regel: <strong>Keine echten Daten, die Personen oder Geschäftsgeheimnisse identifizieren.</strong></p>
+
+<div class="traffic">
+  <div class="light light-green">
+    <h4>DARF REIN</h4>
+    <ul>
+      <li>Branche ("Spedition")</li>
+      <li>Allgemeine Rollen ("Disponent")</li>
+      <li>Prozesstypen ("Reklamation")</li>
+      <li>Fiktive Beispielzahlen</li>
+    </ul>
+  </div>
+  <div class="light light-yellow">
+    <h4>PSEUDONYMISIEREN</h4>
+    <ul>
+      <li>Firmennamen → [FIRMA]</li>
+      <li>Produktnamen → [PRODUKT]</li>
+      <li>Interne Bezeichnungen</li>
+      <li>Standorte → [STANDORT]</li>
+    </ul>
+  </div>
+  <div class="light light-red">
+    <h4>NIEMALS EINGEBEN</h4>
+    <ul>
+      <li>Personennamen</li>
+      <li>Kunden-/Sendungsnummern</li>
+      <li>Adressen, Telefonnummern</li>
+      <li>Vertragsdaten, Preislisten</li>
+    </ul>
+  </div>
+</div>
+
+<div class="info-box"><strong>Tipp:</strong> Ersetzen Sie echte Daten durch Platzhalter wie <code>[KUNDE]</code>, <code>[SENDUNGSNR]</code>, <code>[BETRAG]</code>. Die KI arbeitet genauso gut damit — und Ihre Daten bleiben bei Ihnen.</div>
+
+<div class="toggle-section" style="margin-top: 0.5rem;">
+  <div class="toggle-header" onclick="toggleSection(this)">
+    Technische Lösungen zur Pseudonymisierung <span class="arrow">&#9654;</span>
+  </div>
+  <div class="toggle-body">
+    <p>Manuelles Ersetzen funktioniert — aber bei größeren Textmengen gibt es bessere Wege:</p>
+
+    <h3>Stufe 1: Suchen &amp; Ersetzen (sofort nutzbar)</h3>
+    <ul>
+      <li><strong>Word / Excel:</strong> Strg+H → Echte Namen durch Platzhalter ersetzen, bevor Sie den Text in die KI kopieren</li>
+      <li><strong>Vorteil:</strong> Keine Software nötig, funktioniert überall</li>
+      <li><strong>Nachteil:</strong> Manuell, fehleranfällig bei vielen Datenpunkten</li>
+    </ul>
+
+    <h3>Stufe 2: Vorlagen mit Platzhaltern (empfohlen)</h3>
+    <ul>
+      <li>Erstellen Sie Ihre Prompts <em>von Anfang an</em> mit Platzhaltern — echte Daten kommen nie in den Prompt</li>
+      <li>Statt: <em>"Herr Müller hat am 12.03. Sendung 4711 reklamiert"</em></li>
+      <li>Besser: <em>"[KUNDE] hat am [DATUM] Sendung [NR] reklamiert"</em></li>
+      <li>Das KI-Ergebnis enthält dann auch Platzhalter → Sie setzen die echten Daten erst im fertigen Text ein</li>
+    </ul>
+
+    <h3>Stufe 3: Lokale KI (für Fortgeschrittene)</h3>
+    <ul>
+      <li><strong>Ollama + Open-Source-Modelle</strong> (z.B. Llama, Mistral): KI läuft komplett auf Ihrem Rechner — keine Daten verlassen das Haus</li>
+      <li><strong>ChatGPT Team / Enterprise:</strong> Laut OpenAI werden Eingaben nicht für Training verwendet (vertragliche Zusicherung)</li>
+      <li><strong>Azure OpenAI / AWS Bedrock:</strong> KI in der eigenen Cloud-Umgebung — Datenhoheit beim Unternehmen</li>
+    </ul>
+
+    <div class="info-box"><strong>Faustregel:</strong> Stufe 2 reicht für die meisten Büroaufgaben. Stufe 3 wird relevant, wenn Sie regelmäßig mit personenbezogenen Daten oder Geschäftsgeheimnissen arbeiten.</div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CARD 4: 5 SZENARIEN -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card" id="szenarien">
+<h2><span class="card-number">4</span> Prompt-Vorlagen für 5 Szenarien</h2>
+<p>Wählen Sie ein Szenario. Die <span style="color:#b5830b; font-weight:bold;">[PLATZHALTER]</span> bleiben im Prompt — echte Daten setzen Sie erst im fertigen Ergebnis ein (siehe Karte 3). Kopieren. Einfügen in den Chat.</p>
+
+<select class="preset-dropdown" id="scenario-dropdown" onchange="showPresetScenario(this.value)">
+  <option value="">— Szenario wählen —</option>
+  <optgroup label="Gespeicherte Szenarien" id="scenario-saved-group" style="display:none"></optgroup>
+  <optgroup label="Workshop-Situationen" data-workshop>
+    <option value="ws1">Workshop: Bergmann — Reklamationsantwort</option>
+    <option value="ws2">Workshop: Novak — Rückfrage Auftragsabwicklung</option>
+  </optgroup>
+  <optgroup label="Vorlagen" data-further="Vorlagen">
+    <option value="s1">Reklamationsantwort (allgemein)</option>
+    <option value="s2">Angebotskorrespondenz</option>
+    <option value="s3">Besprechungsprotokoll</option>
+    <option value="s4">Meetingvorbereitung</option>
+  </optgroup>
+</select>
+
+<div class="preset-display" id="scenario-display"></div>
+
+<div class="custom-scenarios-area">
+  <div class="quick-btns" style="margin-top: 0.5rem;">
+    <button class="quick-btn add-custom-btn" onclick="showScenarioForm()">+ Eigenes Szenario</button>
+    <button class="quick-btn" id="manage-scenarios-btn" onclick="showScenarioManager()" style="display:none; font-size:0.8rem; color:var(--red); border-color:var(--red);">Szenarien verwalten</button>
+  </div>
+  <div id="scenario-manager" style="display:none; margin-top:0.5rem;"></div>
+</div>
+
+<div class="custom-form" id="scenario-form">
+  <label>Titel:</label>
+  <input type="text" id="sf-title" placeholder="z.B. Lieferschein-Vorlage">
+  <label>Prompt-Vorlage:</label>
+  <textarea id="sf-prompt" placeholder="Schreibe hier deinen Prompt...&#10;&#10;Tipp: Nutze [PLATZHALTER] für variable Teile."></textarea>
+  <div class="custom-form-btns">
+    <button class="save-btn" onclick="saveCustomScenario()">Im Browser merken</button>
+    <button onclick="hideScenarioForm()">Abbrechen</button>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CARD 5: LOGIK STATT LAYOUT -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card" id="stil">
+<h2><span class="card-number">5</span> Stil — Die KI spricht wie SIE</h2>
+<p>Die KI hat keinen eigenen Stil. Sie nimmt den an, den Sie ihr geben.</p>
+
+<div class="compare">
+  <div class="compare-box compare-bad">
+    <strong>Ohne Steuerung:</strong><br>
+    "Sehr geehrte Damen und Herren,<br>
+    wir möchten uns aufrichtig bei Ihnen entschuldigen und versichern Ihnen, dass wir den Vorfall sehr ernst nehmen..."<br>
+    <em style="color:var(--red)">KI-typisch: höflich, lang, austauschbar</em>
+  </div>
+  <div class="compare-box compare-good">
+    <strong>Mit Steuerung:</strong><br>
+    "Hallo Herr Müller,<br>
+    die verspätete Lieferung tut uns leid. Ersatzlieferung kommt Freitag. Bei Fragen melden Sie sich direkt bei mir."<br>
+    <em style="color:var(--green)">Direkt, kurz, klingt nach Ihnen</em>
+  </div>
+</div>
+
+<p style="font-size:0.85rem; font-weight:600; margin-bottom:0.3rem;">Formalitätsstufe wählen (optional):</p>
+<div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.8rem;">
+  <button class="quick-btn" id="stil-stufe-1" onclick="stilStufe(1)">Sehr förmlich</button>
+  <button class="quick-btn" id="stil-stufe-2" onclick="stilStufe(2)">Sachlich-freundlich</button>
+  <button class="quick-btn" id="stil-stufe-3" onclick="stilStufe(3)">Freundlich</button>
+  <button class="quick-btn" id="stil-stufe-4" onclick="stilStufe(4)">Vertraut</button>
+  <button class="quick-btn" id="stil-stufe-5" onclick="stilStufe(5)">Kollegial-direkt</button>
+</div>
+
+<div class="custom-form" id="stil-form" style="display:block; margin-bottom:0.5rem;">
+  <label>Anrede:</label>
+  <input type="text" id="sf-anrede" placeholder='z.B. "Hallo Herr/Frau [NAME],"' oninput="updateStilPrompt()">
+  <label>Länge:</label>
+  <input type="text" id="sf-laenge" placeholder="z.B. maximal 100 Wörter / 3-5 Sätze" oninput="updateStilPrompt()">
+  <label>Ton:</label>
+  <input type="text" id="sf-ton" placeholder="z.B. sachlich-direkt / freundlich-verbindlich" oninput="updateStilPrompt()">
+  <label>Struktur:</label>
+  <input type="text" id="sf-struktur" placeholder="z.B. Fließtext / Stichpunkte / nummerierte Liste" oninput="updateStilPrompt()">
+  <label>Vermeide:</label>
+  <input type="text" id="sf-vermeide" placeholder='z.B. Floskeln, Passivkonstruktionen, "wir würden uns freuen"' oninput="updateStilPrompt()">
+  <label>Beispiel für Ihren Schreibstil (optional):</label>
+  <textarea id="sf-beispiel" placeholder="2-3 Sätze, die Sie tatsächlich so geschrieben haben" oninput="updateStilPrompt()" style="min-height:60px;"></textarea>
+  <div class="custom-form-btns" style="margin-top:0.5rem;">
+    <input type="text" id="sf-name" placeholder="Name für dieses Stilprofil (z.B. Sachlich kurz)" style="flex:1; padding:0.4rem; border:1px solid #ccc; border-radius:4px; font-size:0.88rem; margin-right:0.5rem;">
+    <button class="save-btn" onclick="saveCustomStil()">Im Browser merken</button>
+  </div>
+</div>
+
+<div class="custom-scenarios-area">
+  <div class="quick-btns" style="margin-top:0.3rem;">
+    <button class="quick-btn" id="manage-stile-btn" onclick="showStilManager()" style="display:none; font-size:0.8rem; color:var(--red); border-color:var(--red);">Stilprofile verwalten</button>
+  </div>
+  <div id="stil-manager" style="display:none; margin-top:0.5rem;"></div>
+</div>
+
+<div class="prompt-box" id="prompt-stil">Stil-Anweisungen für alle folgenden Antworten:
+
+Anrede: <span class="placeholder" id="stil-ph-anrede">[z.B. "Hallo Herr/Frau..." / "Sehr geehrte..." / Du-Form]</span>
+Länge: <span class="placeholder" id="stil-ph-laenge">[z.B. maximal 100 Wörter / 3-5 Sätze / eine halbe Seite]</span>
+Ton: <span class="placeholder" id="stil-ph-ton">[z.B. sachlich-direkt / freundlich-verbindlich / formell]</span>
+Struktur: <span class="placeholder" id="stil-ph-struktur">[z.B. Stichpunkte / Fließtext / nummerierte Liste]</span>
+Vermeide: <span class="placeholder" id="stil-ph-vermeide">[z.B. Floskeln, Passivkonstruktionen, "wir würden uns freuen"]</span>
+
+Orientiere dich an folgendem Beispiel für meinen Schreibstil:
+<span class="placeholder" id="stil-ph-beispiel">[OPTIONAL: Fügen Sie hier 2-3 Sätze ein, die Sie tatsächlich so geschrieben haben]</span><button class="copy-btn" onclick="copyPrompt('prompt-stil')">Kopieren</button></div>
+
+<!-- DIN 5008 Toggle -->
+<div class="toggle-section" id="din5008-toggle" style="margin-top:1rem;">
+  <div class="toggle-header" onclick="toggleSection(this)">
+    DIN 5008 — Formvorgaben für Brief oder E-Mail <span class="arrow">&#9654;</span>
+  </div>
+  <div class="toggle-body">
+    <p style="font-size:0.9rem; margin-bottom:0.6rem;">Wählen Sie den Dokumenttyp. Anrede und Grußformel richten sich nach der oben gewählten Formalitätsstufe.</p>
+
+    <p style="font-size:0.85rem; font-weight:600; margin-bottom:0.3rem;">Dokumenttyp:</p>
+    <div style="display:flex; gap:0.8rem; margin-bottom:0.8rem;">
+      <button class="quick-btn" id="din-btn-brief" onclick="dinSelect('brief')">Brief</button>
+      <button class="quick-btn" id="din-btn-mail" onclick="dinSelect('mail')">E-Mail</button>
+    </div>
+
+    <p id="din-stufe-hint" style="display:none; font-size:0.85rem; color:var(--red); margin-bottom:0.5rem;">Bitte wählen Sie zuerst oben eine Formalitätsstufe.</p>
+
+    <div class="prompt-box" id="din-prompt" style="display:none;"><button class="copy-btn" onclick="copyPrompt('din-prompt')">Kopieren</button></div>
+
+    <div class="info-box" style="margin-top:0.5rem;">
+      <strong>Was der Filter kann:</strong> Betreff, Anrede, Datum, Zahlenformate, Grußformel, Signatur — alles was die KI im Text umsetzen kann.<br>
+      <strong>Was er nicht kann:</strong> Seitenränder, Briefkopf-Layout, Schriftgröße — das ist Aufgabe Ihrer Word-/Outlook-Vorlage.<br>
+      <strong>Mehr Varianten?</strong> Eine vollständige Liste mit Anreden, Grußformeln, Tonalitäten und Kombinationsbeispielen finden Sie in der <strong>Workshop-Dokumentation</strong> (Kapitel „Tonalitäten und Schreibstile").
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CARD 6: FORTGESCHRITTEN -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card" id="fortgeschritten">
+<h2><span class="card-number">6</span> Prompt-Editor</h2>
+<p>Freies Textfeld für beliebige Prompts. Im Browser merken, laden, anpassen, kopieren.</p>
+
+<div style="margin-bottom:0.6rem;">
+  <p style="font-size:0.85rem; font-weight:600; margin-bottom:0.3rem;">Bausteine wählen:</p>
+  <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin-bottom:0.5rem;">
+    <button class="quick-btn active" id="cb-rolle" onclick="this.classList.toggle('active')">Rolle</button>
+    <button class="quick-btn" id="cb-szenario" onclick="this.classList.toggle('active')">Szenario</button>
+    <button class="quick-btn active" id="cb-stil" onclick="this.classList.toggle('active')">Stil</button>
+    <button class="quick-btn" id="cb-din" onclick="this.classList.toggle('active')">DIN 5008</button>
+  </div>
+  <button class="quick-btn" id="btn-zusammenstellen" onclick="buildCombinedPrompt()" style="width:100%; padding:0.5rem; font-size:0.92rem; font-weight:600; background:var(--accent); color:white; border-color:var(--accent);">Zusammenstellen</button>
+</div>
+
+<textarea id="mega-prompt" oninput="updateMegaCount()" placeholder="Prompt hier schreiben oder einfügen..." style="width:100%; min-height:220px; padding:0.8rem; border:1px solid var(--blue-border); border-radius:6px; font-family:'Consolas','Courier New',monospace; font-size:0.88rem; line-height:1.5; resize:vertical; color:var(--accent); background:var(--blue-light);">Du bist [ROLLE] in der [BRANCHE].
+
+Erstelle [AUFGABE, z.B. eine Antwort auf folgende Kundenreklamation].
+
+LÖSUNG 1: Orientiere dich an diesem Format:
+[BEISPIEL EINFÜGEN ODER BESCHREIBEN]
+
+LÖSUNG 2: Falls etwas unklar ist:
+Stelle maximal 3 Rückfragen, bevor du die Antwort erstellst.
+
+LÖSUNG 3: Vor der Ausgabe:
+Prüfe selbst, ob Ton, Zielgruppe, Format und Vollständigkeit stimmen.
+Falls Fehler: Überarbeite.
+
+LÖSUNG 4: Nach der Ausgabe:
+Simuliere typische Missverständnisse und gib Hinweise.</textarea>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-top:0.4rem;">
+  <span style="display:flex; align-items:center; gap:0.6rem;"><span id="mega-count" style="font-size:0.82rem;">0 / 4.000 Zeichen</span><button onclick="clearMegaPrompt()" style="background:none; border:none; color:var(--red); cursor:pointer; font-size:0.82rem; padding:0; text-decoration:underline;" title="Textfeld leeren">Leeren</button></span>
+  <button class="copy-btn" onclick="copyMegaPrompt()" style="position:static;">Kopieren</button>
+</div>
+
+<div style="margin-top:0.5rem;">
+  <button class="quick-btn" id="btn-rueckfragen" onclick="toggleRueckfragen()" style="font-size:0.82rem;">+ Rückfragen aktivieren</button>
+  <span id="rueckfragen-hint" style="display:none; font-size:0.8rem; color:var(--green); margin-left:0.5rem;">KI prüft den Prompt vor der Antwort auf Widersprüche.</span>
+</div>
+
+<div style="display:flex; gap:0.5rem; margin-top:0.6rem; align-items:center;">
+  <input id="mega-name" type="text" placeholder="Name für diesen Prompt (z.B. Reklamation komplex)" style="flex:1; padding:0.4rem; border:1px solid #ccc; border-radius:4px; font-size:0.88rem; font-family:inherit;">
+  <button class="save-btn" onclick="saveMegaProfile()" style="padding:0.35rem 0.8rem; border-radius:4px; font-size:0.85rem; cursor:pointer;">Im Browser merken</button>
+  <button onclick="downloadOfflineCopy()" style="padding:0.35rem 0.8rem; border-radius:4px; font-size:0.85rem; cursor:pointer; background:var(--accent); color:white; border:1px solid var(--accent);">&#11015; Offline-Kopie</button>
+</div>
+
+<div id="mega-profiles" style="margin-top:0.6rem;"></div>
+
+<div class="info-box"><strong>Hinweis:</strong> „Im Browser merken" speichert nur in diesem Browser. „Offline-Kopie" sichert alles als HTML-Datei auf Ihrem Rechner.</div>
+
+<div class="toggle-section" style="margin-top: 0.5rem;">
+  <div class="toggle-header" onclick="toggleSection(this)">
+    4-Lösungen-Systematik — Vorlage für komplexe Aufgaben <span class="arrow">&#9654;</span>
+  </div>
+  <div class="toggle-body">
+    <p>Für wichtige Texte können Sie vier Qualitätsmechanismen kombinieren:</p>
+    <h3>1. Best-Practice mitgeben</h3>
+    <p>Zeigen Sie der KI ein Beispiel, das funktioniert hat.</p>
+    <div class="prompt-box" id="loesung-1">LÖSUNG 1: Orientiere dich an diesem Format:
+[BEISPIEL EINFÜGEN ODER BESCHREIBEN]<button class="copy-btn" onclick="copyPrompt('loesung-1')">Kopieren</button></div>
+
+    <h3>2. Rückfragen zulassen</h3>
+    <div class="prompt-box" id="loesung-2">LÖSUNG 2: Falls etwas unklar ist:
+Stelle maximal 3 Rückfragen, bevor du die Antwort erstellst.<button class="copy-btn" onclick="copyPrompt('loesung-2')">Kopieren</button></div>
+
+    <h3>3. Selbstvalidierung</h3>
+    <div class="prompt-box" id="loesung-3">LÖSUNG 3: Vor der Ausgabe:
+Prüfe selbst, ob Ton, Zielgruppe, Format und Vollständigkeit stimmen.
+Falls Fehler: Überarbeite.<button class="copy-btn" onclick="copyPrompt('loesung-3')">Kopieren</button></div>
+
+    <h3>4. Simulation</h3>
+    <div class="prompt-box" id="loesung-4">LÖSUNG 4: Nach der Ausgabe:
+Simuliere typische Missverständnisse und gib Hinweise.<button class="copy-btn" onclick="copyPrompt('loesung-4')">Kopieren</button></div>
+  </div>
+</div>
+
+<div class="toggle-section" style="margin-top: 0.5rem;">
+  <div class="toggle-header" onclick="toggleSection(this)">
+    Prompt aus Ergebnis extrahieren — Rückwärtsentwicklung <span class="arrow">&#9654;</span>
+  </div>
+  <div class="toggle-body">
+    <p>Sie haben über eine längere Session ein sehr gutes Ergebnis erzielt. Beim nächsten Mal soll es schneller gehen. <strong>Lassen Sie die KI selbst analysieren, was funktioniert hat.</strong></p>
+
+    <p style="font-size:0.9rem; margin-top:0.5rem;"><strong>So geht's:</strong> Kopieren Sie den Extraktions-Prompt, fügen Sie Ihr gutes Ergebnis ein und schicken Sie beides an die KI. Die Antwort können Sie oben als neues Mega-Prompt-Profil speichern.</p>
+
+    <div class="prompt-box" id="prompt-extract">Analysiere den folgenden Text. Er ist das Ergebnis einer längeren KI-Session und hat genau die Qualität, die ich brauche.
+
+Extrahiere daraus die Elemente, die zu diesem Ergebnis geführt haben:
+
+1. ROLLE: Welche Rolle/Perspektive wurde eingenommen?
+2. KONTEXT: Welche Hintergrundinformationen waren entscheidend?
+3. AUFGABE: Was genau war der Auftrag?
+4. QUALITÄTSKRITERIEN: Welche Anforderungen an Ton, Format, Länge, Zielgruppe sind erkennbar?
+5. STRUKTUR: Welches Aufbaumuster wurde verwendet?
+6. BESONDERHEITEN: Was macht dieses Ergebnis besonders gut?
+
+Formuliere aus diesen Elementen einen wiederverwendbaren Prompt, den ich künftig direkt verwenden kann, um ein gleichwertiges Ergebnis zu erhalten — ohne lange Session.
+
+--- ERGEBNIS EINFÜGEN ---
+
+[HIER IHR GUTES ERGEBNIS EINFÜGEN]<button class="copy-btn" onclick="copyPrompt('prompt-extract')">Kopieren</button></div>
+
+    <div class="info-box"><strong>Tipp:</strong> Probieren Sie den extrahierten Prompt sofort aus. Kommt ein vergleichbares Ergebnis? Dann speichern Sie ihn oben als Profil. Wenn nicht: Lassen Sie die KI nachbessern.</div>
+  </div>
+</div>
+
+<div class="toggle-section" style="margin-top: 0.5rem;">
+  <div class="toggle-header" onclick="toggleSection(this)">
+    Triangulation — Wenn Sie unsicher sind <span class="arrow">&#9654;</span>
+  </div>
+  <div class="toggle-body">
+    <p><strong>Fragen Sie eine zweite KI.</strong> Wenn zwei KIs unterschiedlich antworten, ist das kein Fehler — das ist Information über die Schwierigkeit der Aufgabe.</p>
+
+    <h3>Beispiel: Unsere Reklamationsantwort prüfen</h3>
+    <ol>
+      <li>Sie haben mit ChatGPT eine Reklamationsantwort geschrieben (Karte 4)</li>
+      <li>Geben Sie denselben Prompt auch an Claude oder DeepSeek</li>
+      <li>Öffnen Sie ein drittes KI-Fenster im <strong>Prüfmodus</strong> und geben Sie beide Antworten ein</li>
+      <li>Die Prüf-KI zeigt: Wo stimmen beide überein? Wo weichen sie ab? Was fehlt?</li>
+    </ol>
+    <p style="font-size:0.9rem; margin-top:0.3rem;"><strong>Übereinstimmung</strong> = solide Grundlage. <strong>Abweichung</strong> = genauer hinschauen. <strong>Beides fehlerhaft</strong> = Aufgabe war zu vage.</p>
+    <p style="margin-top:0.5rem;">Mehr dazu: <a href="https://jako-odyc.github.io/prompt-dash/operator-card.html" target="_blank">Prüfmodus-Karte</a></p>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CARD 7: PROMPT-SPEICHERUNG -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card" id="speicherung">
+<h2><span class="card-number">7</span> Prompt-Speicherung — Wohin mit guten Prompts?</h2>
+<p>Sie haben einen Prompt gebaut, der funktioniert. Wo bleibt er?</p>
+
+<div class="method-grid">
+  <div class="method-num">1</div>
+  <div><strong>Lesezeichen auf diese Seite</strong> — Am einfachsten. Diese Seite ist Ihre Prompt-Bibliothek. Strg+D / Cmd+D.</div>
+  <div class="method-num">2</div>
+  <div><strong>Eigene Textdatei</strong> — Legen Sie eine Datei an: <code>Meine-Prompts.txt</code>. Kopieren Sie funktionierende Prompts dort hinein.</div>
+  <div class="method-num">3</div>
+  <div><strong>Offline-Kopie herunterladen</strong> — In Karte 6 (Prompt-Editor) finden Sie den Button. Ihre gesamte Prompt-Bibliothek wird als einzelne Datei gespeichert — funktioniert ohne Internet.</div>
+</div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- CARD 8: KI-PROFILE -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="card" id="ki-profile">
+<h2><span class="card-number">8</span> KI-Profile — Wer kann was?</h2>
+<p style="font-size:0.9rem; color:var(--grey);">Beobachtete Tendenzen, keine festen Regeln. Jede KI kann jede Aufgabe — aber manche sind in bestimmten Bereichen stärker.</p>
+
+<div class="ki-grid">
+  <div class="ki-card">
+    <h4>ChatGPT <span class="badge badge-green">Texter</span></h4>
+    <p><em>Der strukturierte Allrounder</em></p>
+    <ul>
+      <li>Schnell und zuverlässig</li>
+      <li>Gute Korrespondenz</li>
+      <li>Kohärente, lesbare Texte</li>
+    </ul>
+    <p style="font-size:0.85rem; color:var(--grey)">Ideal für: Mails, Angebote, Protokolle</p>
+  </div>
+  <div class="ki-card">
+    <h4>Claude <span class="badge badge-green">Prüfer</span></h4>
+    <p><em>Der kritische Gegenleser</em></p>
+    <ul>
+      <li>Erkennt Lücken und Annahmen</li>
+      <li>Benennt Unsicherheiten</li>
+      <li>Stark bei Überarbeitung</li>
+    </ul>
+    <p style="font-size:0.85rem; color:var(--grey)">Ideal für: Prüfen, Verbessern, Gegencheck</p>
+  </div>
+  <div class="ki-card">
+    <h4>DeepSeek <span class="badge badge-yellow">Helfer</span></h4>
+    <p><em>Der direkte Spezialist</em></p>
+    <ul>
+      <li>Direkt und ohne Schönreden</li>
+      <li>Stark bei Logik und Technik</li>
+      <li>Kostenlos nutzbar</li>
+    </ul>
+    <p style="font-size:0.85rem; color:var(--grey)">Ideal für: Formeln, Checklisten, Analysen</p>
+  </div>
+  <div class="ki-card">
+    <h4>Perplexity <span class="badge badge-green">Recherche</span></h4>
+    <p><em>Der quellengestützte Rechercheur</em></p>
+    <ul>
+      <li>Sucht live im Internet</li>
+      <li>Nennt und verlinkt Quellen</li>
+      <li>Antwortet mit Belegen</li>
+    </ul>
+    <p style="font-size:0.85rem; color:var(--grey)">Ideal für: Faktencheck, Marktrecherche, aktuelle Informationen</p>
+  </div>
+</div>
+
+<div class="info-box"><strong>Empfehlung zum Einstieg:</strong> Starten Sie mit <strong>ChatGPT</strong> für den Alltag (Mails, Protokolle). Wenn ein Text wichtig ist: Lassen Sie <strong>Claude</strong> gegenlesen. Für Checklisten und technische Fragen: Probieren Sie <strong>DeepSeek</strong> (kostenlos). Für Recherche mit Quellenangaben: <strong>Perplexity</strong>.</div>
+
+<div class="quote">KIs unterscheiden sich weniger im Wissen als im Umgang mit Wissen. Nutzen Sie das.</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<!-- FOOTER -->
+<!-- ═══════════════════════════════════════════════════════════════ -->
+<div class="ref">
+  <p><strong>Workshop:</strong> Prompt-Dash — Prompting im Büroalltag</p>
+  <p><strong>Kontakt:</strong> Jaroslav Kois | jaro_kois@web.de</p>
+  <p><strong>Dokumentation:</strong> <a href="WORKSHOP-DOKUMENTATION.pdf" target="_blank">Workshop-Dokumentation</a> — Nachschlagewerk mit allen Tabellen und Beispielen</p>
+  <p><strong>Vertiefung:</strong> <a href="https://jako-odyc.github.io/prompt-dash/operator-card.html">Prüfmodus-Karte</a> — Multi-KI-Validierung</p>
+  <p><strong>Version:</strong> 1.8.0 | März 2026</p>
+
+  <div style="margin-top:1.5rem; display:flex; gap:1.5rem; align-items:flex-start; flex-wrap:wrap;">
+    <!-- QR-Code inline (kein externer Datei-Verweis) -->
+    <div style="flex-shrink:0; text-align:center;">
+      <p style="font-size:0.85rem; color:var(--grey); margin-bottom:0.3rem;">Auf dem Smartphone öffnen:</p>
+      <svg width="140" height="140" viewBox="0 0 33 33" xmlns="http://www.w3.org/2000/svg" style="border:1px solid #ddd; border-radius:4px; padding:4px; background:white;">
+        <rect width="33" height="33" fill="white"/>
+        <path d="M2,2H3V3H2zM3,2H4V3H3zM4,2H5V3H4zM5,2H6V3H5zM6,2H7V3H6zM7,2H8V3H7zM8,2H9V3H8zM16,2H17V3H16zM17,2H18V3H17zM21,2H22V3H21zM24,2H25V3H24zM25,2H26V3H25zM26,2H27V3H26zM27,2H28V3H27zM28,2H29V3H28zM29,2H30V3H29zM30,2H31V3H30zM2,3H3V4H2zM8,3H9V4H8zM10,3H11V4H10zM11,3H12V4H11zM13,3H14V4H13zM15,3H16V4H15zM17,3H18V4H17zM19,3H20V4H19zM20,3H21V4H20zM21,3H22V4H21zM24,3H25V4H24zM30,3H31V4H30zM2,4H3V5H2zM4,4H5V5H4zM5,4H6V5H5zM6,4H7V5H6zM8,4H9V5H8zM11,4H12V5H11zM22,4H23V5H22zM24,4H25V5H24zM26,4H27V5H26zM27,4H28V5H27zM28,4H29V5H28zM30,4H31V5H30zM2,5H3V6H2zM4,5H5V6H4zM5,5H6V6H5zM6,5H7V6H6zM8,5H9V6H8zM11,5H12V6H11zM14,5H15V6H14zM16,5H17V6H16zM17,5H18V6H17zM20,5H21V6H20zM24,5H25V6H24zM26,5H27V6H26zM27,5H28V6H27zM28,5H29V6H28zM30,5H31V6H30zM2,6H3V7H2zM4,6H5V7H4zM5,6H6V7H5zM6,6H7V7H6zM8,6H9V7H8zM10,6H11V7H10zM12,6H13V7H12zM13,6H14V7H13zM17,6H18V7H17zM20,6H21V7H20zM21,6H22V7H21zM24,6H25V7H24zM26,6H27V7H26zM27,6H28V7H27zM28,6H29V7H28zM30,6H31V7H30zM2,7H3V8H2zM8,7H9V8H8zM11,7H12V8H11zM14,7H15V8H14zM17,7H18V8H17zM18,7H19V8H18zM21,7H22V8H21zM24,7H25V8H24zM30,7H31V8H30zM2,8H3V9H2zM3,8H4V9H3zM4,8H5V9H4zM5,8H6V9H5zM6,8H7V9H6zM7,8H8V9H7zM8,8H9V9H8zM10,8H11V9H10zM12,8H13V9H12zM14,8H15V9H14zM16,8H17V9H16zM18,8H19V9H18zM20,8H21V9H20zM22,8H23V9H22zM24,8H25V9H24zM25,8H26V9H25zM26,8H27V9H26zM27,8H28V9H27zM28,8H29V9H28zM29,8H30V9H29zM30,8H31V9H30zM11,9H12V10H11zM12,9H13V10H12zM13,9H14V10H13zM15,9H16V10H15zM16,9H17V10H16zM17,9H18V10H17zM18,9H19V10H18zM19,9H20V10H19zM21,9H22V10H21zM22,9H23V10H22zM2,10H3V11H2zM4,10H5V11H4zM6,10H7V11H6zM8,10H9V11H8zM12,10H13V11H12zM15,10H16V11H15zM17,10H18V11H17zM18,10H19V11H18zM19,10H20V11H19zM20,10H21V11H20zM26,10H27V11H26zM29,10H30V11H29zM5,11H6V12H5zM6,11H7V12H6zM7,11H8V12H7zM11,11H12V12H11zM22,11H23V12H22zM23,11H24V12H23zM24,11H25V12H24zM25,11H26V12H25zM27,11H28V12H27zM30,11H31V12H30zM4,12H5V13H4zM7,12H8V13H7zM8,12H9V13H8zM9,12H10V13H9zM10,12H11V13H10zM11,12H12V13H11zM13,12H14V13H13zM16,12H17V13H16zM18,12H19V13H18zM19,12H20V13H19zM23,12H24V13H23zM25,12H26V13H25zM28,12H29V13H28zM29,12H30V13H29zM30,12H31V13H30zM5,13H6V14H5zM6,13H7V14H6zM9,13H10V14H9zM10,13H11V14H10zM11,13H12V14H11zM13,13H14V14H13zM14,13H15V14H14zM15,13H16V14H15zM17,13H18V14H17zM18,13H19V14H18zM19,13H20V14H19zM21,13H22V14H21zM26,13H27V14H26zM29,13H30V14H29zM3,14H4V15H3zM4,14H5V15H4zM7,14H8V15H7zM8,14H9V15H8zM9,14H10V15H9zM11,14H12V15H11zM13,14H14V15H13zM15,14H16V15H15zM16,14H17V15H16zM19,14H20V15H19zM21,14H22V15H21zM22,14H23V15H22zM23,14H24V15H23zM24,14H25V15H24zM27,14H28V15H27zM29,14H30V15H29zM30,14H31V15H30zM4,15H5V16H4zM5,15H6V16H5zM7,15H8V16H7zM11,15H12V16H11zM12,15H13V16H12zM13,15H14V16H13zM14,15H15V16H14zM18,15H19V16H18zM22,15H23V16H22zM23,15H24V16H23zM24,15H25V16H24zM27,15H28V16H27zM30,15H31V16H30zM6,16H7V17H6zM8,16H9V17H8zM10,16H11V17H10zM11,16H12V17H11zM12,16H13V17H12zM13,16H14V17H13zM14,16H15V17H14zM15,16H16V17H15zM18,16H19V17H18zM20,16H21V17H20zM23,16H24V17H23zM25,16H26V17H25zM27,16H28V17H27zM29,16H30V17H29zM30,16H31V17H30zM2,17H3V18H2zM3,17H4V18H3zM4,17H5V18H4zM14,17H15V18H14zM15,17H16V18H15zM16,17H17V18H16zM17,17H18V18H17zM19,17H20V18H19zM20,17H21V18H20zM22,17H23V18H22zM24,17H25V18H24zM25,17H26V18H25zM26,17H27V18H26zM27,17H28V18H27zM29,17H30V18H29zM4,18H5V19H4zM5,18H6V19H5zM6,18H7V19H6zM7,18H8V19H7zM8,18H9V19H8zM9,18H10V19H9zM13,18H14V19H13zM14,18H15V19H14zM16,18H17V19H16zM19,18H20V19H19zM22,18H23V19H22zM23,18H24V19H23zM24,18H25V19H24zM27,18H28V19H27zM29,18H30V19H29zM30,18H31V19H30zM3,19H4V20H3zM6,19H7V20H6zM10,19H11V20H10zM11,19H12V20H11zM13,19H14V20H13zM18,19H20V20H18zM22,19H23V20H22zM23,19H24V20H23zM24,19H25V20H24zM27,19H28V20H27zM28,19H29V20H28zM30,19H31V20H30zM2,20H3V21H2zM5,20H6V21H5zM7,20H8V21H7zM8,20H9V21H8zM11,20H12V21H11zM14,20H15V21H14zM15,20H16V21H15zM19,20H20V21H19zM22,20H23V21H22zM23,20H24V21H23zM24,20H25V21H24zM25,20H26V21H25zM26,20H27V21H26zM29,20H30V21H29zM30,20H31V21H30zM3,21H4V22H3zM6,21H7V22H6zM14,21H15V22H14zM17,21H18V22H17zM18,21H19V22H18zM19,21H20V22H19zM20,21H22V22H20zM22,21H23V22H22zM23,21H24V22H23zM25,21H26V22H25zM27,21H28V22H27zM29,21H30V22H29zM2,22H3V23H2zM4,22H5V23H4zM5,22H6V23H5zM6,22H7V23H6zM7,22H8V23H7zM8,22H9V23H8zM11,22H12V23H11zM13,22H14V23H13zM14,22H15V23H14zM17,22H18V23H17zM18,22H19V23H18zM19,22H20V23H19zM20,22H21V23H20zM21,22H22V23H21zM22,22H23V23H22zM23,22H24V23H23zM24,22H25V23H24zM25,22H26V23H25zM26,22H27V23H26zM10,23H11V24H10zM13,23H14V24H13zM14,23H15V24H14zM15,23H16V24H15zM18,23H19V24H18zM21,23H22V24H21zM22,23H23V24H22zM26,23H27V24H26zM28,23H29V24H28zM29,23H30V24H29zM30,23H31V24H30zM2,24H3V25H2zM3,24H4V25H3zM4,24H5V25H4zM5,24H6V25H5zM6,24H7V25H6zM7,24H8V25H7zM8,24H9V25H8zM11,24H12V25H11zM12,24H13V25H12zM14,24H15V25H14zM16,24H17V25H16zM19,24H20V25H19zM21,24H22V25H21zM22,24H23V25H22zM24,24H25V25H24zM26,24H27V25H26zM27,24H28V25H27zM29,24H30V25H29zM30,24H31V25H30zM2,25H3V26H2zM8,25H9V26H8zM13,25H14V26H13zM14,25H15V26H14zM15,25H16V26H15zM16,25H17V26H16zM18,25H19V26H18zM19,25H20V26H19zM20,25H21V26H20zM21,25H22V26H21zM22,25H23V26H22zM26,25H27V26H26zM27,25H28V26H27zM29,25H30V26H29zM2,26H3V27H2zM4,26H5V27H4zM5,26H6V27H5zM6,26H7V27H6zM8,26H9V27H8zM10,26H11V27H10zM11,26H12V27H11zM12,26H13V27H12zM16,26H17V27H16zM17,26H18V27H17zM18,26H19V27H18zM19,26H20V27H19zM22,26H23V27H22zM23,26H24V27H23zM24,26H25V27H24zM25,26H26V27H25zM26,26H27V27H26zM2,27H3V28H2zM4,27H5V28H4zM5,27H6V28H5zM6,27H7V28H6zM8,27H9V28H8zM11,27H12V28H11zM16,27H17V28H16zM18,27H19V28H18zM19,27H20V28H19zM20,27H21V28H20zM22,27H23V28H22zM25,27H26V28H25zM26,27H27V28H26zM28,27H29V28H28zM29,27H30V28H29zM30,27H31V28H30zM2,28H3V29H2zM4,28H5V29H4zM5,28H6V29H5zM6,28H7V29H6zM8,28H9V29H8zM10,28H11V29H10zM12,28H13V29H12zM15,28H16V29H15zM18,28H19V29H18zM20,28H21V29H20zM22,28H23V29H22zM23,28H24V29H23zM25,28H26V29H25zM26,28H27V29H26zM27,28H28V29H27zM30,28H31V29H30zM2,29H3V30H2zM8,29H9V30H8zM12,29H13V30H12zM13,29H14V30H13zM16,29H17V30H16zM19,29H20V30H19zM21,29H22V30H21zM22,29H23V30H22zM23,29H24V30H23zM24,29H25V30H24zM25,29H26V30H25zM26,29H27V30H26zM29,29H30V30H29zM2,30H3V31H2zM3,30H4V31H3zM4,30H5V31H4zM5,30H6V31H5zM6,30H7V31H6zM7,30H8V31H7zM8,30H9V31H8zM10,30H11V31H10zM11,30H12V31H11zM12,30H13V31H12zM14,30H15V31H14zM15,30H16V31H15zM19,30H20V31H19zM21,30H22V31H21zM22,30H23V31H22zM23,30H24V31H23zM24,30H25V31H24zM29,30H30V31H29zM30,30H31V31H30z" fill="#1e3a5f"/>
+      </svg>
+    </div>
+
+    <!-- App-Anleitung -->
+    <div style="flex:1; min-width:200px;">
+      <p style="font-size:0.9rem; font-weight:600; margin-bottom:0.5rem;">Als App-Symbol speichern:</p>
+      <div style="font-size:0.85rem; line-height:1.5;">
+        <p style="margin-bottom:0.4rem;"><strong>iPhone / iPad (Safari):</strong></p>
+        <ol style="margin:0 0 0.6rem 1.2rem; padding:0;">
+          <li>Seite in Safari öffnen (QR-Code scannen)</li>
+          <li>Teilen-Symbol antippen (Quadrat mit Pfeil nach oben)</li>
+          <li>„Zum Home-Bildschirm" wählen</li>
+          <li>„Hinzufügen" antippen — fertig</li>
+        </ol>
+        <p style="margin-bottom:0.4rem;"><strong>Android (Chrome):</strong></p>
+        <ol style="margin:0 0 0 1.2rem; padding:0;">
+          <li>Drei-Punkte-Menü rechts oben</li>
+          <li>„Zum Startbildschirm hinzufügen"</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+
+  <!-- Offline-Kopie auf iPhone/iPad aktualisieren -->
+  <div class="toggle-section" style="margin-top:1rem;">
+    <div class="toggle-header" onclick="toggleSection(this)">
+      Offline-Kopie auf iPhone / iPad speichern und aktualisieren <span class="arrow">&#9654;</span>
+    </div>
+    <div class="toggle-body">
+      <p style="font-size:0.9rem; font-weight:600;">Erstmals speichern:</p>
+      <ol style="font-size:0.85rem; margin:0.3rem 0 0.8rem 1.2rem;">
+        <li>Im Prompt-Dash auf „Offline-Kopie" tippen</li>
+        <li>Es öffnet sich das Teilen-Menü (nicht der Download-Ordner!)</li>
+        <li>„In Dateien sichern" wählen</li>
+        <li>Speicherort wählen — z.B. <strong>iCloud Drive</strong> oder <strong>Auf meinem iPad</strong></li>
+        <li>Merken Sie sich den Ordner (z.B. einen Ordner „Prompts" anlegen)</li>
+      </ol>
+      <p style="font-size:0.9rem; font-weight:600;">Aktualisieren (nach Änderungen):</p>
+      <ol style="font-size:0.85rem; margin:0.3rem 0 0.8rem 1.2rem;">
+        <li>Im Prompt-Dash erneut auf „Offline-Kopie" tippen</li>
+        <li>„In Dateien sichern" wählen</li>
+        <li>Zum <strong>selben Ordner</strong> navigieren wie beim ersten Mal</li>
+        <li>Die alte Datei <code>prompt-dash-offline.html</code> antippen</li>
+        <li>„Ersetzen" bestätigen — die neue Version überschreibt die alte</li>
+      </ol>
+      <div class="info-box"><strong>Tipp:</strong> Die Online-Version unter <a href="https://jako-odyc.github.io/prompt-dash/" target="_blank">jako-odyc.github.io/prompt-dash</a> ist immer aktuell. Eigene Einträge werden aber nur im jeweiligen Browser gespeichert — nicht zwischen Geräten synchronisiert. Deswegen: regelmäßig Offline-Kopie sichern.</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /container -->
+
+<script>
+/* ─── Clipboard-Hilfsfunktion (iOS/Android/Desktop) ─── */
+function clipCopy(text) {
+  // Methode 1: Clipboard API (Desktop + aktuelle Mobile-Browser)
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(text).catch(function() {
+      return clipCopyFallback(text);
+    });
+  }
+  // Methode 2: Fallback für ältere Browser / eingeschränkte Kontexte
+  return clipCopyFallback(text);
+}
+function clipCopyFallback(text) {
+  return new Promise(function(resolve, reject) {
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0;';
+    document.body.appendChild(ta);
+    // iOS erfordert setSelectionRange statt select()
+    var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+    if (isIOS) {
+      ta.contentEditable = true;
+      ta.readOnly = false;
+      var range = document.createRange();
+      range.selectNodeContents(ta);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      ta.setSelectionRange(0, 999999);
+    } else {
+      ta.select();
+    }
+    try {
+      document.execCommand('copy');
+      resolve();
+    } catch(e) {
+      reject(e);
+    }
+    document.body.removeChild(ta);
+  });
+}
+function showCopied(btn) {
+  btn.textContent = 'Kopiert!';
+  btn.classList.add('copied');
+  setTimeout(function() { btn.textContent = 'Kopieren'; btn.classList.remove('copied'); }, 2000);
+}
+
+/* ─── Kopieren ─── */
+function copyPrompt(id) {
+  const el = document.getElementById(id);
+  // Klartext extrahieren, Platzhalter-Spans als [TEXT] behalten
+  let text = '';
+  el.childNodes.forEach(node => {
+    if (node.nodeType === 3) text += node.textContent;
+    else if (node.classList && node.classList.contains('placeholder')) text += node.textContent;
+    else if (node.classList && node.classList.contains('copy-btn')) return;
+    else text += node.textContent;
+  });
+  text = text.replace(/\s*Kopieren\s*$/, '').replace(/\s*Kopiert!\s*$/, '').trim();
+  clipCopy(text).then(function() {
+    showCopied(el.querySelector('.copy-btn'));
+  });
+}
+
+/* ─── Storage-Wrapper (Fallback für file://) ─── */
+const _memStore = {};
+let _storageWarnShown = false;
+const store = {
+  get(key) {
+    try { const v = localStorage.getItem(key); return v; }
+    catch { return _memStore[key] || null; }
+  },
+  set(key, value) {
+    try { localStorage.setItem(key, value); }
+    catch {
+      _memStore[key] = value;
+      if (!_storageWarnShown) {
+        _storageWarnShown = true;
+        const bar = document.createElement('div');
+        bar.style.cssText = 'background:#fff3cd;color:#856404;padding:0.5rem 1rem;font-size:0.85rem;text-align:center;border-bottom:1px solid #ffc107;';
+        bar.innerHTML = '<strong>Hinweis:</strong> Ihr Browser kann auf file://-Seiten nicht dauerhaft speichern. Einträge bleiben nur bis zum Schließen erhalten. <br>Lösung: <a href="https://jako-odyc.github.io/prompt-dash/" style="color:#1e3a5f;font-weight:bold;">Online-Version nutzen</a> oder vor dem Schließen eine <strong>Offline-Kopie herunterladen</strong> (Karte 7).';
+        document.body.insertBefore(bar, document.body.firstChild);
+      }
+    }
+  }
+};
+
+/* ─── Prompt-Werkstatt (Workshop-Modus) ─── */
+function updateWerkstattCount() {
+  const ta = document.getElementById('werkstatt-prompt');
+  const counter = document.getElementById('werkstatt-count');
+  const len = ta.value.length;
+  counter.textContent = len.toLocaleString('de-DE') + ' Zeichen';
+  counter.style.color = len > 4000 ? 'var(--red)' : len > 3000 ? '#b8860b' : 'var(--green)';
+}
+function copyWerkstatt() {
+  const ta = document.getElementById('werkstatt-prompt');
+  if (!ta.value.trim()) { ta.focus(); return; }
+  const btn = ta.parentElement.querySelector('.copy-btn') || event.target;
+  clipCopy(ta.value.trim()).then(function() { showCopied(btn); });
+}
+
+/* ─── Mega-Prompt: Zeichenzähler + Kopieren + Profile ─── */
+/* ─── Prompt zusammenstellen ─── */
+function buildCombinedPrompt() {
+  var parts = [];
+  var isActive = function(id) { return document.getElementById(id).classList.contains('active'); };
+  // Rolle (Karte 2)
+  if (isActive('cb-rolle')) {
+    var rolleBox = document.getElementById('prompt-rolle');
+    var rolleText = rolleBox.textContent.replace('Kopieren', '').trim();
+    // Wenn Stil auch aktiv: Tonalitäts-Zeilen aus Rolle entfernen (Stil deckt das ab)
+    if (isActive('cb-stil') && rolleText) {
+      rolleText = rolleText.replace(/\n*Ich kommuniziere[^\n]*\.\n*/g, '\n');
+      rolleText = rolleText.replace(/\n*Antworte in meinem Stil[^\n]*/g, '');
+      rolleText = rolleText.trim();
+    }
+    if (rolleText) { parts.push(rolleText); }
+  }
+  // Szenario (Karte 4)
+  if (isActive('cb-szenario')) {
+    var scenarioDisplay = document.getElementById('scenario-display');
+    var scenarioText = scenarioDisplay ? scenarioDisplay.textContent.replace('Kopieren', '').trim() : '';
+    if (scenarioText) { parts.push(scenarioText); }
+    else { parts.push('[SZENARIO: Wählen Sie zuerst ein Szenario in Karte 4]'); }
+  }
+  // Stil (Karte 5)
+  if (isActive('cb-stil')) {
+    var stilBox = document.getElementById('prompt-stil');
+    var stilText = stilBox.textContent.replace('Kopieren', '').trim();
+    // Wenn DIN auch aktiv: Anrede und Ton aus Stil entfernen (DIN deckt das ab)
+    if (isActive('cb-din') && stilText) {
+      stilText = stilText.replace(/\n*Anrede:[^\n]*/g, '');
+      stilText = stilText.replace(/\n*Ton:[^\n]*/g, '');
+      stilText = stilText.trim();
+    }
+    if (stilText) { parts.push(stilText); }
+  }
+  // DIN 5008 (Karte 5 Toggle)
+  if (isActive('cb-din')) {
+    var dinBox = document.getElementById('din-prompt');
+    if (dinBox && dinBox.style.display !== 'none') {
+      var dinText = dinBox.textContent.replace('Kopieren', '').trim();
+      if (dinText) { parts.push(dinText); }
+    } else {
+      parts.push('[DIN 5008: Wählen Sie zuerst Dokumenttyp und Formalitätsstufe in Karte 5]');
+    }
+  }
+  if (!parts.length) {
+    parts.push('Wählen Sie mindestens einen Baustein aus (Rolle, Szenario, Stil oder DIN 5008).');
+  }
+  var ta = document.getElementById('mega-prompt');
+  ta.value = parts.join('\n\n');
+  updateMegaCount();
+  ta.focus();
+  ta.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+
+/* ─── Sofort-Szenarien (Komplett-Prompts) ─── */
+var _sofortSzenarien = [
+  { name: '▹ Reklamationsantwort',
+    prompt: 'Du bist Sachbearbeiter/in im Kundenservice eines mittelständischen Unternehmens.\n\nSchreibe eine Antwort auf folgende Kundenreklamation:\n[REKLAMATION HIER EINFÜGEN]\n\nAnforderungen:\n- Sachlich-freundlicher Ton\n- Entschuldigung ohne Schuldzuweisung\n- Konkrete Lösung oder nächsten Schritt benennen\n- Maximal 150 Wörter\n- Anrede: "Guten Tag, [NAME],"\n- Grußformel: "Freundliche Grüße"' },
+  { name: '▹ Meeting-Protokoll',
+    prompt: 'Du bist Protokollführer/in in einem Unternehmen.\n\nErstelle aus folgenden Notizen ein strukturiertes Besprechungsprotokoll:\n[NOTIZEN HIER EINFÜGEN]\n\nFormat:\n- Kopf: Datum, Teilnehmer, Thema\n- Nummerierte Tagesordnungspunkte\n- Pro Punkt: Ergebnis/Beschluss + Verantwortlich + Termin\n- Offene Punkte am Ende\n- Sachlich-knapper Stil, keine Prosa' },
+  { name: '▹ Angebots-E-Mail',
+    prompt: 'Du bist im Vertrieb/Auftragsmanagement.\n\nSchreibe eine E-Mail mit einem Angebot an:\n[EMPFÄNGER UND KONTEXT HIER EINFÜGEN]\n\nInhalt des Angebots:\n[LEISTUNG/PRODUKT, PREIS, KONDITIONEN]\n\nAnforderungen:\n- Professionell-freundlicher Ton\n- Klare Gliederung: Bezug → Angebot → Konditionen → nächster Schritt\n- Maximal 200 Wörter\n- Gültigkeit und Ansprechpartner nennen' },
+  { name: '▹ Terminverschiebung',
+    prompt: 'Du bist Bürokraft/Assistenz.\n\nSchreibe eine höfliche E-Mail zur Verschiebung eines Termins:\n\nUrsprünglicher Termin: [DATUM, UHRZEIT]\nNeuer Terminvorschlag: [DATUM, UHRZEIT]\nGrund (kurz): [GRUND ODER WEGLASSEN]\nEmpfänger: [NAME/ANREDE]\n\nAnforderungen:\n- Kurz und verbindlich (max. 80 Wörter)\n- Entschuldigung für die Umstände\n- Alternativtermin vorschlagen\n- Um Bestätigung bitten' },
+  { name: '▹ Text zusammenfassen',
+    prompt: 'Fasse den folgenden Text zusammen:\n[TEXT HIER EINFÜGEN]\n\nAnforderungen:\n- Maximal 5 Stichpunkte\n- Nur Kernaussagen, keine Wiederholungen\n- Fachbegriffe beibehalten\n- Sachlicher Stil\n- Am Ende: eine Zeile "Fazit:" mit dem wichtigsten Punkt' }
+];
+
+const MEGA_KEY = 'workshop-mega-profiles';
+function getMegaProfiles() { try { return JSON.parse(store.get(MEGA_KEY)) || []; } catch { return []; } }
+
+function updateMegaCount() {
+  const ta = document.getElementById('mega-prompt');
+  const counter = document.getElementById('mega-count');
+  const len = ta.value.length;
+  counter.textContent = len.toLocaleString('de-DE') + ' / 4.000 Zeichen';
+  counter.style.color = len > 4000 ? 'var(--red)' : len > 3000 ? '#b8860b' : 'var(--green)';
+}
+function copyMegaPrompt() {
+  const ta = document.getElementById('mega-prompt');
+  const btn = ta.parentElement.querySelector('.copy-btn') || event.target;
+  clipCopy(ta.value.trim()).then(function() { showCopied(btn); });
+}
+function clearMegaPrompt() {
+  document.getElementById('mega-prompt').value = '';
+  document.getElementById('mega-name').value = '';
+  updateMegaCount();
+  // Rückfragen-Status zurücksetzen
+  var btn = document.getElementById('btn-rueckfragen');
+  if (btn.classList.contains('active')) { toggleRueckfragen(); }
+}
+
+var _rueckfragenText = '\n\nFalls etwas unklar ist oder sich Angaben widersprechen (z.B. verschiedene Längenangaben, widersprüchliche Tonvorgaben): Stelle maximal 3 Rückfragen, bevor du die Antwort erstellst.';
+function toggleRueckfragen() {
+  var btn = document.getElementById('btn-rueckfragen');
+  var hint = document.getElementById('rueckfragen-hint');
+  var ta = document.getElementById('mega-prompt');
+  if (btn.classList.contains('active')) {
+    btn.classList.remove('active');
+    btn.textContent = '+ Rückfragen aktivieren';
+    hint.style.display = 'none';
+    ta.value = ta.value.replace(_rueckfragenText, '');
+  } else {
+    btn.classList.add('active');
+    btn.textContent = '- Rückfragen deaktivieren';
+    hint.style.display = '';
+    if (ta.value.indexOf('Stelle maximal 3 Rückfragen') === -1) {
+      ta.value = ta.value.trimEnd() + _rueckfragenText;
+    }
+  }
+  updateMegaCount();
+}
+function saveMegaProfile() {
+  const name = document.getElementById('mega-name').value.trim();
+  const prompt = document.getElementById('mega-prompt').value.trim();
+  if (!name) { document.getElementById('mega-name').focus(); return; }
+  if (!prompt) { document.getElementById('mega-prompt').focus(); return; }
+  const profiles = getMegaProfiles();
+  const idx = profiles.findIndex(p => p.name === name);
+  if (idx >= 0) { profiles[idx].prompt = prompt; } else { profiles.unshift({ name, prompt }); }
+  store.set(MEGA_KEY, JSON.stringify(profiles));
+  document.getElementById('mega-name').value = '';
+  renderMegaProfiles();
+}
+function loadMegaProfile(name) {
+  const profiles = getMegaProfiles();
+  const p = profiles.find(x => x.name === name);
+  if (!p) return;
+  document.getElementById('mega-prompt').value = p.prompt;
+  document.getElementById('mega-name').value = p.name;
+  updateMegaCount();
+}
+function deleteMegaProfile(name) {
+  const profiles = getMegaProfiles().filter(p => p.name !== name);
+  store.set(MEGA_KEY, JSON.stringify(profiles));
+  renderMegaProfiles();
+}
+function renderMegaProfiles() {
+  var container = document.getElementById('mega-profiles');
+  var profiles = getMegaProfiles();
+  var html = '';
+  // Eigene Prompts (neueste zuerst)
+  if (profiles.length) {
+    html += '<p style="font-size:0.85rem; font-weight:600; margin-bottom:0.3rem;">Eigene Prompts:</p>';
+    html += profiles.map(function(p) {
+      var esc = p.name.replace(/'/g, "\\'");
+      return '<div style="display:flex; justify-content:space-between; align-items:center; padding:0.35rem 0.6rem; margin:0.2rem 0; background:var(--blue-light); border:1px solid var(--blue-border); border-radius:4px; cursor:pointer;" onclick="loadMegaProfile(\'' + esc + '\')">' +
+        '<span style="font-size:0.88rem;">' + p.name + ' <span style="color:var(--grey); font-size:0.78rem;">(' + p.prompt.length + ' Zeichen)</span></span>' +
+        '<span style="display:flex; align-items:center; gap:0.3rem;">' +
+        '<span style="font-size:0.78rem; color:var(--accent);">laden</span>' +
+        '<button onclick="event.stopPropagation(); deleteMegaProfile(\'' + esc + '\')" style="background:none; border:none; color:var(--red); cursor:pointer; font-size:1rem; padding:0 0.3rem;" title="Löschen">&times;</button></span></div>';
+    }).join('');
+  }
+  // Sofort-Szenarien (nur im Tool-Modus)
+  if (document.body.classList.contains('tool-mode')) {
+    html += '<p style="font-size:0.85rem; font-weight:600; margin:0.6rem 0 0.3rem; color:var(--grey);">Sofort-Szenarien (Komplett-Prompts):</p>';
+    html += _sofortSzenarien.map(function(s, i) {
+      return '<div style="display:flex; justify-content:space-between; align-items:center; padding:0.35rem 0.6rem; margin:0.2rem 0; background:#f0f4f0; border:1px solid #c8d8c8; border-radius:4px; cursor:pointer;" onclick="loadSofortSzenario(' + i + ')">' +
+        '<span style="font-size:0.88rem;">' + s.name + '</span>' +
+        '<span style="font-size:0.78rem; color:var(--accent);">laden</span></div>';
+    }).join('');
+  }
+  container.innerHTML = html;
+}
+function loadSofortSzenario(idx) {
+  var s = _sofortSzenarien[idx];
+  if (!s) return;
+  document.getElementById('mega-prompt').value = s.prompt;
+  document.getElementById('mega-name').value = '';
+  updateMegaCount();
+}
+
+/* ─── Schnellstart-Buttons (Rolle) ─── */
+const rolePresets = {
+  bergmann: {
+    rolle: 'Sachbearbeiterin Kundenservice',
+    branche: 'Spedition und Logistik',
+    abteilung: 'Auftragsabwicklung / Kundenservice',
+    aufgaben: 'Reklamationsbearbeitung, Kundenkorrespondenz, Sendungsverfolgung',
+    ton: 'direkt, persönlich, lösungsorientiert'
+  },
+  novak: {
+    rolle: 'Sachbearbeiter Auftragsabwicklung',
+    branche: 'Spedition und Logistik',
+    abteilung: 'Auftragsabwicklung',
+    aufgaben: 'Auftragsprüfung, Kundenrückfragen, Transportplanung',
+    ton: 'freundlich und direkt'
+  },
+  disponent: {
+    rolle: 'Disponent/in',
+    branche: 'Spedition und Lagerlogistik',
+    abteilung: 'Disposition',
+    aufgaben: 'Tourenplanung, Kundenkorrespondenz, Reklamationsbearbeitung, Angebotserstellung',
+    ton: 'sachlich und lösungsorientiert'
+  },
+  lagerleiter: {
+    rolle: 'Lagerleiter/in',
+    branche: 'Lagerlogistik',
+    abteilung: 'Lager / Wareneingang / Versand',
+    aufgaben: 'Personalplanung, Inventurvorbereitung, Unterweisungen, Prozessoptimierung',
+    ton: 'direkt und klar'
+  },
+  ausbilder: {
+    rolle: 'Ausbilder/in für Lagerlogistik',
+    branche: 'Spedition und Lagerlogistik',
+    abteilung: 'Ausbildung',
+    aufgaben: 'Unterweisungen erstellen, Azubis anleiten, Prüfungsvorbereitung, Feedbackgespräche',
+    ton: 'verständlich und ermutigend'
+  },
+  buero: {
+    rolle: 'Büroleiter/in',
+    branche: 'Spedition und Lagerlogistik',
+    abteilung: 'Verwaltung / Büro',
+    aufgaben: 'Auftragsabwicklung, Protokolle, Meetingvorbereitung, interne Kommunikation',
+    ton: 'professionell und verbindlich'
+  }
+};
+
+function fillRole(preset) {
+  const data = rolePresets[preset];
+  if (!data) return;
+  document.querySelectorAll('#prompt-rolle .placeholder').forEach(span => {
+    const field = span.dataset.field;
+    if (data[field]) span.textContent = data[field];
+  });
+}
+
+/* ─── Szenarien-Dropdown (Presets) ─── */
+const scenarioPresets = {
+  ws1: { title: 'Workshop: Bergmann — Reklamationsantwort', prompt: 'Kundenreklamation: [FIRMA] meldet zu Sendung [NR]:\n- Lieferung 2 Tage verspätet\n- 1 Palette beschädigt angekommen\n\nStammkunde, gute Beziehung.\nUnser Angebot: Ersatzlieferung oder Gutschrift — Kunde entscheidet.\n\nSchreib eine Antwortmail mit Sendungsbezug.',
+    stil: { laenge: 'maximal 80 Wörter', ton: 'persönlich, lösungsorientiert', vermeide: 'Passiv, inhaltsleere Wendungen' } },
+  ws2: { title: 'Workshop: Novak — Rückfrage Auftragsabwicklung', prompt: 'Situation: Ein Neukunde hat über das Online-Portal einen unvollständigen\nAuftrag eingereicht. Es fehlen: Wunsch-Abholtermin, Sendungsgewicht,\nAnsprechpartner am Empfangsort für die Lieferankündigung.\n\nAufgabe: Schreibe eine Rückfrage-E-Mail mit Betreffzeile. Bestätige den\nAuftragseingang, frage die fehlenden Angaben ab und setze eine Frist.\n\nVorgaben:\n- Fehlende Angaben als nummerierte Liste\n- Frist als Platzhalter: [DATUM]',
+    stil: { laenge: 'maximal 5 Sätze', struktur: 'nummerierte Liste für fehlende Angaben', vermeide: 'inhaltsleere Wendungen' } },
+  s1: { title: 'Reklamationsantwort', prompt: 'Schreibe eine Antwort auf folgende Kundenreklamation:\n\nSachverhalt: [WAS IST PASSIERT? z.B. Lieferung 3 Tage verspätet, Ware teilweise beschädigt]\nKunde: [KUNDENTYP, z.B. Stammkunde / Neukunde / Großabnehmer]\nLösung die angeboten wird: [z.B. Ersatzlieferung bis Freitag, 10% Gutschrift]\n\nSchreib eine Antwortmail.',
+    stil: { laenge: 'maximal 150 Wörter', ton: 'sachlich-lösungsorientiert', vermeide: 'Floskeln wie "Ihre Zufriedenheit liegt uns am Herzen"' } },
+  s2: { title: 'Angebotskorrespondenz', prompt: 'Erstelle ein Angebot / eine Angebotsantwort:\n\nLeistung: [WAS WIRD ANGEBOTEN? z.B. Lagerung von 200 Paletten, Kommissionierung, Versandabwicklung]\nKonditionen: [PREIS / LAUFZEIT / BESONDERHEITEN, z.B. 4,50 EUR/Palette/Monat, Mindestlaufzeit 6 Monate]\nEmpfänger: [WER BEKOMMT DAS? z.B. Einkaufsleiter eines mittelständischen Unternehmens]\nFrist: [BIS WANN GÜLTIG? z.B. 14 Tage]',
+    stil: { ton: 'professionell, verbindlich, nicht aufdringlich', struktur: 'klar strukturiert: Leistung, Konditionen, nächste Schritte' } },
+  s3: { title: 'Besprechungsprotokoll', prompt: 'Erstelle ein Besprechungsprotokoll aus folgenden Notizen:\n\nTeilnehmer: [WER WAR DABEI? z.B. Lagerleitung, Disposition, QM]\nDatum: [WANN?]\nThemen: [STICHPUNKTE, z.B. - Inventurdifferenzen Q1 besprechen - Neue Kommissionierstrategie - Azubi-Einsatzplan]\nBeschlüsse: [WAS WURDE ENTSCHIEDEN?]\nOffene Punkte: [WAS IST NOCH ZU KLÄREN?]',
+    stil: { ton: 'sachlich, knapp', struktur: 'Tabelle mit Spalten: Thema | Ergebnis | Verantwortlich | Frist' } },
+  s4: { title: 'Meetingvorbereitung', prompt: 'Bereite folgendes Meeting vor:\n\nZiel des Meetings: [WAS SOLL ERREICHT WERDEN? z.B. Entscheidung über neues WMS-System]\nTeilnehmer: [WER KOMMT? z.B. Geschäftsführung, IT, Lagerleitung, Betriebsrat]\nZeitrahmen: [WIE LANGE? z.B. 60 Minuten]\nVorgeschichte: [KONTEXT, z.B. Zwei Anbieter wurden bereits vorgestellt, Testphase läuft]\n\nErstelle:\n1. Agenda mit Zeitblöcken\n2. Je Agendapunkt: 2-3 Leitfragen\n3. Liste: Was muss VOR dem Meeting vorbereitet werden?' },
+};
+
+function prefillStilFromScenario(stilData) {
+  if (!stilData) return;
+  var fields = { anrede: 'sf-anrede', laenge: 'sf-laenge', ton: 'sf-ton', struktur: 'sf-struktur', vermeide: 'sf-vermeide' };
+  for (var k in fields) {
+    if (stilData[k]) {
+      var el = document.getElementById(fields[k]);
+      if (el && !el.value.trim()) { el.value = stilData[k]; }
+    }
+  }
+  updateStilPrompt();
+}
+
+function showPresetScenario(key) {
+  const container = document.getElementById('scenario-display');
+  if (!key) { container.innerHTML = ''; return; }
+  const s = scenarioPresets[key];
+  if (!s) return;
+  // Auto-Add: Stil-Felder vorbefuellen wenn leer
+  if (s.stil) { prefillStilFromScenario(s.stil); }
+  const id = 'prompt-' + key;
+  // Platzhalter farbig markieren
+  const html = escapeHtml(s.prompt).replace(/\[([^\]]+)\]/g, '<span class="placeholder">[$1]</span>');
+  container.innerHTML = '<div class="prompt-box" id="' + id + '">' + html + '<button class="copy-btn" onclick="copyPrompt(\'' + id + '\')">Kopieren</button></div>';
+}
+
+/* ─── Akkordeon ─── */
+function toggleAccordion(header) {
+  const body = header.nextElementSibling;
+  const isOpen = header.classList.contains('open');
+  // Alle schliessen
+  header.parentElement.querySelectorAll('.accordion-header').forEach(h => {
+    h.classList.remove('open');
+    h.nextElementSibling.classList.remove('open');
+  });
+  // Dieses öffnen (wenn es vorher zu war)
+  if (!isOpen) {
+    header.classList.add('open');
+    body.classList.add('open');
+  }
+}
+
+/* ─── Tool-Modus ─── */
+var _removedOptgroups = [];
+function applyToolModeDropdowns(active) {
+  if (active) {
+    // Workshop-Optgroups komplett aus dem DOM entfernen (verhindert Lücke)
+    document.querySelectorAll('optgroup[data-workshop]').forEach(og => {
+      _removedOptgroups.push({ el: og, parent: og.parentNode, next: og.nextSibling });
+      og.parentNode.removeChild(og);
+    });
+    // "Vorlagen"-Optgroup: Optionen herausnehmen und Optgroup entfernen
+    document.querySelectorAll('optgroup[data-further]').forEach(og => {
+      var options = Array.from(og.children);
+      var parent = og.parentNode;
+      options.forEach(function(opt) { parent.insertBefore(opt, og); });
+      _removedOptgroups.push({ el: og, parent: parent, next: og.nextSibling, options: options });
+      parent.removeChild(og);
+    });
+  } else {
+    // Alles wiederherstellen (umgekehrte Reihenfolge)
+    _removedOptgroups.reverse().forEach(function(item) {
+      // Vorlagen-Optgroup: gespeicherte Options zuruecklegen
+      if (item.el.dataset.further) {
+        item.el.label = item.el.dataset.further;
+        (item.options || []).forEach(function(opt) {
+          if (opt.parentNode) opt.parentNode.removeChild(opt);
+          item.el.appendChild(opt);
+        });
+      }
+      if (item.next && item.next.parentNode === item.parent) {
+        item.parent.insertBefore(item.el, item.next);
+      } else {
+        item.parent.appendChild(item.el);
+      }
+    });
+    _removedOptgroups = [];
+  }
+}
+function toggleToolMode() {
+  document.body.classList.toggle('tool-mode');
+  const active = document.body.classList.contains('tool-mode');
+  document.querySelector('.tool-btn').textContent = active ? 'Tool-Modus' : 'Workshop-Modus';
+  applyToolModeDropdowns(active);
+  renderMegaProfiles();
+}
+if (new URLSearchParams(window.location.search).get('tool') === '1') {
+  document.body.classList.add('tool-mode');
+  document.querySelector('.tool-btn').textContent = 'Tool-Modus';
+  applyToolModeDropdowns(true);
+}
+
+/* ─── Toggle-Sektionen ─── */
+function toggleSection(header) {
+  const body = header.nextElementSibling;
+  const isOpen = body.classList.contains('open');
+  header.querySelector('.arrow').style.transform = isOpen ? '' : 'rotate(90deg)';
+  body.classList.toggle('open');
+}
+
+/* ─── DIN 5008 ─── */
+var _dinBasis = [
+  'Beachte folgende Schreibregeln nach DIN 5008:2020:',
+  '',
+  '- Datum: TT.MM.JJJJ (z.B. 22.03.2026), Jahreszahl immer vierstellig',
+  '- Uhrzeiten: HH:MM Uhr (z.B. 15:45 Uhr)',
+  '- Telefonnummern: Vorwahl und Rufnummer mit Leerzeichen (z.B. 06151 123456)',
+  '- IBAN: in Vierergruppen von links (z.B. DE89 3704 0044 0532 0130 00)',
+  '- Geldbeträge: einheitlich mit Tausenderpunkt und Dezimalkomma (z.B. 1.250,00 EUR)',
+  '- Postfach: zweistellig von rechts gliedern (z.B. Postfach 12 34 56)',
+  '- Abkürzungen mit geschütztem Leerzeichen (z. B., u. a., Prof. Dr.)',
+  '- Zahlen mit Einheiten: Leerzeichen dazwischen (10 km, 250 g, 3 %)',
+  '- Hervorhebungen durch Fettschrift — Unterstreichungen nur für Links',
+  '- Absätze durch je eine Leerzeile trennen'
+];
+var _dinBrief = [
+  '',
+  'Zusätzlich für den Geschäftsbrief:',
+  '',
+  '- Betreff: ohne das Wort „Betreff", fett, kein Punkt am Ende, eine Leerzeile zum Fließtext',
+  '- Kein Einzug am Absatzanfang',
+  '- Eine Leerzeile zwischen Brieftext und Grußformel',
+  '- Grußformel: ohne Satzzeichen danach, mehrere Leerzeilen Abstand vor dem gedruckten Namen',
+  '- Steuernummer / USt-IdNr.: falls vorhanden, im Fußbereich'
+];
+var _dinMail = [
+  '',
+  'Zusätzlich für die E-Mail:',
+  '',
+  '- Betreffzeile: präzise und aussagekräftig, kein „AW:" wenn es keine Antwort ist',
+  '- Fließtext einzeilig, keine Silbentrennung am Zeilenende',
+  '- Signatur: Name, Anschrift, Telefon, E-Mail-Adresse',
+  '- Geschäftlich zusätzlich: Unternehmensname, Rechtsform, Sitz, Registergericht, HRB-Nr., Geschäftsführer'
+];
+var _dinStufen = {
+  1: { label: 'Sehr förmlich', anrede: '„Sehr geehrte Frau/Herr [NAME],"', gruss: '„Mit freundlichen Grüßen"', ton: 'formell und sachlich' },
+  2: { label: 'Sachlich-freundlich', anrede: '„Guten Tag, Frau/Herr [NAME],"', gruss: '„Freundliche Grüße"', ton: 'sachlich-freundlich' },
+  3: { label: 'Freundlich', anrede: '„Hallo Frau/Herr [NAME],"', gruss: '„Beste Grüße"', ton: 'freundlich-professionell' },
+  4: { label: 'Vertraut', anrede: '„Liebe Frau/Lieber Herr [NAME],"', gruss: '„Herzliche Grüße"', ton: 'persönlich und warm' },
+  5: { label: 'Kollegial-direkt', anrede: '„Hallo [VORNAME],"', gruss: '„Viele Grüße"', ton: 'locker und direkt' }
+};
+var _dinTyp = null;
+function dinSelect(typ) {
+  _dinTyp = typ;
+  document.getElementById('din-btn-brief').classList.toggle('active', typ === 'brief');
+  document.getElementById('din-btn-mail').classList.toggle('active', typ === 'mail');
+  var hint = document.getElementById('din-stufe-hint');
+  if (!_currentStufe) {
+    hint.style.display = '';
+    document.getElementById('din-prompt').style.display = 'none';
+    return;
+  }
+  hint.style.display = 'none';
+  dinBuildPrompt();
+}
+function dinBuildPrompt() {
+  var n = _currentStufe;
+  var s = _dinStufen[n];
+  var typLines = _dinTyp === 'brief' ? _dinBrief : _dinMail;
+  var anredeGruss = [
+    '',
+    'Anrede und Grußformel (Stufe ' + n + ': ' + s.label + '):',
+    '',
+    '- Anrede: ' + s.anrede + ' — nach der Anrede Komma, kein Ausrufezeichen',
+    '- Grußformel: ' + s.gruss + ' — ohne Satzzeichen danach',
+    '- Ton: ' + s.ton
+  ];
+  var lines = _dinBasis.concat(typLines).concat(anredeGruss);
+  var box = document.getElementById('din-prompt');
+  var btn = box.querySelector('.copy-btn');
+  box.textContent = lines.join('\n');
+  box.appendChild(btn);
+  box.style.display = '';
+}
+
+/* ─── Stil-Prompt: Formalitätsstufen-Auswahl ─── */
+var _currentStufe = null;
+var _stilStufen = {
+  1: { anrede: '"Sehr geehrte Frau/Herr [NAME]," / "Sehr geehrte Damen und Herren,"', ton: 'formell und sachlich', vermeide: 'Umgangssprache, Abkürzungen, lockere Wendungen' },
+  2: { anrede: '"Guten Tag, Frau/Herr [NAME],"', ton: 'sachlich-freundlich', vermeide: 'Floskeln, übertriebene Höflichkeit, Passivkonstruktionen' },
+  3: { anrede: '"Hallo Frau/Herr [NAME],"', ton: 'freundlich-professionell', vermeide: 'Passivkonstruktionen, Bürokratendeutsch, "wir würden uns freuen"' },
+  4: { anrede: '"Liebe Frau/Lieber Herr [NAME],"', ton: 'persönlich und warm', vermeide: 'steife Formulierungen, Distanzsprache, Nominalstil' },
+  5: { anrede: '"Hallo [VORNAME]," (Du-Form)', ton: 'locker und direkt', vermeide: 'Floskeln, Passiv, umständliche Höflichkeitsformeln' }
+};
+function stilStufe(n) {
+  _currentStufe = n;
+  for (var i = 1; i <= 5; i++) document.getElementById('stil-stufe-' + i).classList.toggle('active', i === n);
+  var s = _stilStufen[n];
+  // Felder vorbefuellen
+  document.getElementById('sf-anrede').value = s.anrede;
+  document.getElementById('sf-ton').value = s.ton;
+  document.getElementById('sf-vermeide').value = s.vermeide;
+  updateStilPrompt();
+  // DIN-Prompt aktualisieren falls Dokumenttyp bereits gewählt
+  if (_dinTyp) {
+    document.getElementById('din-stufe-hint').style.display = 'none';
+    dinBuildPrompt();
+  }
+}
+function updateStilPrompt() {
+  var fields = [
+    { id: 'sf-anrede', ph: 'stil-ph-anrede', fallback: '[z.B. "Hallo Herr/Frau..." / "Sehr geehrte..." / Du-Form]' },
+    { id: 'sf-laenge', ph: 'stil-ph-laenge', fallback: '[z.B. maximal 100 Wörter / 3-5 Sätze / eine halbe Seite]' },
+    { id: 'sf-ton', ph: 'stil-ph-ton', fallback: '[z.B. sachlich-direkt / freundlich-verbindlich / formell]' },
+    { id: 'sf-struktur', ph: 'stil-ph-struktur', fallback: '[z.B. Stichpunkte / Fließtext / nummerierte Liste]' },
+    { id: 'sf-vermeide', ph: 'stil-ph-vermeide', fallback: '[z.B. Floskeln, Passivkonstruktionen, "wir würden uns freuen"]' },
+    { id: 'sf-beispiel', ph: 'stil-ph-beispiel', fallback: '[OPTIONAL: Fügen Sie hier 2-3 Sätze ein, die Sie tatsächlich so geschrieben haben]' }
+  ];
+  fields.forEach(function(f) {
+    var val = document.getElementById(f.id).value.trim();
+    var ph = document.getElementById(f.ph);
+    if (val) {
+      ph.textContent = val;
+      ph.classList.remove('placeholder'); ph.style.color = 'var(--text)';
+    } else {
+      ph.textContent = f.fallback;
+      ph.classList.add('placeholder'); ph.style.color = '';
+    }
+  });
+}
+
+/* ─── Eigene Stilprofile (localStorage) ─── */
+var _editingStilIdx = -1;
+function saveCustomStil() {
+  var name = document.getElementById('sf-name').value.trim();
+  if (!name) { document.getElementById('sf-name').focus(); return; }
+  var entry = {
+    name: name,
+    anrede: document.getElementById('sf-anrede').value.trim(),
+    laenge: document.getElementById('sf-laenge').value.trim(),
+    ton: document.getElementById('sf-ton').value.trim(),
+    struktur: document.getElementById('sf-struktur').value.trim(),
+    vermeide: document.getElementById('sf-vermeide').value.trim(),
+    beispiel: document.getElementById('sf-beispiel').value.trim()
+  };
+  var styles = getCustomStyles();
+  if (_editingStilIdx >= 0) { styles.splice(_editingStilIdx, 1); _editingStilIdx = -1; }
+  styles.push(entry);
+  store.set(STYLE_KEY, JSON.stringify(styles));
+  document.getElementById('sf-name').value = '';
+  renderStilManager();
+}
+function loadCustomStil(i) {
+  var styles = getCustomStyles();
+  var s = styles[i]; if (!s) return;
+  document.getElementById('sf-anrede').value = s.anrede || '';
+  document.getElementById('sf-laenge').value = s.laenge || '';
+  document.getElementById('sf-ton').value = s.ton || '';
+  document.getElementById('sf-struktur').value = s.struktur || '';
+  document.getElementById('sf-vermeide').value = s.vermeide || '';
+  document.getElementById('sf-beispiel').value = s.beispiel || '';
+  updateStilPrompt();
+}
+function editCustomStil(i) {
+  loadCustomStil(i);
+  var styles = getCustomStyles();
+  document.getElementById('sf-name').value = styles[i].name;
+  _editingStilIdx = i;
+  document.getElementById('sf-name').focus();
+}
+function deleteCustomStil(i) {
+  var styles = getCustomStyles();
+  styles.splice(i, 1);
+  store.set(STYLE_KEY, JSON.stringify(styles));
+  renderStilManager();
+}
+function showStilManager() {
+  var mgr = document.getElementById('stil-manager');
+  mgr.style.display = mgr.style.display === 'none' ? '' : 'none';
+  renderStilManager();
+}
+function renderStilManager() {
+  var styles = getCustomStyles();
+  var mgr = document.getElementById('stil-manager');
+  var btn = document.getElementById('manage-stile-btn');
+  btn.style.display = styles.length > 0 ? '' : 'none';
+  if (styles.length === 0) { mgr.innerHTML = ''; mgr.style.display = 'none'; return; }
+  var html = '';
+  styles.forEach(function(s, i) {
+    html += '<div style="display:flex; justify-content:space-between; align-items:center; padding:0.35rem 0.6rem; margin:0.2rem 0; background:#fef3e0; border:1px solid #e8c87a; border-radius:4px;">';
+    html += '<span style="font-size:0.88rem; cursor:pointer;" onclick="loadCustomStil(' + i + ')">' + s.name + '</span>';
+    html += '<span><a href="#" onclick="editCustomStil(' + i + '); return false;" style="font-size:0.78rem; color:var(--accent); margin-right:0.5rem;">bearbeiten</a>';
+    html += '<a href="#" onclick="deleteCustomStil(' + i + '); return false;" style="font-size:0.78rem; color:var(--red);">&times;</a></span>';
+    html += '</div>';
+  });
+  mgr.innerHTML = html;
+}
+
+/* ─── Eigene Rollen (localStorage) ─── */
+const ROLE_KEY = 'workshop-custom-roles';
+const SCENARIO_KEY = 'workshop-custom-scenarios';
+const STYLE_KEY = 'workshop-custom-styles';
+
+function getCustomRoles() {
+  try { return JSON.parse(store.get(ROLE_KEY)) || []; } catch { return []; }
+}
+function getCustomScenarios() {
+  try { return JSON.parse(store.get(SCENARIO_KEY)) || []; } catch { return []; }
+}
+function getCustomStyles() {
+  try { return JSON.parse(store.get(STYLE_KEY)) || []; } catch { return []; }
+}
+
+function showRoleForm() { document.getElementById('role-form').classList.add('open'); document.getElementById('rf-name').focus(); }
+function hideRoleForm() { document.getElementById('role-form').classList.remove('open'); _editingRoleIdx = -1; }
+
+function saveCustomRole() {
+  const name = document.getElementById('rf-name').value.trim();
+  if (!name) { document.getElementById('rf-name').focus(); return; }
+  const role = {
+    name,
+    rolle: document.getElementById('rf-rolle').value.trim() || name,
+    branche: document.getElementById('rf-branche').value.trim(),
+    abteilung: document.getElementById('rf-abteilung').value.trim(),
+    aufgaben: document.getElementById('rf-aufgaben').value.trim(),
+    ton: document.getElementById('rf-ton').value.trim()
+  };
+  const roles = getCustomRoles();
+  if (_editingRoleIdx >= 0 && _editingRoleIdx < roles.length) {
+    roles[_editingRoleIdx] = role;
+    _editingRoleIdx = -1;
+  } else {
+    roles.push(role);
+    _editingRoleIdx = -1;
+  }
+  store.set(ROLE_KEY, JSON.stringify(roles));
+  renderCustomRoles();
+  hideRoleForm();
+  ['rf-name','rf-rolle','rf-branche','rf-abteilung','rf-aufgaben','rf-ton'].forEach(id => document.getElementById(id).value = '');
+}
+
+function deleteCustomRole(i) {
+  if (!confirm('Rolle "' + getCustomRoles()[i].name + '" löschen?')) return;
+  const roles = getCustomRoles();
+  roles.splice(i, 1);
+  store.set(ROLE_KEY, JSON.stringify(roles));
+  // Alte custom_ Presets entfernen
+  Object.keys(rolePresets).filter(k => k.startsWith('custom_')).forEach(k => delete rolePresets[k]);
+  renderCustomRoles();
+  document.getElementById('role-dropdown').value = '';
+}
+
+function renderCustomRoles() {
+  const roles = getCustomRoles();
+  const group = document.getElementById('role-saved-group');
+  group.innerHTML = '';
+  if (roles.length === 0) { group.style.display = 'none'; return; }
+  group.style.display = '';
+  roles.forEach((r, i) => {
+    // In Dropdown als Option
+    const opt = document.createElement('option');
+    opt.value = 'custom_' + i;
+    opt.textContent = r.name;
+    group.appendChild(opt);
+    // Als rolePreset registrieren
+    rolePresets['custom_' + i] = { rolle: r.rolle || r.name, branche: r.branche || '', abteilung: r.abteilung || '', aufgaben: r.aufgaben || '', ton: r.ton || '' };
+  });
+}
+
+/* ─── Eigene Szenarien (localStorage) ─── */
+function showScenarioForm() { document.getElementById('scenario-form').classList.add('open'); document.getElementById('sf-title').focus(); }
+function hideScenarioForm() { document.getElementById('scenario-form').classList.remove('open'); _editingScenarioIdx = -1; }
+
+function saveCustomScenario() {
+  const title = document.getElementById('sf-title').value.trim();
+  const prompt = document.getElementById('sf-prompt').value.trim();
+  if (!title || !prompt) { (title ? document.getElementById('sf-prompt') : document.getElementById('sf-title')).focus(); return; }
+  const scenarios = getCustomScenarios();
+  if (_editingScenarioIdx >= 0 && _editingScenarioIdx < scenarios.length) {
+    scenarios[_editingScenarioIdx] = { title, prompt };
+    _editingScenarioIdx = -1;
+  } else {
+    scenarios.push({ title, prompt });
+    _editingScenarioIdx = -1;
+  }
+  store.set(SCENARIO_KEY, JSON.stringify(scenarios));
+  renderCustomScenarios();
+  hideScenarioForm();
+  document.getElementById('sf-title').value = '';
+  document.getElementById('sf-prompt').value = '';
+}
+
+function deleteCustomScenario(i) {
+  if (!confirm('Szenario "' + getCustomScenarios()[i].title + '" löschen?')) return;
+  const scenarios = getCustomScenarios();
+  scenarios.splice(i, 1);
+  store.set(SCENARIO_KEY, JSON.stringify(scenarios));
+  Object.keys(scenarioPresets).filter(k => k.startsWith('custom_s')).forEach(k => delete scenarioPresets[k]);
+  renderCustomScenarios();
+  document.getElementById('scenario-dropdown').value = '';
+  document.getElementById('scenario-display').innerHTML = '';
+}
+
+function renderCustomScenarios() {
+  const scenarios = getCustomScenarios();
+  const group = document.getElementById('scenario-saved-group');
+  group.innerHTML = '';
+  if (scenarios.length === 0) { group.style.display = 'none'; return; }
+  group.style.display = '';
+  scenarios.forEach((s, i) => {
+    const opt = document.createElement('option');
+    opt.value = 'custom_s' + i;
+    opt.textContent = s.title;
+    group.appendChild(opt);
+    scenarioPresets['custom_s' + i] = { title: s.title, prompt: s.prompt };
+  });
+}
+
+function escapeHtml(text) {
+  const d = document.createElement('div');
+  d.textContent = text;
+  return d.innerHTML;
+}
+
+/* ─── Offline-Kopie ─── */
+// Original-Quelltext beim Laden sichern (sauberer HTML ohne DOM-Aenderungen)
+var _originalHTML = null;
+(function() {
+  // fetch funktioniert auf https://, nicht auf file://
+  if (location.protocol !== 'file:') {
+    fetch(location.href).then(function(r) { return r.text(); }).then(function(t) { _originalHTML = t; }).catch(function() {});
+  }
+})();
+function downloadOfflineCopy() {
+  var roles = getCustomRoles();
+  var scenarios = getCustomScenarios();
+  var styles = getCustomStyles();
+  var megaProfiles = getMegaProfiles();
+  function buildOffline(html) {
+    // Alten Seed-Code entfernen (falls Offline-Kopie von Offline-Kopie)
+    html = html.replace(/\n\/\/ Eingebettete Daten \(Offline-Kopie\)\n[\s\S]*?(?=<\/script>)/, '');
+    // Altes Offline-Datum entfernen
+    html = html.replace(/ \| Offline-Kopie vom [\d.]+/g, '');
+    // Alle eigenen Daten als localStorage-Seed einbetten
+    var seedCode = '\n// Eingebettete Daten (Offline-Kopie)\n';
+    if (roles.length) {
+      seedCode += 'localStorage.setItem("workshop-custom-roles", ' + JSON.stringify(JSON.stringify(roles)) + ');\n';
+    }
+    if (scenarios.length) {
+      seedCode += 'localStorage.setItem("workshop-custom-scenarios", ' + JSON.stringify(JSON.stringify(scenarios)) + ');\n';
+    }
+    if (styles.length) {
+      seedCode += 'localStorage.setItem("workshop-custom-styles", ' + JSON.stringify(JSON.stringify(styles)) + ');\n';
+    }
+    if (megaProfiles.length) {
+      seedCode += 'localStorage.setItem("workshop-mega-profiles", ' + JSON.stringify(JSON.stringify(megaProfiles)) + ');\n';
+    }
+    if (roles.length || scenarios.length || styles.length || megaProfiles.length) {
+      seedCode += 'renderCustomRoles(); renderCustomScenarios(); renderStilManager(); renderMegaProfiles(); updateManagerButtons();\n';
+      var lastScript = html.lastIndexOf('<\/script>');
+      html = html.substring(0, lastScript) + seedCode + html.substring(lastScript);
+    }
+    // Offline-Datum im Footer
+    var today = new Date().toLocaleDateString('de-DE');
+    html = html.replace(
+      '1.8.0 | M\u00E4rz 2026',
+      '1.8.0 | M\u00E4rz 2026 | Offline-Kopie vom ' + today
+    );
+    var blob = new Blob([html], { type: 'text/html; charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'prompt-dash-offline.html';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  if (_originalHTML) {
+    // Sauberer Quelltext verfuegbar (HTTPS)
+    buildOffline(_originalHTML);
+  } else {
+    // Fallback fuer file:// — Original per fetch vom eigenen Pfad versuchen, sonst outerHTML bereinigen
+    fetch(location.href).then(function(r) { return r.text(); }).then(function(t) {
+      buildOffline(t);
+    }).catch(function() {
+      // Letzter Fallback: outerHTML mit Bereinigung
+      var clone = document.documentElement.cloneNode(true);
+      // Dynamisch erzeugte Inhalte zuruecksetzen
+      var promptBoxes = clone.querySelectorAll('.prompt-box');
+      promptBoxes.forEach(function(b) { b.style.display = 'none'; b.textContent = ''; });
+      var activeBtns = clone.querySelectorAll('.quick-btn.active');
+      activeBtns.forEach(function(b) { b.classList.remove('active'); });
+      var managers = clone.querySelectorAll('#role-manager, #scenario-manager');
+      managers.forEach(function(m) { m.style.display = 'none'; m.innerHTML = ''; });
+      var megaDiv = clone.querySelector('#mega-profiles');
+      if (megaDiv) megaDiv.innerHTML = '';
+      var fileBar = clone.querySelector('#file-warning-bar');
+      if (fileBar) fileBar.remove();
+      buildOffline('<!DOCTYPE html>\n' + clone.outerHTML);
+    });
+  }
+}
+
+/* ─── Rollen-/Szenarien-Verwaltung ─── */
+function showRoleManager() {
+  const mgr = document.getElementById('role-manager');
+  const roles = getCustomRoles();
+  if (mgr.style.display !== 'none') { mgr.style.display = 'none'; return; }
+  mgr.style.display = 'block';
+  mgr.innerHTML = roles.map((r, i) =>
+    '<div style="display:flex; justify-content:space-between; align-items:center; padding:0.3rem 0.5rem; margin:0.2rem 0; background:#f8d7da; border:1px solid #e0b0b0; border-radius:4px; font-size:0.85rem;">' +
+    '<span>' + escapeHtml(r.name) + '</span>' +
+    '<span style="display:flex; align-items:center; gap:0.3rem;">' +
+    '<button onclick="editCustomRole(' + i + ');" style="background:none; border:none; color:var(--accent); cursor:pointer; font-size:0.82rem; text-decoration:underline;">bearbeiten</button>' +
+    '<button onclick="deleteCustomRole(' + i + '); showRoleManager();" style="background:none; border:none; color:var(--red); cursor:pointer; font-size:1rem;">&times;</button>' +
+    '</span></div>'
+  ).join('');
+  if (!roles.length) mgr.innerHTML = '<p style="font-size:0.85rem; color:var(--grey);">Keine gespeicherten Rollen.</p>';
+}
+var _editingRoleIdx = -1;
+function editCustomRole(i) {
+  var roles = getCustomRoles();
+  var r = roles[i];
+  if (!r) return;
+  _editingRoleIdx = i;
+  document.getElementById('rf-name').value = r.name || '';
+  document.getElementById('rf-rolle').value = r.rolle || '';
+  document.getElementById('rf-branche').value = r.branche || '';
+  document.getElementById('rf-abteilung').value = r.abteilung || '';
+  document.getElementById('rf-aufgaben').value = r.aufgaben || '';
+  document.getElementById('rf-ton').value = r.ton || '';
+  document.getElementById('role-form').classList.add('open');
+  document.getElementById('role-manager').style.display = 'none';
+  document.getElementById('rf-rolle').focus();
+}
+function showScenarioManager() {
+  const mgr = document.getElementById('scenario-manager');
+  const scenarios = getCustomScenarios();
+  if (mgr.style.display !== 'none') { mgr.style.display = 'none'; return; }
+  mgr.style.display = 'block';
+  mgr.innerHTML = scenarios.map((s, i) =>
+    '<div style="display:flex; justify-content:space-between; align-items:center; padding:0.3rem 0.5rem; margin:0.2rem 0; background:#f8d7da; border:1px solid #e0b0b0; border-radius:4px; font-size:0.85rem;">' +
+    '<span>' + escapeHtml(s.title) + ' <span style="color:var(--grey); font-size:0.78rem;">(' + s.prompt.length + ' Zeichen)</span></span>' +
+    '<span style="display:flex; align-items:center; gap:0.3rem;">' +
+    '<button onclick="editCustomScenario(' + i + ');" style="background:none; border:none; color:var(--accent); cursor:pointer; font-size:0.82rem; text-decoration:underline;">bearbeiten</button>' +
+    '<button onclick="deleteCustomScenario(' + i + '); showScenarioManager();" style="background:none; border:none; color:var(--red); cursor:pointer; font-size:1rem;">&times;</button>' +
+    '</span></div>'
+  ).join('');
+  if (!scenarios.length) mgr.innerHTML = '<p style="font-size:0.85rem; color:var(--grey);">Keine gespeicherten Szenarien.</p>';
+}
+var _editingScenarioIdx = -1;
+function editCustomScenario(i) {
+  var scenarios = getCustomScenarios();
+  var s = scenarios[i];
+  if (!s) return;
+  _editingScenarioIdx = i;
+  document.getElementById('sf-title').value = s.title;
+  document.getElementById('sf-prompt').value = s.prompt;
+  document.getElementById('scenario-form').classList.add('open');
+  document.getElementById('scenario-manager').style.display = 'none';
+  document.getElementById('sf-prompt').focus();
+}
+
+// Verwalten-Buttons nur anzeigen wenn Einträge existieren
+function updateManagerButtons() {
+  const roleBtn = document.getElementById('manage-roles-btn');
+  const scenarioBtn = document.getElementById('manage-scenarios-btn');
+  if (roleBtn) roleBtn.style.display = getCustomRoles().length ? '' : 'none';
+  if (scenarioBtn) scenarioBtn.style.display = getCustomScenarios().length ? '' : 'none';
+}
+
+// Original renderCustomRoles/Scenarios erweitern
+const _origRenderRoles = renderCustomRoles;
+renderCustomRoles = function() { _origRenderRoles(); updateManagerButtons(); };
+const _origRenderScenarios = renderCustomScenarios;
+renderCustomScenarios = function() { _origRenderScenarios(); updateManagerButtons(); };
+
+// Gespeicherte Einträge beim Laden rendern
+renderCustomRoles();
+renderCustomScenarios();
+renderStilManager();
+updateMegaCount();
+renderMegaProfiles();
+updateManagerButtons();
+</script>
+</body>
+</html>
