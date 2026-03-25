@@ -1071,6 +1071,13 @@ function buildCombinedPrompt() {
   }
   var ta = document.getElementById('mega-prompt');
   ta.value = parts.join('\n\n');
+  // Rückfragen-Toggle zurücksetzen (Prompt wurde neu gebaut)
+  var rfBtn = document.getElementById('btn-rueckfragen');
+  if (rfBtn.classList.contains('active')) {
+    rfBtn.classList.remove('active');
+    rfBtn.textContent = '+ Rückfragen aktivieren';
+    document.getElementById('rueckfragen-hint').style.display = 'none';
+  }
   updateMegaCount();
   ta.focus();
   ta.scrollIntoView({ behavior: 'smooth', block: 'center' });
