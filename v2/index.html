@@ -1271,25 +1271,11 @@ const scenarioPresets = {
   s4: { title: 'Meetingvorbereitung', prompt: 'Bereite folgendes Meeting vor:\n\nZiel des Meetings: [WAS SOLL ERREICHT WERDEN? z.B. Entscheidung über neues WMS-System]\nTeilnehmer: [WER KOMMT? z.B. Geschäftsführung, IT, Lagerleitung, Betriebsrat]\nZeitrahmen: [WIE LANGE? z.B. 60 Minuten]\nVorgeschichte: [KONTEXT, z.B. Zwei Anbieter wurden bereits vorgestellt, Testphase läuft]\n\nErstelle:\n1. Agenda mit Zeitblöcken\n2. Je Agendapunkt: 2-3 Leitfragen\n3. Liste: Was muss VOR dem Meeting vorbereitet werden?' },
 };
 
-function prefillStilFromScenario(stilData) {
-  if (!stilData) return;
-  var fields = { anrede: 'sf-anrede', laenge: 'sf-laenge', ton: 'sf-ton', struktur: 'sf-struktur', vermeide: 'sf-vermeide' };
-  for (var k in fields) {
-    if (stilData[k]) {
-      var el = document.getElementById(fields[k]);
-      if (el && !el.value.trim()) { el.value = stilData[k]; }
-    }
-  }
-  updateStilPrompt();
-}
-
 function showPresetScenario(key) {
   const container = document.getElementById('scenario-display');
   if (!key) { container.innerHTML = ''; return; }
   const s = scenarioPresets[key];
   if (!s) return;
-  // Auto-Add: Stil-Felder vorbefuellen wenn leer
-  if (s.stil) { prefillStilFromScenario(s.stil); }
   const id = 'prompt-' + key;
   // Platzhalter farbig markieren
   const html = escapeHtml(s.prompt).replace(/\[([^\]]+)\]/g, '<span class="placeholder">[$1]</span>');
