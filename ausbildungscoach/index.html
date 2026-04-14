@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<!--
+  SYNC-HINWEIS: Diese Datei existiert in zwei Repos.
+  - Entwicklung: odyc-monorepo/docs/ausbildungscoach/index.html
+  - GitHub Pages: eigener Subfolder jako-odyc.github.io/ausbildungscoach/
+  Nach Aenderungen BEIDE Kopien committen und pushen.
+-->
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ausbildungscoach — KI-gestützte Unterstützung</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ausb-Coach">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1e3a5f">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+<style>
+  :root {
+    --bg: #f0f4f8; --card: #fff; --accent: #1e3a5f; --accent-light: #2d5986;
+    --green: #2d6a4f; --yellow: #b5830b; --red: #9b2226; --grey: #666;
+    --blue-light: #e8f0fe; --blue-border: #4a90d9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 17px; background: var(--bg); color: var(--accent); line-height: 1.6; }
+
+  .nav { background: var(--accent); color: white; padding: 0.5rem 1rem; position: sticky; top: 0; z-index: 100; display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .nav a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.8rem; padding: 0.25rem 0.5rem; border-radius: 3px; white-space: nowrap; }
+  .nav a:hover { background: rgba(255,255,255,0.15); color: white; }
+  .nav .nav-title { font-weight: bold; font-size: 0.9rem; color: white; margin-right: 0.5rem; }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 1rem; }
+  h1 { font-size: 1.7rem; margin-bottom: 0.3rem; }
+  h2 { font-size: 1.25rem; margin: 1.5rem 0 0.5rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.25rem; }
+  h3 { font-size: 1.05rem; margin: 1rem 0 0.3rem; }
+  .subtitle { color: var(--grey); font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+  .card { background: var(--card); border-radius: 8px; padding: 1.2rem; margin-bottom: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .card-number { display: inline-block; background: var(--accent); color: white; width: 1.8rem; height: 1.8rem; border-radius: 50%; text-align: center; line-height: 1.8rem; font-weight: bold; font-size: 0.85rem; margin-right: 0.5rem; vertical-align: middle; }
+
+  .prompt-box { background: #1e3a5f; color: #e0e8f0; border-radius: 6px; padding: 1rem; font-family: 'Consolas', 'Courier New', monospace; font-size: 0.88rem; white-space: pre-wrap; margin: 0.5rem 0; position: relative; line-height: 1.5; }
+  .prompt-box .placeholder { color: #ffd166; font-weight: bold; }
+  .copy-btn { position: absolute; top: 0.5rem; right: 0.5rem; background: rgba(255,255,255,0.15); color: #ccc; border: none; padding: 0.3rem 0.7rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
+  .copy-btn:hover { background: rgba(255,255,255,0.25); color: white; }
+  .copy-btn.copied { background: var(--green); color: white; }
+
+  /* Ampel */
+  .traffic { display: flex; gap: 0.5rem; margin: 0.5rem 0; flex-wrap: wrap; }
+  .light { padding: 0.8rem; border-radius: 6px; flex: 1; min-width: 180px; }
+  .light-green { background: #d8f3dc; border: 2px solid var(--green); }
+  .light-yellow { background: #fff3cd; border: 2px solid var(--yellow); }
+  .light-red { background: #f8d7da; border: 2px solid var(--red); }
+  .light h4 { font-size: 0.95rem; margin-bottom: 0.3rem; }
+  .light p, .light ul { font-size: 0.88rem; }
+
+  .info-box { background: var(--blue-light); border: 1px solid #b3cce6; border-radius: 6px; padding: 0.8rem; margin: 0.5rem 0; font-size: 0.9rem; }
+  .warn-box { background: #fff3cd; border: 1px solid var(--yellow); border-radius: 6px; padding: 0.8rem; margin: 0.5rem 0; font-size: 0.9rem; }
+
+  /* Suche */
+  .search-wrap { display: flex; gap: 0.5rem; margin: 0.8rem 0; flex-wrap: wrap; }
+  .search-wrap input[type="search"] { flex: 1; min-width: 200px; padding: 0.6rem 0.8rem; font-size: 1rem; border: 2px solid #c8d8e8; border-radius: 6px; }
+  .search-wrap input[type="search"]:focus { outline: none; border-color: var(--accent); }
+  .search-filters { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 0.5rem; font-size: 0.85rem; }
+  .search-filters label { display: inline-flex; align-items: center; gap: 0.25rem; background: var(--blue-light); padding: 0.3rem 0.6rem; border-radius: 4px; cursor: pointer; }
+  .search-results { margin-top: 0.8rem; }
+  .search-result { background: #fafbfc; border-left: 3px solid var(--blue-border); padding: 0.7rem 0.9rem; margin-bottom: 0.6rem; border-radius: 0 6px 6px 0; }
+  .search-result .sr-head { font-size: 0.8rem; color: var(--grey); margin-bottom: 0.3rem; }
+  .search-result .sr-head .badge { display: inline-block; background: var(--accent); color: white; padding: 0.05rem 0.4rem; border-radius: 3px; font-size: 0.75rem; margin-right: 0.3rem; }
+  .search-result .sr-snippet { font-size: 0.9rem; line-height: 1.5; }
+  .search-result mark { background: #ffd166; padding: 0 2px; }
+  .search-meta { font-size: 0.8rem; color: var(--grey); margin: 0.4rem 0; }
+
+  /* Checkliste */
+  .check-list { margin: 0.5rem 0; }
+  .check-item { display: flex; gap: 0.6rem; padding: 0.6rem 0.8rem; margin-bottom: 0.4rem; background: #fafbfc; border-left: 3px solid #ccc; border-radius: 0 6px 6px 0; align-items: flex-start; }
+  .check-item input[type="checkbox"] { margin-top: 0.25rem; flex-shrink: 0; width: 1.1rem; height: 1.1rem; cursor: pointer; }
+  .check-item.done { border-left-color: var(--green); background: #f0faf4; }
+  .check-item.done .ci-text { text-decoration: line-through; color: var(--grey); }
+  .check-item .ci-text { flex: 1; }
+  .check-item .ci-src { font-size: 0.78rem; color: var(--grey); display: block; margin-top: 0.2rem; font-style: italic; }
+  .check-item .ci-cat { display: inline-block; font-size: 0.72rem; padding: 0.05rem 0.35rem; border-radius: 3px; margin-right: 0.4rem; vertical-align: middle; }
+  .cat-hart { background: var(--green); color: white; }
+  .cat-weich { background: var(--yellow); color: white; }
+
+  .tab-bar { display: flex; gap: 0.3rem; border-bottom: 2px solid var(--accent); margin-bottom: 0.8rem; flex-wrap: wrap; }
+  .tab { padding: 0.5rem 1rem; background: var(--blue-light); border: 1px solid #c8d8e8; border-bottom: none; border-radius: 6px 6px 0 0; cursor: pointer; font-size: 0.9rem; color: var(--accent); }
+  .tab.active { background: var(--accent); color: white; border-color: var(--accent); font-weight: 600; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  ul { padding-left: 1.2rem; margin: 0.3rem 0; }
+  li { margin: 0.2rem 0; }
+  .ref { font-size: 0.85rem; color: var(--grey); margin-top: 2rem; border-top: 1px solid #ddd; padding-top: 0.5rem; }
+  .kbd { background: #eee; border: 1px solid #ccc; border-radius: 3px; padding: 0.05rem 0.4rem; font-family: monospace; font-size: 0.85rem; }
+  details { margin: 0.5rem 0; }
+  details summary { cursor: pointer; padding: 0.4rem 0; color: var(--accent-light); font-weight: 600; }
+  details summary:hover { color: var(--accent); }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    .container { padding: 0.6rem; }
+    .card { padding: 0.9rem; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <span class="nav-title">Ausbildungscoach</span>
+  <a href="#karte-1">1 KI verstehen</a>
+  <a href="#karte-2">2 Rahmen</a>
+  <a href="#karte-3">3 Themen-Navigator</a>
+  <a href="#karte-4">4 Unterweisungen</a>
+  <a href="#karte-5">5 Material</a>
+  <a href="#karte-6">6 Beratung</a>
+  <a href="#karte-7">7 Fachgespräche</a>
+  <a href="#karte-8">8 Eigene Prompts</a>
+</nav>
+
+<div class="container">
+
+<h1>Ausbildungscoach</h1>
+<p class="subtitle">KI-gestützte Unterstützung für die betriebliche Ausbildung und Beratung &mdash; für Ausbilder in Büromanagement, Lagerlogistik, Spedition und Berufskraftverkehr.</p>
+
+<div class="info-box">
+  <strong>Wichtig:</strong> Dieses Werkzeug ersetzt <em>keine</em> Sachkunde. Es hilft beim Strukturieren, Prüfen und Erzeugen von Material. Die rechtliche Verantwortung für Unterweisungen und Beratung bleibt beim qualifizierten Ausbilder.
+</div>
+
+
+<!-- ============ KARTE 1: KI VERSTEHEN ============ -->
+<section class="card" id="karte-1">
+<h2><span class="card-number">1</span>KI verstehen</h2>
+<p>Sprachmodelle erzeugen Text anhand von Wahrscheinlichkeiten. Sie wissen nicht, was sie sagen, und sie verwechseln plausibel-klingend mit korrekt. Daraus folgen drei Haltungen:</p>
+<ul>
+  <li><strong>Prüfen statt glauben</strong> — jede Ausgabe ist ein Entwurf, kein Ergebnis.</li>
+  <li><strong>Konkrete Quellen statt allgemeiner Aussagen</strong> — lassen Sie die KI auf Ihrem Material arbeiten, nicht auf ihrer Erinnerung.</li>
+  <li><strong>Mehrere KIs befragen</strong> — wo sie übereinstimmen, sind Sie auf solidem Grund. Wo sie abweichen, wird es interessant.</li>
+</ul>
+
+<h3>Begleitendes Edupad</h3>
+<p>Für den Workshop und die Weiterarbeit gibt es ein gemeinsames Edupad, in dem Teilnehmende Notizen, Prompts und Beispiele teilen können:</p>
+<p><a href="https://edupad.ch/p/cR3mlekNEV" target="_blank" rel="noopener">edupad.ch/p/cR3mlekNEV</a></p>
+
+<details>
+<summary>Mehr zur Funktionsweise</summary>
+<p style="margin-top:0.5rem">Ein Sprachmodell hat keine Datenbank, in der es nachschlägt. Es hat Muster aus Milliarden von Trainingsdokumenten und schätzt bei jeder Antwort, welches Wort statistisch als nächstes käme. Das Ergebnis kann brillant sein &mdash; oder eine eloquent vorgetragene Fiktion. Deshalb: je enger der Kontext (Ihr eigenes Material, klare Vorgaben, ein spezifischer Beruf), desto belastbarer die Antwort.</p>
+</details>
+</section>
+
+
+<!-- ============ KARTE 2: RAHMEN & DATENSCHUTZ ============ -->
+<section class="card" id="karte-2">
+<h2><span class="card-number">2</span>Rahmen &amp; Datenschutz</h2>
+<p>Was darf in den Chat mit der KI &mdash; und was nicht? Einfache Faustregel: <strong>keine personenbezogenen Daten, keine Geschäftsgeheimnisse.</strong></p>
+<div class="traffic">
+  <div class="light light-green">
+    <h4>✓ Grün &mdash; geht</h4>
+    <ul>
+      <li>Fachliche Fragen, allgemeine Sachverhalte</li>
+      <li>Entwürfe mit anonymisierten Beispielen („Azubi A, 2. LJ")</li>
+      <li>Prüfung öffentlich verfügbarer Texte</li>
+    </ul>
+  </div>
+  <div class="light light-yellow">
+    <h4>⚠ Gelb &mdash; mit Einschränkung</h4>
+    <ul>
+      <li>Betriebsinterne Abläufe nur generisch</li>
+      <li>Berufsbezogene Szenarien ohne Namen/Daten</li>
+      <li>KI-Ausgabe prüfen, bevor sie weitergereicht wird</li>
+    </ul>
+  </div>
+  <div class="light light-red">
+    <h4>✗ Rot &mdash; nicht</h4>
+    <ul>
+      <li>Namen, Geburtsdaten, Adressen von Azubis</li>
+      <li>Gesundheits-, Leistungs-, Konfliktdaten</li>
+      <li>Kunden-, Personal- oder Vertragsdaten</li>
+    </ul>
+  </div>
+</div>
+<div class="warn-box"><strong>Kurzregel:</strong> Was Sie der Schwiegermutter nicht per Postkarte schicken würden, schicken Sie auch nicht an die KI.</div>
+</section>
+
+
+<!-- ============ KARTE 3: THEMEN-NAVIGATOR ============ -->
+<section class="card" id="karte-3">
+<h2><span class="card-number">3</span>Themen-Navigator &mdash; Begriffssuche über Lehrpläne</h2>
+<p>Suche nach einem Fachbegriff (z.&nbsp;B. <em>Stapler</em>, <em>Gefahrgut</em>, <em>Incoterms</em>) und finde, in welchen Lehrplänen und Lernfeldern er vorkommt. Grundlage: die eingebundenen Rahmenlehrpläne (KMK) und Ausbildungsrahmenpläne (BIBB).</p>
+
+<div class="search-filters" id="search-filters">
+  <label><input type="checkbox" value="buero" checked> Büromanagement</label>
+  <label><input type="checkbox" value="fll" checked> Lagerlogistik / Fachlagerist</label>
+  <label><input type="checkbox" value="spedition" checked> Spedition &amp; Logistikdienstleistung</label>
+  <label><input type="checkbox" value="bkf" checked> Berufskraftfahrer</label>
+</div>
+<div class="search-wrap">
+  <input id="search-input" type="search" placeholder="Begriff eingeben &mdash; z.B. Stapler, Incoterms, Arbeitsschutz" autocomplete="off" disabled>
+  <button class="tab active" id="search-btn" style="border:0; cursor:pointer; opacity:0.5" disabled>Suchen</button>
+</div>
+<div class="search-meta" id="search-meta">Datenbank lädt&hellip;</div>
+<div class="search-results" id="search-results"></div>
+</section>
+
+
+<!-- ============ KARTE 4: UNTERWEISUNGEN ============ -->
+<section class="card" id="karte-4">
+<h2><span class="card-number">4</span>Unterweisungen nach §12 ArbSchG</h2>
+<p>Unterweisungen dürfen nur von <strong>sachkundigen und beauftragten Personen</strong> durchgeführt werden. Bevor Sie eine Unterweisung mit KI-Unterstützung vorbereiten, gehen Sie die Formalia-Checkliste durch. Erst wenn diese Voraussetzungen stehen, lohnt sich der Entwurf.</p>
+
+<div class="tab-bar">
+  <button class="tab active" data-panel="p-modus-a">Modus A: Formale Unterweisung</button>
+  <button class="tab" data-panel="p-modus-b">Modus B: Einweisung (informell)</button>
+</div>
+
+<div class="tab-panel active" id="p-modus-a">
+  <h3>Abgrenzung Unterweisung / Einweisung</h3>
+  <div class="info-box">
+    <p><strong>Unterweisung</strong> nach §12 ArbSchG ist eine verpflichtende, dokumentierte, arbeitsplatz- und tätigkeitsbezogene Anweisung an Beschäftigte. Sie muss <em>vor</em> Tätigkeitsaufnahme und mindestens <em>jährlich</em> erfolgen und von einer sachkundigen Person gehalten werden.</p>
+    <p style="margin-top:0.4rem"><strong>Einweisung</strong> ist die praktische Erklärung eines Geräts oder Ablaufs ohne formale Pflichten (z.&nbsp;B. Bedienung eines Bürokopierers). Eine Einweisung ersetzt <em>keine</em> Unterweisung bei sicherheitsrelevanten Tätigkeiten.</p>
+  </div>
+
+  <h3>Formalia-Checkliste (10 Punkte)</h3>
+  <p class="search-meta">Gehen Sie die Liste durch, bevor Sie einen KI-Entwurf starten. Grüne Marker = harte rechtliche Grundlage. Gelbe Marker = fachlich anerkannter Standard, rechtlich aus §12 ArbSchG abgeleitet.</p>
+
+  <div class="check-list" id="unterweisung-check">
+    <!-- items werden per JS injiziert fuer Zustandspersistenz -->
+  </div>
+
+  <h3>KI-Prompt-Starter (nach bestandener Checkliste)</h3>
+  <div class="prompt-box">Erstelle einen Unterweisungsentwurf für folgende Tätigkeit:
+
+Tätigkeit: <span class="placeholder">[TÄTIGKEIT, z.B. Bedienung eines Gabelstaplers im Lager]</span>
+Beruf/Zielgruppe: <span class="placeholder">[z.B. Azubi 1. Lehrjahr, Fachkraft für Lagerlogistik]</span>
+Sprachniveau: <span class="placeholder">[A2 / B1 / B2 / Muttersprachniveau]</span>
+Betriebliche Besonderheiten: <span class="placeholder">[kurze Stichpunkte, anonymisiert]</span>
+
+ANFORDERUNGEN:
+- Struktur: Einstieg, Gefährdungen, Regeln, praktischer Teil, Verständnisfragen
+- Bezug auf §12 ArbSchG und relevante DGUV-Schriften nennen
+- Keine personenbezogenen Daten im Entwurf
+- Am Ende: 3 Verständnisfragen zum Abgleich mit dem Teilnehmer
+
+WICHTIG: Dieser Entwurf ist eine VORLAGE. Die inhaltliche und rechtliche Prüfung und die Dokumentation (Datum, Teilnehmer, Unterschrift) liegen bei mir als sachkundigem Unterweiser.<button class="copy-btn" onclick="copyPromptBox(this)">Kopieren</button></div>
+
+  <details>
+  <summary>Verantwortungskern: Was die KI nicht übernimmt</summary>
+  <ul style="margin-top:0.4rem">
+    <li><strong>Sachkunde</strong> &mdash; Bewertung, ob der Inhalt fachlich korrekt und auf den Betrieb anwendbar ist</li>
+    <li><strong>Gefährdungsbeurteilung</strong> &mdash; muss <em>vorab</em> vorliegen, die KI kann sie nicht erstellen</li>
+    <li><strong>Durchführung</strong> &mdash; die Unterweisung selbst muss eine sachkundige Person halten</li>
+    <li><strong>Dokumentation</strong> &mdash; Datum, Teilnehmer, Unterschrift sind rechtlich bindend und bleiben beim Ausbilder</li>
+    <li><strong>Verständnisprüfung</strong> &mdash; ob die Teilnehmenden es verstanden haben, kann nur ein Mensch im Gespräch feststellen</li>
+  </ul>
+  </details>
+</div>
+
+<div class="tab-panel" id="p-modus-b">
+  <h3>Einweisung: kurz und pragmatisch</h3>
+  <p>Für nicht-sicherheitskritische Geräte oder Abläufe (Drucker, interne Software, Ablagesystem). Keine formale Dokumentationspflicht, aber eine klare Struktur hilft dem Azubi trotzdem.</p>
+  <div class="prompt-box">Erstelle eine kurze Einweisung (max. 1 Seite) für:
+
+Gerät/Ablauf: <span class="placeholder">[z.B. Ablagesystem im Lager / Bürodrucker XY]</span>
+Zielgruppe: <span class="placeholder">[z.B. neuer Azubi, 1. Woche]</span>
+
+STRUKTUR:
+1. Zweck und Einordnung
+2. Schritt-für-Schritt-Bedienung
+3. Typische Fehler und wie man sie vermeidet
+4. Wen ansprechen bei Problemen
+
+HINWEIS: Dies ist eine Einweisung, KEINE Unterweisung nach §12 ArbSchG.<button class="copy-btn" onclick="copyPromptBox(this)">Kopieren</button></div>
+</div>
+</section>
+
+
+<!-- ============ KARTE 5: MATERIAL ============ -->
+<section class="card" id="karte-5">
+<h2><span class="card-number">5</span>Material analysieren und überarbeiten</h2>
+<p>Effektiver als Generieren aus dem Nichts: lassen Sie die KI <em>vorhandenes</em> Material prüfen und verbessern. Das reduziert Halluzinationen und behält Ihre Fachsprache bei.</p>
+
+<h3>Zustandsprüfung: 5 Achsen</h3>
+<ul>
+  <li><strong>Vollständigkeit</strong> &mdash; fehlen Punkte, die rechtlich oder fachlich da sein müssten?</li>
+  <li><strong>Eindeutigkeit</strong> &mdash; gibt es Formulierungen, die unterschiedlich verstanden werden können?</li>
+  <li><strong>Empfängerrisiko</strong> &mdash; passt Sprache und Niveau zur Zielgruppe?</li>
+  <li><strong>Struktur</strong> &mdash; ist der Aufbau logisch, Abschnitte klar getrennt?</li>
+  <li><strong>Ton</strong> &mdash; wirkt der Text wertschätzend und professionell?</li>
+</ul>
+
+<div class="prompt-box">Analysiere den folgenden Text entlang dieser 5 Achsen:
+(1) Vollständigkeit (2) Eindeutigkeit (3) Empfängerrisiko (4) Struktur (5) Ton
+
+Zielgruppe: <span class="placeholder">[z.B. Azubis 1. LJ, Fachkraft für Lagerlogistik]</span>
+Zweck: <span class="placeholder">[z.B. Unterweisungsentwurf / Beratungsgespräch / Prüfungsaufgabe]</span>
+
+TEXT:
+<span class="placeholder">[Eigenen Text hier einfügen]</span>
+
+AUFGABE:
+1. Nenne pro Achse: was ist OK, was ist schwach, konkrete Verbesserung
+2. Schlage KEINE komplette Neufassung vor, sondern gezielte Eingriffe
+3. Wenn etwas rechtlich fragwürdig wirkt, markiere es mit ⚠ und erkläre kurz
+
+Am Ende: zusammenfassende Einschätzung in 2-3 Sätzen.<button class="copy-btn" onclick="copyPromptBox(this)">Kopieren</button></div>
+</section>
+
+
+<!-- ============ KARTE 6: BERATUNG ============ -->
+<section class="card" id="karte-6">
+<h2><span class="card-number">6</span>Ausbildungsberatung</h2>
+<p>Für die Beratung eines Azubis ist die Diff zwischen zwei KIs selbst Information: wo beide übereinstimmen, sind Sie auf sicherem Grund; wo sie abweichen, lohnt sich ein zweiter Gedanke.</p>
+
+<div class="info-box">
+  <strong>Keine Personendaten.</strong> Beschreibe die Situation generisch: Lehrjahr, Tätigkeitsfeld, beobachtetes Verhalten. Namen und persönliche Details bleiben draußen.
+</div>
+
+<h3>Ausgangslage beschreiben</h3>
+<div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem; margin:0.6rem 0">
+  <label style="font-size:0.9rem">Kontext
+    <select id="beratung-context" style="width:100%; padding:0.4rem; border-radius:4px; border:1px solid #c8d8e8; margin-top:0.2rem">
+      <option value="praktikant">Praktikant, noch nicht in Ausbildung</option>
+      <option value="berufsorientierung">Berufsorientierung / Wahl-Unsicherheit</option>
+      <option value="azubi-1lj">Azubi 1. Lehrjahr</option>
+      <option value="azubi-2lj">Azubi 2. Lehrjahr</option>
+      <option value="azubi-3lj">Azubi 3. Lehrjahr, vor Prüfung</option>
+    </select>
+  </label>
+  <label style="font-size:0.9rem">Anlass
+    <select id="beratung-anlass" style="width:100%; padding:0.4rem; border-radius:4px; border:1px solid #c8d8e8; margin-top:0.2rem">
+      <option value="passung">Passung Beruf / Person</option>
+      <option value="leistung">Leistungsabfall oder -auffälligkeit</option>
+      <option value="foerderung">Fördermöglichkeiten</option>
+      <option value="konflikt">Konflikt mit Kollegen / Anleitung</option>
+      <option value="motivation">Motivation / Perspektive</option>
+      <option value="pruefungsangst">Prüfungsangst / Prüfungsvorbereitung</option>
+    </select>
+  </label>
+</div>
+
+<h3>Triangulations-Prompt (an 2 KIs schicken)</h3>
+<div class="prompt-box">Ich bereite ein Beratungsgespräch mit einem Azubi vor.
+
+Kontext: <span class="placeholder">[aus Dropdown oben]</span>
+Anlass: <span class="placeholder">[aus Dropdown oben]</span>
+Beruf: <span class="placeholder">[z.B. Fachkraft für Lagerlogistik]</span>
+Beobachtete Situation (anonym): <span class="placeholder">[2-3 Sätze, ohne Namen oder Details]</span>
+
+AUFGABE:
+1. Welche drei bis fünf Fragen sollte ich im Gespräch offen stellen?
+2. Welche möglichen Ursachen sollte ich im Kopf haben?
+3. Welche konkreten Schritte kämen als Hilfsangebote in Frage?
+4. Was sollte ich NICHT tun oder sagen?
+
+Antworte strukturiert und knapp. Keine Diagnose, sondern Orientierung.<button class="copy-btn" onclick="copyPromptBox(this)">Kopieren</button></div>
+
+<details>
+<summary>So nutzen Sie die Triangulation</summary>
+<ol style="margin-top:0.5rem; padding-left: 1.4rem">
+  <li>Prompt oben kopieren, Platzhalter anpassen</li>
+  <li>An KI 1 schicken (z.&nbsp;B. ChatGPT) &mdash; Antwort speichern</li>
+  <li>Dasselbe an KI 2 schicken (z.&nbsp;B. Claude) &mdash; Antwort speichern</li>
+  <li>Beide Antworten vergleichen: Wo stimmen sie überein? Wo weichen sie ab?</li>
+  <li><strong>Konsens</strong> = solide Orientierung. <strong>Divergenz</strong> = genau hier selbst nachdenken, nicht der Mehrheit folgen.</li>
+</ol>
+</details>
+</section>
+
+
+<!-- ============ KARTE 7: FACHGESPRÄCHE ============ -->
+<section class="card" id="karte-7">
+<h2><span class="card-number">7</span>Fachgespräche &amp; Prüfungsvorbereitung</h2>
+<p>Aufgabensätze, Leitfragen und Feedback-Formulierungen lassen sich mit KI effizient entwerfen &mdash; wenn Sie den Prüfungsrahmen präzise vorgeben.</p>
+
+<div class="prompt-box">Erstelle <span class="placeholder">[ANZAHL]</span> Übungsfragen für ein Fachgespräch zur Vorbereitung auf die <span class="placeholder">[Zwischen-/Abschluss-]</span>prüfung.
+
+Beruf: <span class="placeholder">[z.B. Kfm. Spedition und Logistikdienstleistung]</span>
+Lernfeld/Themenbereich: <span class="placeholder">[z.B. Lernfeld 7 &mdash; Güterbeförderung planen]</span>
+Schwierigkeitsgrad: <span class="placeholder">[leicht / mittel / schwer]</span>
+
+FORMAT pro Frage:
+- Frage
+- Erwartete Kernpunkte in der Antwort (3-5 Stichworte)
+- Mögliche Nachfrage zur Vertiefung
+- Typischer Fehler, auf den zu achten ist
+
+Am Ende: kurzer Hinweis, welche Lernfeld-Inhalte die Fragen abdecken.<button class="copy-btn" onclick="copyPromptBox(this)">Kopieren</button></div>
+</section>
+
+
+<!-- ============ KARTE 8: EIGENE PROMPTS ============ -->
+<section class="card" id="karte-8">
+<h2><span class="card-number">8</span>Eigene Prompts speichern</h2>
+<p>Speichern Sie gelungene Prompts lokal in Ihrem Browser, um sie später wiederzufinden. Die Daten verlassen Ihr Gerät nicht.</p>
+
+<div style="margin:0.6rem 0">
+  <input id="prompt-title" type="text" placeholder="Titel des Prompts" style="width:100%; padding:0.5rem; border:1px solid #c8d8e8; border-radius:4px; margin-bottom:0.4rem">
+  <textarea id="prompt-text" rows="6" placeholder="Prompt-Text" style="width:100%; padding:0.5rem; border:1px solid #c8d8e8; border-radius:4px; font-family:Consolas, monospace; font-size:0.85rem"></textarea>
+  <button onclick="savePrompt()" style="margin-top:0.4rem; background:var(--accent); color:white; border:0; padding:0.5rem 1rem; border-radius:4px; cursor:pointer">Speichern</button>
+</div>
+
+<h3>Gespeicherte Prompts</h3>
+<div id="saved-prompts" class="search-meta">Noch keine Prompts gespeichert.</div>
+</section>
+
+
+<div class="ref">
+  <p><strong>Datengrundlagen:</strong> KMK-Rahmenlehrpläne (Büromanagement 2013 i.d.F. 2025, Fachkraft für Lagerlogistik 2004, Berufskraftfahrer 2000 i.d.F. 2017), BIBB-Verordnungen (Lagerlogistik/Fachlagerist 2004, Spedition 2004, Büromanagement 2025), sterac Ausbildungsrahmenplan Spedition.</p>
+  <p><strong>Hinweis zur Begriffssuche:</strong> Die Lehrpläne verwenden formale Fachsprache. Alltagsbegriffe wie „Stapler" kommen nicht vor &mdash; gesucht werden sollte z.&nbsp;B. nach „Flurförderzeug", „Ladehilfsmittel", „Kommissionierung" oder „Güter".</p>
+  <p><strong>Kontakt:</strong> Jaroslav Kois &mdash; jaro_kois@web.de</p>
+  <p><em>Kein Rechtsrat. Dieses Werkzeug ersetzt keine Sachkunde.</em></p>
+
+  <div style="margin-top:1.5rem; display:flex; gap:1.5rem; align-items:flex-start; flex-wrap:wrap;">
+    <div style="flex-shrink:0; text-align:center;">
+      <p style="font-size:0.85rem; color:var(--grey); margin-bottom:0.3rem;">Auf dem Smartphone öffnen:</p>
+      <svg width="160" height="160" viewBox="0 0 37 37" xmlns="http://www.w3.org/2000/svg" style="border:1px solid #ddd; border-radius:4px; padding:4px; background:white;"><rect width="37" height="37" fill="white"/><path d="M2,2h1v1h-1zM3,2h1v1h-1zM4,2h1v1h-1zM5,2h1v1h-1zM6,2h1v1h-1zM7,2h1v1h-1zM8,2h1v1h-1zM10,2h1v1h-1zM12,2h1v1h-1zM13,2h1v1h-1zM16,2h1v1h-1zM18,2h1v1h-1zM20,2h1v1h-1zM21,2h1v1h-1zM22,2h1v1h-1zM25,2h1v1h-1zM28,2h1v1h-1zM29,2h1v1h-1zM30,2h1v1h-1zM31,2h1v1h-1zM32,2h1v1h-1zM33,2h1v1h-1zM34,2h1v1h-1zM2,3h1v1h-1zM8,3h1v1h-1zM10,3h1v1h-1zM12,3h1v1h-1zM13,3h1v1h-1zM16,3h1v1h-1zM18,3h1v1h-1zM19,3h1v1h-1zM22,3h1v1h-1zM23,3h1v1h-1zM24,3h1v1h-1zM25,3h1v1h-1zM26,3h1v1h-1zM28,3h1v1h-1zM34,3h1v1h-1zM2,4h1v1h-1zM4,4h1v1h-1zM5,4h1v1h-1zM6,4h1v1h-1zM8,4h1v1h-1zM11,4h1v1h-1zM15,4h1v1h-1zM16,4h1v1h-1zM18,4h1v1h-1zM20,4h1v1h-1zM21,4h1v1h-1zM22,4h1v1h-1zM26,4h1v1h-1zM28,4h1v1h-1zM30,4h1v1h-1zM31,4h1v1h-1zM32,4h1v1h-1zM34,4h1v1h-1zM2,5h1v1h-1zM4,5h1v1h-1zM5,5h1v1h-1zM6,5h1v1h-1zM8,5h1v1h-1zM10,5h1v1h-1zM11,5h1v1h-1zM14,5h1v1h-1zM17,5h1v1h-1zM20,5h1v1h-1zM23,5h1v1h-1zM25,5h1v1h-1zM26,5h1v1h-1zM28,5h1v1h-1zM30,5h1v1h-1zM31,5h1v1h-1zM32,5h1v1h-1zM34,5h1v1h-1zM2,6h1v1h-1zM4,6h1v1h-1zM5,6h1v1h-1zM6,6h1v1h-1zM8,6h1v1h-1zM11,6h1v1h-1zM18,6h1v1h-1zM20,6h1v1h-1zM23,6h1v1h-1zM28,6h1v1h-1zM30,6h1v1h-1zM31,6h1v1h-1zM32,6h1v1h-1zM34,6h1v1h-1zM2,7h1v1h-1zM8,7h1v1h-1zM13,7h1v1h-1zM15,7h1v1h-1zM16,7h1v1h-1zM17,7h1v1h-1zM18,7h1v1h-1zM23,7h1v1h-1zM28,7h1v1h-1zM34,7h1v1h-1zM2,8h1v1h-1zM3,8h1v1h-1zM4,8h1v1h-1zM5,8h1v1h-1zM6,8h1v1h-1zM7,8h1v1h-1zM8,8h1v1h-1zM10,8h1v1h-1zM12,8h1v1h-1zM14,8h1v1h-1zM16,8h1v1h-1zM18,8h1v1h-1zM20,8h1v1h-1zM22,8h1v1h-1zM24,8h1v1h-1zM26,8h1v1h-1zM28,8h1v1h-1zM29,8h1v1h-1zM30,8h1v1h-1zM31,8h1v1h-1zM32,8h1v1h-1zM33,8h1v1h-1zM34,8h1v1h-1zM10,9h1v1h-1zM11,9h1v1h-1zM12,9h1v1h-1zM13,9h1v1h-1zM17,9h1v1h-1zM18,9h1v1h-1zM19,9h1v1h-1zM21,9h1v1h-1zM24,9h1v1h-1zM25,9h1v1h-1zM2,10h1v1h-1zM4,10h1v1h-1zM5,10h1v1h-1zM7,10h1v1h-1zM8,10h1v1h-1zM9,10h1v1h-1zM12,10h1v1h-1zM14,10h1v1h-1zM16,10h1v1h-1zM17,10h1v1h-1zM18,10h1v1h-1zM19,10h1v1h-1zM20,10h1v1h-1zM22,10h1v1h-1zM23,10h1v1h-1zM25,10h1v1h-1zM28,10h1v1h-1zM31,10h1v1h-1zM33,10h1v1h-1zM34,10h1v1h-1zM3,11h1v1h-1zM6,11h1v1h-1zM10,11h1v1h-1zM13,11h1v1h-1zM15,11h1v1h-1zM16,11h1v1h-1zM18,11h1v1h-1zM19,11h1v1h-1zM21,11h1v1h-1zM22,11h1v1h-1zM25,11h1v1h-1zM26,11h1v1h-1zM28,11h1v1h-1zM29,11h1v1h-1zM31,11h1v1h-1zM32,11h1v1h-1zM34,11h1v1h-1zM3,12h1v1h-1zM4,12h1v1h-1zM5,12h1v1h-1zM7,12h1v1h-1zM8,12h1v1h-1zM10,12h1v1h-1zM11,12h1v1h-1zM13,12h1v1h-1zM14,12h1v1h-1zM15,12h1v1h-1zM18,12h1v1h-1zM20,12h1v1h-1zM23,12h1v1h-1zM24,12h1v1h-1zM25,12h1v1h-1zM26,12h1v1h-1zM28,12h1v1h-1zM29,12h1v1h-1zM30,12h1v1h-1zM31,12h1v1h-1zM33,12h1v1h-1zM34,12h1v1h-1zM3,13h1v1h-1zM4,13h1v1h-1zM5,13h1v1h-1zM7,13h1v1h-1zM9,13h1v1h-1zM10,13h1v1h-1zM11,13h1v1h-1zM12,13h1v1h-1zM13,13h1v1h-1zM17,13h1v1h-1zM19,13h1v1h-1zM21,13h1v1h-1zM23,13h1v1h-1zM24,13h1v1h-1zM25,13h1v1h-1zM26,13h1v1h-1zM28,13h1v1h-1zM29,13h1v1h-1zM31,13h1v1h-1zM3,14h1v1h-1zM4,14h1v1h-1zM5,14h1v1h-1zM6,14h1v1h-1zM7,14h1v1h-1zM8,14h1v1h-1zM10,14h1v1h-1zM11,14h1v1h-1zM12,14h1v1h-1zM16,14h1v1h-1zM18,14h1v1h-1zM21,14h1v1h-1zM22,14h1v1h-1zM23,14h1v1h-1zM24,14h1v1h-1zM25,14h1v1h-1zM26,14h1v1h-1zM27,14h1v1h-1zM30,14h1v1h-1zM31,14h1v1h-1zM34,14h1v1h-1zM2,15h1v1h-1zM5,15h1v1h-1zM7,15h1v1h-1zM9,15h1v1h-1zM12,15h1v1h-1zM14,15h1v1h-1zM16,15h1v1h-1zM19,15h1v1h-1zM22,15h1v1h-1zM26,15h1v1h-1zM29,15h1v1h-1zM32,15h1v1h-1zM33,15h1v1h-1zM2,16h1v1h-1zM3,16h1v1h-1zM4,16h1v1h-1zM8,16h1v1h-1zM9,16h1v1h-1zM10,16h1v1h-1zM12,16h1v1h-1zM14,16h1v1h-1zM16,16h1v1h-1zM20,16h1v1h-1zM21,16h1v1h-1zM22,16h1v1h-1zM26,16h1v1h-1zM28,16h1v1h-1zM29,16h1v1h-1zM6,17h1v1h-1zM7,17h1v1h-1zM9,17h1v1h-1zM16,17h1v1h-1zM17,17h1v1h-1zM23,17h1v1h-1zM25,17h1v1h-1zM26,17h1v1h-1zM27,17h1v1h-1zM28,17h1v1h-1zM31,17h1v1h-1zM32,17h1v1h-1zM2,18h1v1h-1zM8,18h1v1h-1zM9,18h1v1h-1zM10,18h1v1h-1zM11,18h1v1h-1zM14,18h1v1h-1zM15,18h1v1h-1zM20,18h1v1h-1zM22,18h1v1h-1zM23,18h1v1h-1zM24,18h1v1h-1zM25,18h1v1h-1zM27,18h1v1h-1zM28,18h1v1h-1zM30,18h1v1h-1zM31,18h1v1h-1zM32,18h1v1h-1zM2,19h1v1h-1zM4,19h1v1h-1zM6,19h1v1h-1zM7,19h1v1h-1zM10,19h1v1h-1zM13,19h1v1h-1zM15,19h1v1h-1zM17,19h1v1h-1zM18,19h1v1h-1zM22,19h1v1h-1zM25,19h1v1h-1zM26,19h1v1h-1zM27,19h1v1h-1zM28,19h1v1h-1zM30,19h1v1h-1zM31,19h1v1h-1zM33,19h1v1h-1zM34,19h1v1h-1zM3,20h1v1h-1zM4,20h1v1h-1zM5,20h1v1h-1zM6,20h1v1h-1zM7,20h1v1h-1zM8,20h1v1h-1zM9,20h1v1h-1zM10,20h1v1h-1zM12,20h1v1h-1zM13,20h1v1h-1zM14,20h1v1h-1zM15,20h1v1h-1zM17,20h1v1h-1zM18,20h1v1h-1zM20,20h1v1h-1zM22,20h1v1h-1zM23,20h1v1h-1zM29,20h1v1h-1zM30,20h1v1h-1zM32,20h1v1h-1zM33,20h1v1h-1zM2,21h1v1h-1zM4,21h1v1h-1zM5,21h1v1h-1zM7,21h1v1h-1zM9,21h1v1h-1zM13,21h1v1h-1zM17,21h1v1h-1zM18,21h1v1h-1zM19,21h1v1h-1zM20,21h1v1h-1zM21,21h1v1h-1zM24,21h1v1h-1zM27,21h1v1h-1zM30,21h1v1h-1zM2,22h1v1h-1zM3,22h1v1h-1zM6,22h1v1h-1zM7,22h1v1h-1zM8,22h1v1h-1zM10,22h1v1h-1zM11,22h1v1h-1zM12,22h1v1h-1zM14,22h1v1h-1zM17,22h1v1h-1zM18,22h1v1h-1zM21,22h1v1h-1zM24,22h1v1h-1zM25,22h1v1h-1zM31,22h1v1h-1zM32,22h1v1h-1zM33,22h1v1h-1zM2,23h1v1h-1zM4,23h1v1h-1zM5,23h1v1h-1zM6,23h1v1h-1zM9,23h1v1h-1zM11,23h1v1h-1zM12,23h1v1h-1zM13,23h1v1h-1zM15,23h1v1h-1zM16,23h1v1h-1zM17,23h1v1h-1zM18,23h1v1h-1zM22,23h1v1h-1zM24,23h1v1h-1zM25,23h1v1h-1zM28,23h1v1h-1zM31,23h1v1h-1zM32,23h1v1h-1zM34,23h1v1h-1zM4,24h1v1h-1zM5,24h1v1h-1zM6,24h1v1h-1zM7,24h1v1h-1zM8,24h1v1h-1zM9,24h1v1h-1zM11,24h1v1h-1zM12,24h1v1h-1zM13,24h1v1h-1zM17,24h1v1h-1zM21,24h1v1h-1zM22,24h1v1h-1zM25,24h1v1h-1zM26,24h1v1h-1zM30,24h1v1h-1zM31,24h1v1h-1zM33,24h1v1h-1zM34,24h1v1h-1zM3,25h1v1h-1zM4,25h1v1h-1zM9,25h1v1h-1zM11,25h1v1h-1zM17,25h1v1h-1zM22,25h1v1h-1zM27,25h1v1h-1zM28,25h1v1h-1zM29,25h1v1h-1zM31,25h1v1h-1zM2,26h1v1h-1zM4,26h1v1h-1zM5,26h1v1h-1zM8,26h1v1h-1zM10,26h1v1h-1zM12,26h1v1h-1zM15,26h1v1h-1zM16,26h1v1h-1zM19,26h1v1h-1zM20,26h1v1h-1zM21,26h1v1h-1zM24,26h1v1h-1zM26,26h1v1h-1zM27,26h1v1h-1zM28,26h1v1h-1zM29,26h1v1h-1zM30,26h1v1h-1zM31,26h1v1h-1zM33,26h1v1h-1zM34,26h1v1h-1zM10,27h1v1h-1zM12,27h1v1h-1zM13,27h1v1h-1zM14,27h1v1h-1zM17,27h1v1h-1zM18,27h1v1h-1zM21,27h1v1h-1zM23,27h1v1h-1zM25,27h1v1h-1zM26,27h1v1h-1zM30,27h1v1h-1zM31,27h1v1h-1zM2,28h1v1h-1zM3,28h1v1h-1zM4,28h1v1h-1zM5,28h1v1h-1zM6,28h1v1h-1zM7,28h1v1h-1zM8,28h1v1h-1zM10,28h1v1h-1zM11,28h1v1h-1zM12,28h1v1h-1zM16,28h1v1h-1zM19,28h1v1h-1zM20,28h1v1h-1zM21,28h1v1h-1zM23,28h1v1h-1zM25,28h1v1h-1zM26,28h1v1h-1zM28,28h1v1h-1zM30,28h1v1h-1zM2,29h1v1h-1zM8,29h1v1h-1zM10,29h1v1h-1zM12,29h1v1h-1zM14,29h1v1h-1zM17,29h1v1h-1zM19,29h1v1h-1zM20,29h1v1h-1zM21,29h1v1h-1zM22,29h1v1h-1zM25,29h1v1h-1zM26,29h1v1h-1zM30,29h1v1h-1zM31,29h1v1h-1zM32,29h1v1h-1zM33,29h1v1h-1zM34,29h1v1h-1zM2,30h1v1h-1zM4,30h1v1h-1zM5,30h1v1h-1zM6,30h1v1h-1zM8,30h1v1h-1zM12,30h1v1h-1zM13,30h1v1h-1zM16,30h1v1h-1zM17,30h1v1h-1zM18,30h1v1h-1zM19,30h1v1h-1zM20,30h1v1h-1zM21,30h1v1h-1zM24,30h1v1h-1zM25,30h1v1h-1zM26,30h1v1h-1zM27,30h1v1h-1zM28,30h1v1h-1zM29,30h1v1h-1zM30,30h1v1h-1zM32,30h1v1h-1zM34,30h1v1h-1zM2,31h1v1h-1zM4,31h1v1h-1zM5,31h1v1h-1zM6,31h1v1h-1zM8,31h1v1h-1zM10,31h1v1h-1zM11,31h1v1h-1zM12,31h1v1h-1zM14,31h1v1h-1zM16,31h1v1h-1zM18,31h1v1h-1zM19,31h1v1h-1zM21,31h1v1h-1zM24,31h1v1h-1zM25,31h1v1h-1zM29,31h1v1h-1zM31,31h1v1h-1zM33,31h1v1h-1zM34,31h1v1h-1zM2,32h1v1h-1zM4,32h1v1h-1zM5,32h1v1h-1zM6,32h1v1h-1zM8,32h1v1h-1zM10,32h1v1h-1zM11,32h1v1h-1zM12,32h1v1h-1zM13,32h1v1h-1zM14,32h1v1h-1zM15,32h1v1h-1zM16,32h1v1h-1zM17,32h1v1h-1zM18,32h1v1h-1zM19,32h1v1h-1zM22,32h1v1h-1zM26,32h1v1h-1zM28,32h1v1h-1zM29,32h1v1h-1zM31,32h1v1h-1zM32,32h1v1h-1zM2,33h1v1h-1zM8,33h1v1h-1zM12,33h1v1h-1zM19,33h1v1h-1zM22,33h1v1h-1zM24,33h1v1h-1zM25,33h1v1h-1zM26,33h1v1h-1zM27,33h1v1h-1zM29,33h1v1h-1zM30,33h1v1h-1zM34,33h1v1h-1zM2,34h1v1h-1zM3,34h1v1h-1zM4,34h1v1h-1zM5,34h1v1h-1zM6,34h1v1h-1zM7,34h1v1h-1zM8,34h1v1h-1zM10,34h1v1h-1zM11,34h1v1h-1zM14,34h1v1h-1zM16,34h1v1h-1zM18,34h1v1h-1zM19,34h1v1h-1zM20,34h1v1h-1zM21,34h1v1h-1zM23,34h1v1h-1zM24,34h1v1h-1zM25,34h1v1h-1zM28,34h1v1h-1zM30,34h1v1h-1zM32,34h1v1h-1z" fill="#1e3a5f"/></svg>
+      <p style="font-size:0.75rem; color:var(--grey); margin-top:0.3rem;">jako-odyc.github.io/<br>ausbildungscoach/</p>
+    </div>
+
+    <div style="flex:1; min-width:220px;">
+      <p style="font-size:0.9rem; font-weight:600; margin-bottom:0.5rem;">Als App-Symbol speichern:</p>
+      <div style="font-size:0.85rem; line-height:1.5;">
+        <p style="margin-bottom:0.4rem;"><strong>iPhone / iPad (Safari):</strong></p>
+        <ol style="margin:0 0 0.6rem 1.2rem; padding:0;">
+          <li>Seite in Safari öffnen (QR-Code scannen)</li>
+          <li>Teilen-Symbol antippen (Quadrat mit Pfeil nach oben)</li>
+          <li>„Zum Home-Bildschirm" wählen</li>
+          <li>„Hinzufügen" antippen &mdash; fertig</li>
+        </ol>
+        <p style="margin-bottom:0.4rem;"><strong>Android (Chrome):</strong></p>
+        <ol style="margin:0 0 0 1.2rem; padding:0;">
+          <li>Drei-Punkte-Menü rechts oben</li>
+          <li>„Zum Startbildschirm hinzufügen"</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+
+<script>
+// ============ GEMEINSAM ============
+function copyPromptBox(btn) {
+  const box = btn.parentElement;
+  const text = Array.from(box.childNodes)
+    .filter(n => n !== btn)
+    .map(n => n.textContent)
+    .join('')
+    .replace(/\[([^\]]+)\]/g, '[$1]');
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Kopiert ✓';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Kopieren'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ============ KARTE 3: BEGRIFFSSUCHE ============
+let CURRICULA = null;
+const searchInput = document.getElementById('search-input');
+const searchBtn = document.getElementById('search-btn');
+const searchMeta = document.getElementById('search-meta');
+const searchResults = document.getElementById('search-results');
+const searchFilters = document.getElementById('search-filters');
+
+fetch('curricula-db.json')
+  .then(r => {
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return r.json();
+  })
+  .then(db => {
+    CURRICULA = db;
+    const totalChars = db.docs.reduce((s, d) => s + d.chars, 0);
+    searchMeta.innerHTML = `Datenbank geladen: ${db.docs.length} Dokumente, ${Object.keys(db.berufe).length} Berufe, ~${Math.round(totalChars/1000)}&nbsp;k Zeichen. Sie können jetzt suchen.`;
+    searchInput.disabled = false;
+    searchBtn.disabled = false;
+    searchBtn.style.opacity = '1';
+    searchInput.focus();
+  })
+  .catch(e => {
+    const isFile = location.protocol === 'file:';
+    searchMeta.innerHTML = isFile
+      ? '<strong>Suche nicht verfügbar:</strong> Die Seite wurde als Datei geöffnet. Browser blockieren in diesem Modus das Laden lokaler Datenbanken. Bitte die Seite über einen Webserver oder GitHub Pages öffnen.'
+      : '<strong>Fehler beim Laden der Datenbank:</strong> ' + e.message;
+  });
+
+function escapeRegex(s) { return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+function escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function runSearch() {
+  if (!CURRICULA) { searchMeta.textContent = 'Datenbank noch nicht geladen.'; return; }
+  const q = searchInput.value.trim();
+  if (q.length < 2) { searchResults.innerHTML = ''; searchMeta.textContent = 'Bitte mindestens 2 Zeichen eingeben.'; return; }
+
+  const activeBerufe = new Set(
+    Array.from(searchFilters.querySelectorAll('input:checked')).map(i => i.value)
+  );
+  const re = new RegExp(escapeRegex(q), 'gi');
+
+  let totalHits = 0;
+  const out = [];
+  const SNIPPET_RADIUS = 100;
+  const MAX_HITS_PER_DOC = 5;
+
+  CURRICULA.docs.forEach(doc => {
+    if (!activeBerufe.has(doc.beruf_key)) return;
+    const hits = [];
+    let m;
+    re.lastIndex = 0;
+    while ((m = re.exec(doc.text)) !== null && hits.length < MAX_HITS_PER_DOC) {
+      const start = Math.max(0, m.index - SNIPPET_RADIUS);
+      const end = Math.min(doc.text.length, m.index + q.length + SNIPPET_RADIUS);
+      let snippet = doc.text.slice(start, end);
+      if (start > 0) snippet = '…' + snippet;
+      if (end < doc.text.length) snippet = snippet + '…';
+      hits.push(snippet);
+    }
+    if (hits.length === 0) return;
+    totalHits += hits.length;
+    out.push(`
+      <div class="search-result">
+        <div class="sr-head">
+          <span class="badge">${doc.doktyp}</span>
+          <strong>${escapeHtml(doc.beruf_name)}</strong>
+          &nbsp;&middot;&nbsp; ${escapeHtml(doc.quelle)}
+          &nbsp;&middot;&nbsp; ${hits.length} Treffer
+        </div>
+        ${hits.map(s => `<div class="sr-snippet">${escapeHtml(s).replace(re, '<mark>$&</mark>')}</div>`).join('')}
+      </div>
+    `);
+  });
+
+  searchMeta.textContent = totalHits
+    ? `${totalHits} Treffer in ${out.length} Dokument(en) für „${q}".`
+    : `Keine Treffer für „${q}".`;
+  searchResults.innerHTML = out.join('');
+}
+
+searchBtn.addEventListener('click', runSearch);
+searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') runSearch(); });
+searchFilters.addEventListener('change', () => { if (searchInput.value.trim().length >= 2) runSearch(); });
+
+
+// ============ KARTE 4: CHECKLISTE ============
+const CHECKLISTE = [
+  { id: 1, kat: 'hart', text: 'Gefährdungsbeurteilung liegt vor und ist aktuell', src: '§5 ArbSchG' },
+  { id: 2, kat: 'weich', text: 'Betriebsanweisung existiert und ist Grundlage der Unterweisung', src: 'abgeleitet aus §12 ArbSchG; fachlich Standard' },
+  { id: 3, kat: 'hart', text: 'Unterweiser ist sachkundig und vom Arbeitgeber beauftragt', src: '§13 ArbSchG / DGUV V1 §4' },
+  { id: 4, kat: 'hart', text: 'Unterweisung ist arbeitsplatz- und tätigkeitsbezogen', src: '§12 Abs. 1 ArbSchG' },
+  { id: 5, kat: 'hart', text: 'Sprache und Niveau passen zu den Teilnehmenden', src: '§12 Abs. 1 Satz 4 ArbSchG' },
+  { id: 6, kat: 'weich', text: 'Praktischer Teil vorgesehen bei tätigkeitsbezogenen Unterweisungen', src: 'abgeleitet aus Wirksamkeitsgrundsatz §12 ArbSchG' },
+  { id: 7, kat: 'hart', text: 'Dokumentation mit Datum, Thema, Teilnehmern, Unterschrift', src: 'DGUV V1 §4 Abs. 1' },
+  { id: 8, kat: 'hart', text: 'Regelmäßige Wiederholung mindestens jährlich vorgesehen', src: 'DGUV V1 §4 Abs. 1' },
+  { id: 9, kat: 'hart', text: 'Besondere Qualifikationsanforderungen geprüft (z.B. Flurförderzeuge, Gefahrstoffe)', src: 'DGUV Grundsatz 308-001; GefStoffV §14' },
+  { id: 10, kat: 'weich', text: 'Verhalten bei Störung, Unfall, Brand ist Bestandteil', src: 'abgeleitet aus §12 ArbSchG; fachlich Standard' },
+];
+
+function renderChecklist() {
+  const container = document.getElementById('unterweisung-check');
+  if (!container) return;
+  const state = JSON.parse(localStorage.getItem('ausb-check') || '{}');
+  container.innerHTML = CHECKLISTE.map(it => `
+    <label class="check-item ${state[it.id] ? 'done' : ''}">
+      <input type="checkbox" data-id="${it.id}" ${state[it.id] ? 'checked' : ''}>
+      <span class="ci-text">
+        <span class="ci-cat ${it.kat === 'hart' ? 'cat-hart' : 'cat-weich'}">${it.kat === 'hart' ? 'hart' : 'weich'}</span>
+        ${escapeHtml(it.text)}
+        <span class="ci-src">${escapeHtml(it.src)}</span>
+      </span>
+    </label>
+  `).join('');
+  container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', e => {
+      const id = e.target.dataset.id;
+      const s = JSON.parse(localStorage.getItem('ausb-check') || '{}');
+      if (e.target.checked) s[id] = 1; else delete s[id];
+      localStorage.setItem('ausb-check', JSON.stringify(s));
+      e.target.closest('.check-item').classList.toggle('done', e.target.checked);
+    });
+  });
+}
+renderChecklist();
+
+
+// ============ TABS (Karte 4) ============
+document.querySelectorAll('.tab-bar .tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    const bar = tab.closest('.tab-bar');
+    bar.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const parent = bar.parentElement;
+    parent.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    const panelId = tab.dataset.panel;
+    if (panelId) document.getElementById(panelId).classList.add('active');
+  });
+});
+
+
+// ============ KARTE 8: PROMPT-SPEICHER ============
+function loadSavedPrompts() {
+  const saved = JSON.parse(localStorage.getItem('ausb-prompts') || '[]');
+  const el = document.getElementById('saved-prompts');
+  if (saved.length === 0) {
+    el.innerHTML = 'Noch keine Prompts gespeichert.';
+    return;
+  }
+  el.innerHTML = saved.map((p, i) => `
+    <details style="margin-bottom:0.5rem; background:#fafbfc; padding:0.6rem; border-radius:4px">
+      <summary><strong>${escapeHtml(p.title)}</strong> <span style="color:var(--grey); font-size:0.8rem">&mdash; ${new Date(p.ts).toLocaleDateString('de-DE')}</span></summary>
+      <pre style="white-space:pre-wrap; font-family:Consolas, monospace; font-size:0.85rem; margin-top:0.4rem">${escapeHtml(p.text)}</pre>
+      <button onclick="deletePrompt(${i})" style="margin-top:0.4rem; background:var(--red); color:white; border:0; padding:0.3rem 0.7rem; border-radius:3px; cursor:pointer; font-size:0.8rem">Löschen</button>
+    </details>
+  `).join('');
+}
+
+function savePrompt() {
+  const title = document.getElementById('prompt-title').value.trim();
+  const text = document.getElementById('prompt-text').value.trim();
+  if (!title || !text) { alert('Titel und Prompt-Text sind erforderlich.'); return; }
+  const saved = JSON.parse(localStorage.getItem('ausb-prompts') || '[]');
+  saved.push({ title, text, ts: Date.now() });
+  localStorage.setItem('ausb-prompts', JSON.stringify(saved));
+  document.getElementById('prompt-title').value = '';
+  document.getElementById('prompt-text').value = '';
+  loadSavedPrompts();
+}
+
+function deletePrompt(i) {
+  if (!confirm('Diesen Prompt löschen?')) return;
+  const saved = JSON.parse(localStorage.getItem('ausb-prompts') || '[]');
+  saved.splice(i, 1);
+  localStorage.setItem('ausb-prompts', JSON.stringify(saved));
+  loadSavedPrompts();
+}
+loadSavedPrompts();
+</script>
+
+</body>
+</html>

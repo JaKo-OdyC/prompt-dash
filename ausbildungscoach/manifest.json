@@ -1,0 +1,16 @@
+{
+  "name": "Ausbildungscoach",
+  "short_name": "Ausb-Coach",
+  "description": "KI-gestützte Unterstützung für die betriebliche Ausbildung und Beratung",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f0f4f8",
+  "theme_color": "#1e3a5f",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
