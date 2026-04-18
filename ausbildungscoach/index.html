@@ -73,12 +73,12 @@
   .search-result .sr-head .badge { display: inline-block; background: var(--accent); color: white; padding: 0.05rem 0.4rem; border-radius: 3px; font-size: 0.75rem; margin-right: 0.3rem; }
   .search-result .sr-snippet { font-size: 0.9rem; line-height: 1.5; cursor: pointer; padding: 0.3rem 0.4rem; border-radius: 4px; margin: 0.2rem -0.4rem; transition: background 0.15s; }
   .search-result .sr-snippet:hover { background: #f0f4f8; }
-  .search-result .sr-snippet .sr-long { display: none; }
-  .search-result .sr-snippet.expanded .sr-short { display: none; }
-  .search-result .sr-snippet.expanded .sr-long { display: inline; }
   .search-result .sr-snippet .sr-toggle { display: block; font-size: 0.78rem; color: var(--blue-border); margin-top: 0.35rem; user-select: none; }
   .search-result .sr-snippet.expanded { background: #f8fafc; }
+  .search-result .sr-fulltext { display: none; max-height: 420px; overflow-y: auto; background: #ffffff; border: 1px solid #c8d8e8; border-radius: 4px; padding: 0.8rem; margin-top: 0.4rem; font-size: 0.85rem; line-height: 1.55; white-space: pre-wrap; word-wrap: break-word; }
+  .search-result .sr-snippet.expanded .sr-fulltext { display: block; }
   .search-result mark { background: #ffd166; padding: 0 2px; }
+  .search-result mark.active { background: #ff9f1c; outline: 2px solid #ff6b00; }
   .search-meta { font-size: 0.8rem; color: var(--grey); margin: 0.4rem 0; }
 
   /* Checkliste */
@@ -747,7 +747,6 @@ function runSearch() {
   let totalHits = 0;
   const out = [];
   const SHORT_RADIUS = 100;
-  const LONG_RADIUS = 450;
   const MAX_HITS_PER_DOC = 5;
 
   function buildSnippet(text, matchIdx, matchLen, radius) {
@@ -765,13 +764,12 @@ function runSearch() {
     let m;
     re.lastIndex = 0;
     while ((m = re.exec(doc.text)) !== null && hits.length < MAX_HITS_PER_DOC) {
-      hits.push({
-        shortSnip: buildSnippet(doc.text, m.index, q.length, SHORT_RADIUS),
-        longSnip: buildSnippet(doc.text, m.index, q.length, LONG_RADIUS),
-      });
+      hits.push({ shortSnip: buildSnippet(doc.text, m.index, q.length, SHORT_RADIUS), matchIdx: m.index });
     }
     if (hits.length === 0) return;
     totalHits += hits.length;
+    // Volltext mit allen Mark-Tags (einmal pro doc berechnet)
+    const fullMarked = escapeHtml(doc.text).replace(re, '<mark>$&</mark>');
     out.push(`
       <div class="search-result">
         <div class="sr-head">
@@ -780,7 +778,7 @@ function runSearch() {
           &nbsp;&middot;&nbsp; ${escapeHtml(doc.quelle)}
           &nbsp;&middot;&nbsp; ${hits.length} Treffer
         </div>
-        ${hits.map(h => `<div class="sr-snippet" onclick="toggleSnippet(this)"><span class="sr-short">${escapeHtml(h.shortSnip).replace(re, '<mark>$&</mark>')}</span><span class="sr-long">${escapeHtml(h.longSnip).replace(re, '<mark>$&</mark>')}</span><span class="sr-toggle">Mehr Kontext ▾</span></div>`).join('')}
+        ${hits.map((h, idx) => `<div class="sr-snippet" data-docid="${escapeHtml(doc.id)}" data-matchidx="${h.matchIdx}" data-hitidx="${idx}" onclick="toggleSnippet(this)"><span class="sr-short">${escapeHtml(h.shortSnip).replace(re, '<mark>$&</mark>')}</span><span class="sr-toggle">Im Volltext öffnen (scrollen nach oben/unten) ▾</span><div class="sr-fulltext" data-fulltext="${encodeURIComponent(fullMarked)}"></div></div>`).join('')}
       </div>
     `);
   });
@@ -796,9 +794,39 @@ searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') runSearch(
 searchFilters.addEventListener('change', () => { if (searchInput.value.trim().length >= 2) runSearch(); });
 
 function toggleSnippet(el) {
-  el.classList.toggle('expanded');
+  const isExpanded = el.classList.toggle('expanded');
   const toggle = el.querySelector('.sr-toggle');
-  if (toggle) toggle.textContent = el.classList.contains('expanded') ? 'Weniger ▴' : 'Mehr Kontext ▾';
+  if (toggle) toggle.textContent = isExpanded ? 'Volltext schließen ▴' : 'Im Volltext öffnen (scrollen nach oben/unten) ▾';
+  if (!isExpanded) return;
+  const ft = el.querySelector('.sr-fulltext');
+  if (!ft) return;
+  // Volltext lazy einfügen, falls noch nicht drin
+  if (!ft.dataset.rendered) {
+    const html = decodeURIComponent(ft.dataset.fulltext || '');
+    // Den spezifischen Match-Treffer markieren (active-Highlight)
+    const matchIdx = parseInt(el.dataset.matchidx, 10);
+    const hitIdx = parseInt(el.dataset.hitidx, 10);
+    // Wir zählen die <mark>-Tags und aktivieren den n-ten (hitIdx)
+    let counter = 0;
+    const processed = html.replace(/<mark>([^<]*)<\/mark>/g, (m, inner) => {
+      const current = counter++;
+      return current === hitIdx ? `<mark class="active" id="sr-active-${el.dataset.docid}-${hitIdx}">${inner}</mark>` : `<mark>${inner}</mark>`;
+    });
+    ft.innerHTML = processed;
+    ft.dataset.rendered = '1';
+    // Zum aktiven Match scrollen
+    const activeMark = document.getElementById(`sr-active-${el.dataset.docid}-${hitIdx}`);
+    if (activeMark) {
+      setTimeout(() => {
+        activeMark.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }, 80);
+    }
+  } else {
+    // Bereits gerendert — nur zum aktiven Match scrollen
+    const hitIdx = el.dataset.hitidx;
+    const activeMark = document.getElementById(`sr-active-${el.dataset.docid}-${hitIdx}`);
+    if (activeMark) activeMark.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  }
 }
 window.toggleSnippet = toggleSnippet;
 
