@@ -46,6 +46,8 @@
   .copy-btn { position: absolute; top: 0.5rem; right: 0.5rem; background: rgba(255,255,255,0.15); color: #ccc; border: none; padding: 0.3rem 0.7rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
   .copy-btn:hover { background: rgba(255,255,255,0.25); color: white; }
   .copy-btn.copied { background: var(--green); color: white; }
+  .download-btn { position: absolute; top: 0.5rem; right: 5.7rem; background: rgba(255,255,255,0.15); color: #ccc; border: none; padding: 0.3rem 0.7rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
+  .download-btn:hover { background: rgba(255,255,255,0.25); color: white; }
 
   /* Ampel */
   .traffic { display: flex; gap: 0.5rem; margin: 0.5rem 0; flex-wrap: wrap; }
@@ -69,21 +71,43 @@
   .search-result { background: #fafbfc; border-left: 3px solid var(--blue-border); padding: 0.7rem 0.9rem; margin-bottom: 0.6rem; border-radius: 0 6px 6px 0; }
   .search-result .sr-head { font-size: 0.8rem; color: var(--grey); margin-bottom: 0.3rem; }
   .search-result .sr-head .badge { display: inline-block; background: var(--accent); color: white; padding: 0.05rem 0.4rem; border-radius: 3px; font-size: 0.75rem; margin-right: 0.3rem; }
-  .search-result .sr-snippet { font-size: 0.9rem; line-height: 1.5; }
+  .search-result .sr-snippet { font-size: 0.9rem; line-height: 1.5; cursor: pointer; padding: 0.3rem 0.4rem; border-radius: 4px; margin: 0.2rem -0.4rem; transition: background 0.15s; }
+  .search-result .sr-snippet:hover { background: #f0f4f8; }
+  .search-result .sr-snippet .sr-long { display: none; }
+  .search-result .sr-snippet.expanded .sr-short { display: none; }
+  .search-result .sr-snippet.expanded .sr-long { display: inline; }
+  .search-result .sr-snippet .sr-toggle { display: block; font-size: 0.78rem; color: var(--blue-border); margin-top: 0.35rem; user-select: none; }
+  .search-result .sr-snippet.expanded { background: #f8fafc; }
   .search-result mark { background: #ffd166; padding: 0 2px; }
   .search-meta { font-size: 0.8rem; color: var(--grey); margin: 0.4rem 0; }
 
   /* Checkliste */
   .check-list { margin: 0.5rem 0; }
-  .check-item { display: flex; gap: 0.6rem; padding: 0.6rem 0.8rem; margin-bottom: 0.4rem; background: #fafbfc; border-left: 3px solid #ccc; border-radius: 0 6px 6px 0; align-items: flex-start; }
+  .check-item { display: flex; gap: 0.6rem; padding: 0.6rem 0.8rem; margin-bottom: 0.4rem; background: #fafbfc; border-left: 4px solid #ccc; border-radius: 0 6px 6px 0; align-items: flex-start; }
   .check-item input[type="checkbox"] { margin-top: 0.25rem; flex-shrink: 0; width: 1.1rem; height: 1.1rem; cursor: pointer; }
-  .check-item.done { border-left-color: var(--green); background: #f0faf4; }
-  .check-item.done .ci-text { text-decoration: line-through; color: var(--grey); }
+  .check-item.done { border-left-color: var(--green); background: #e8f5ec; }
+  .check-item.done .ci-text { color: var(--accent); }
+  .check-item.done::after { content: '✓'; color: var(--green); font-weight: bold; font-size: 1.1rem; margin-left: 0.3rem; }
   .check-item .ci-text { flex: 1; }
   .check-item .ci-src { font-size: 0.78rem; color: var(--grey); display: block; margin-top: 0.2rem; font-style: italic; }
   .check-item .ci-cat { display: inline-block; font-size: 0.72rem; padding: 0.05rem 0.35rem; border-radius: 3px; margin-right: 0.4rem; vertical-align: middle; }
   .cat-hart { background: var(--green); color: white; }
   .cat-weich { background: var(--yellow); color: white; }
+  .check-status { font-size: 0.85rem; padding: 0.5rem 0.8rem; border-radius: 6px; margin: 0.5rem 0; font-weight: 600; }
+  .check-status.ok { background: #d8f3dc; border: 1px solid var(--green); color: var(--green); }
+  .check-status.warn { background: #fff3cd; border: 1px solid var(--yellow); color: #6b4e02; }
+
+  /* Prompt-Formular */
+  .prompt-form { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 0.7rem; margin: 0.8rem 0; }
+  .prompt-form label { font-size: 0.88rem; display: flex; flex-direction: column; gap: 0.25rem; min-width: 0; }
+  .prompt-form label.full { grid-column: 1 / -1; }
+  .prompt-form select, .prompt-form input, .prompt-form textarea { padding: 0.45rem 0.6rem; border: 1px solid #c8d8e8; border-radius: 4px; font-size: 0.9rem; font-family: inherit; background: white; color: var(--accent); width: 100%; max-width: 100%; box-sizing: border-box; }
+  .prompt-form select:focus, .prompt-form input:focus, .prompt-form textarea:focus { outline: none; border-color: var(--accent); }
+  .prompt-form .hint { font-size: 0.75rem; color: var(--grey); font-style: italic; }
+  .generate-btn { background: var(--accent); color: white; border: 0; padding: 0.7rem 1.2rem; border-radius: 6px; cursor: pointer; font-size: 0.95rem; font-weight: 600; margin: 0.5rem 0; }
+  .generate-btn:hover { background: var(--accent-light); }
+  .generate-btn:disabled { background: #ccc; cursor: not-allowed; }
+  @media (max-width: 600px) { .prompt-form { grid-template-columns: 1fr; } }
 
   .tab-bar { display: flex; gap: 0.3rem; border-bottom: 2px solid var(--accent); margin-bottom: 0.8rem; flex-wrap: wrap; }
   .tab { padding: 0.5rem 1rem; background: var(--blue-light); border: 1px solid #c8d8e8; border-bottom: none; border-radius: 6px 6px 0 0; cursor: pointer; font-size: 0.9rem; color: var(--accent); }
@@ -103,6 +127,10 @@
     body { font-size: 16px; }
     .container { padding: 0.6rem; }
     .card { padding: 0.9rem; }
+    .nav a { font-size: 0.95rem; padding: 0.35rem 0.65rem; }
+    .nav .nav-title { font-size: 1rem; }
+    .prompt-form { grid-template-columns: 1fr; }
+    .compare { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -113,7 +141,7 @@
   <a href="#karte-1">1 KI verstehen</a>
   <a href="#karte-2">2 Rahmen</a>
   <a href="#karte-3">3 Themen-Navigator</a>
-  <a href="#karte-4">4 Unterweisungen</a>
+  <a href="#karte-4">4 Unterweisungen &amp; Einweisungen</a>
   <a href="#karte-5">5 Material</a>
   <a href="#karte-6">6 Beratung</a>
   <a href="#karte-7">7 Fachgespräche</a>
@@ -128,6 +156,12 @@
 <div class="info-box">
   <strong>Wichtig:</strong> Dieses Werkzeug ersetzt <em>keine</em> Sachkunde. Es hilft beim Strukturieren, Prüfen und Erzeugen von Material. Die rechtliche Verantwortung für Unterweisungen und Beratung bleibt beim qualifizierten Ausbilder.
 </div>
+
+<div class="info-box" id="quickstart-box" style="border-color: var(--green); background: #e8f5ec">
+  <strong>Schnell zum ersten Prompt:</strong> <a href="#karte-4">Karte 4</a> öffnen → Beruf wählen → „Prompt erzeugen" → Kopieren. Fertig. Detailwissen über <a href="doku/">Doku</a> später.
+  <button onclick="document.getElementById('quickstart-box').style.display='none'; localStorage.setItem('ausb-quickstart-dismissed','1')" style="float:right; background:transparent; border:0; color:var(--grey); cursor:pointer; font-size:0.9rem" aria-label="schließen">✕</button>
+</div>
+<script>if (localStorage.getItem('ausb-quickstart-dismissed')) { document.getElementById('quickstart-box').style.display = 'none'; }</script>
 
 
 <!-- ============ KARTE 1: KI VERSTEHEN ============ -->
@@ -144,6 +178,9 @@
 <p>Für den Workshop und die Weiterarbeit gibt es ein gemeinsames Edupad, in dem Teilnehmende Notizen, Prompts und Beispiele teilen können:</p>
 <p><a href="https://edupad.ch/p/cR3mlekNEV" target="_blank" rel="noopener">edupad.ch/p/cR3mlekNEV</a></p>
 
+<h3>Dokumentation zum Nachlesen</h3>
+<p>Vertiefende Hintergründe (Rechtsrahmen, Sprachstrategien, Datenschutz, Cowork-Profile, Multi-KI-Muster, FAQ) stehen in der Doku: <a href="doku/">Dokumentation öffnen</a>.</p>
+
 <details>
 <summary>Mehr zur Funktionsweise</summary>
 <p style="margin-top:0.5rem">Ein Sprachmodell hat keine Datenbank, in der es nachschlägt. Es hat Muster aus Milliarden von Trainingsdokumenten und schätzt bei jeder Antwort, welches Wort statistisch als nächstes käme. Das Ergebnis kann brillant sein &mdash; oder eine eloquent vorgetragene Fiktion. Deshalb: je enger der Kontext (Ihr eigenes Material, klare Vorgaben, ein spezifischer Beruf), desto belastbarer die Antwort.</p>
@@ -154,13 +191,13 @@
 <!-- ============ KARTE 2: RAHMEN & DATENSCHUTZ ============ -->
 <section class="card" id="karte-2">
 <h2><span class="card-number">2</span>Rahmen &amp; Datenschutz</h2>
-<p>Was darf in den Chat mit der KI &mdash; und was nicht? Einfache Faustregel: <strong>keine personenbezogenen Daten, keine Geschäftsgeheimnisse.</strong></p>
+<p>Was darf in den Chat mit der KI &mdash; und was nicht? Einfache Faustregel: <strong>keine personenbezogenen Daten, keine Geschäftsgeheimnisse.</strong> Für den Umgang mit Azubi- oder Beratungsunterlagen ist <strong>Pseudonymisieren</strong> der passende Begriff &mdash; nicht Anonymisieren.</p>
 <div class="traffic">
   <div class="light light-green">
     <h4>✓ Grün &mdash; geht</h4>
     <ul>
       <li>Fachliche Fragen, allgemeine Sachverhalte</li>
-      <li>Entwürfe mit anonymisierten Beispielen („Azubi A, 2. LJ")</li>
+      <li>Entwürfe mit pseudonymisierten Beispielen („Azubi A, 2. LJ")</li>
       <li>Prüfung öffentlich verfügbarer Texte</li>
     </ul>
   </div>
@@ -175,20 +212,26 @@
   <div class="light light-red">
     <h4>✗ Rot &mdash; nicht</h4>
     <ul>
-      <li>Namen, Geburtsdaten, Adressen von Azubis</li>
+      <li>Klarnamen, Geburtsdaten, Adressen von Azubis</li>
       <li>Gesundheits-, Leistungs-, Konfliktdaten</li>
       <li>Kunden-, Personal- oder Vertragsdaten</li>
     </ul>
   </div>
 </div>
-<div class="warn-box"><strong>Kurzregel:</strong> Was Sie der Schwiegermutter nicht per Postkarte schicken würden, schicken Sie auch nicht an die KI.</div>
+
+<h3>Pseudonymisieren in Word &mdash; drei Schritte</h3>
+<ol>
+  <li><strong>Dokument duplizieren</strong> — Original bleibt unverändert. Arbeitsdatei z.&nbsp;B. <code>beratung_AzubiA.docx</code>.</li>
+  <li><strong>Suchen-und-Ersetzen</strong> (<kbd>Strg</kbd>+<kbd>H</kbd>): Vorname → „A.", Nachname → weglassen, Firma → „Speditionsbetrieb", konkrete Orte → „Region", Geburtsdatum → „LJ 2007" oder entfernen.</li>
+  <li><strong>Sichtkontrolle</strong> — ein letztes Lesen auf eindeutige Kombinationen: auch ohne Namen kann eine Beschreibung identifizierend sein, wenn mehrere selten kombinierte Merkmale zusammenkommen (z.&nbsp;B. Standort + Schicht + Eintrittsjahr). Merkmale, die einzeln nichts sagen, können zusammen eine Person eindeutig machen.</li>
+</ol>
 </section>
 
 
 <!-- ============ KARTE 3: THEMEN-NAVIGATOR ============ -->
 <section class="card" id="karte-3">
 <h2><span class="card-number">3</span>Themen-Navigator &mdash; Begriffssuche über Lehrpläne</h2>
-<p>Suche nach einem Fachbegriff (z.&nbsp;B. <em>Stapler</em>, <em>Gefahrgut</em>, <em>Incoterms</em>) und finde, in welchen Lehrplänen und Lernfeldern er vorkommt. Grundlage: die eingebundenen Rahmenlehrpläne (KMK) und Ausbildungsrahmenpläne (BIBB).</p>
+<p>Suche nach einem Fachbegriff (z.&nbsp;B. <em>Kommissionierung</em>, <em>Gefahrgut</em>, <em>Incoterms</em>) und finde, in welchen Lehrplänen und Lernfeldern er vorkommt. Grundlage: die eingebundenen Rahmenlehrpläne (KMK) und Ausbildungsrahmenpläne (BIBB). Klick auf einen Treffer zeigt mehr Kontext.</p>
 
 <div class="search-filters" id="search-filters">
   <label><input type="checkbox" value="buero" checked> Büromanagement</label>
@@ -197,7 +240,7 @@
   <label><input type="checkbox" value="bkf" checked> Berufskraftfahrer</label>
 </div>
 <div class="search-wrap">
-  <input id="search-input" type="search" placeholder="Begriff eingeben &mdash; z.B. Stapler, Incoterms, Arbeitsschutz" autocomplete="off" disabled>
+  <input id="search-input" type="search" placeholder="Begriff eingeben &mdash; z.B. Kommissionierung, Gefahrgut, Incoterms" autocomplete="off" disabled>
   <button class="tab active" id="search-btn" style="border:0; cursor:pointer; opacity:0.5" disabled>Suchen</button>
 </div>
 <div class="search-meta" id="search-meta">Datenbank lädt&hellip;</div>
@@ -205,51 +248,103 @@
 </section>
 
 
-<!-- ============ KARTE 4: UNTERWEISUNGEN ============ -->
+<!-- ============ KARTE 4: UNTERWEISUNGEN & EINWEISUNGEN ============ -->
 <section class="card" id="karte-4">
-<h2><span class="card-number">4</span>Unterweisungen nach §12 ArbSchG</h2>
-<p>Unterweisungen dürfen nur von <strong>sachkundigen und beauftragten Personen</strong> durchgeführt werden. Bevor Sie eine Unterweisung mit KI-Unterstützung vorbereiten, gehen Sie die Formalia-Checkliste durch. Erst wenn diese Voraussetzungen stehen, lohnt sich der Entwurf.</p>
+<h2><span class="card-number">4</span>Unterweisungen §12 ArbSchG und Einweisungen</h2>
+<p>Zwei verwandte, aber rechtlich unterschiedliche Formate: <strong>Unterweisungen</strong> sind pflichtig und dokumentiert, <strong>Einweisungen</strong> sind praktische Erklärungen ohne formale Pflicht. Die KI unterstützt beim Entwurf, die Verantwortung bleibt beim sachkundigen Ausbilder.</p>
+
+<details open>
+<summary>Abgrenzung Unterweisung / Einweisung</summary>
+<div class="info-box" style="margin-top:0.4rem">
+  <p><strong>Unterweisung</strong> nach §12 ArbSchG ist verpflichtend, dokumentiert, arbeitsplatz- und tätigkeitsbezogen. Sie muss <em>vor</em> Tätigkeitsaufnahme und mindestens <em>jährlich</em> erfolgen und von einer sachkundigen Person gehalten werden.</p>
+  <p style="margin-top:0.4rem"><strong>Einweisung</strong> ist die praktische Erklärung eines Geräts oder Ablaufs ohne formale Pflichten (z.&nbsp;B. Bedienung eines Bürokopierers). Eine Einweisung ersetzt <em>keine</em> Unterweisung bei sicherheitsrelevanten Tätigkeiten.</p>
+  <p style="margin-top:0.4rem">Mehr zum Rechtsrahmen: <a href="doku/#recht">Doku &gt; Rechtsrahmen</a>.</p>
+</div>
+</details>
 
 <div class="tab-bar">
   <button class="tab active" data-panel="p-modus-a">Modus A: Formale Unterweisung</button>
   <button class="tab" data-panel="p-modus-b">Modus B: Einweisung (informell)</button>
 </div>
+<div class="info-box" style="font-size:0.85rem; margin-top:-0.4rem">
+  <strong>Welchen Modus wählen?</strong> Geht es um eine <em>sicherheits- oder gefährdungsrelevante</em> Tätigkeit (Stapler, Gefahrstoff, Maschine)? → <strong>Modus A</strong>. Geht es um Geräte/Abläufe ohne Sicherheitsbezug (Drucker, Software, Ablage)? → <strong>Modus B</strong>.
+</div>
 
+<!-- ===== MODUS A ===== -->
 <div class="tab-panel active" id="p-modus-a">
-  <h3>Abgrenzung Unterweisung / Einweisung</h3>
-  <div class="info-box">
-    <p><strong>Unterweisung</strong> nach §12 ArbSchG ist eine verpflichtende, dokumentierte, arbeitsplatz- und tätigkeitsbezogene Anweisung an Beschäftigte. Sie muss <em>vor</em> Tätigkeitsaufnahme und mindestens <em>jährlich</em> erfolgen und von einer sachkundigen Person gehalten werden.</p>
-    <p style="margin-top:0.4rem"><strong>Einweisung</strong> ist die praktische Erklärung eines Geräts oder Ablaufs ohne formale Pflichten (z.&nbsp;B. Bedienung eines Bürokopierers). Eine Einweisung ersetzt <em>keine</em> Unterweisung bei sicherheitsrelevanten Tätigkeiten.</p>
-  </div>
-
-  <h3>Formalia-Checkliste (10 Punkte)</h3>
-  <p class="search-meta">Gehen Sie die Liste durch, bevor Sie einen KI-Entwurf starten. Grüne Marker = harte rechtliche Grundlage. Gelbe Marker = fachlich anerkannter Standard, rechtlich aus §12 ArbSchG abgeleitet.</p>
+  <h3>Formalia-Checkliste</h3>
+  <p class="search-meta">Die Liste prüft die <strong>Voraussetzungen</strong> einer rechtmäßigen Unterweisung. Was Sie abhaken, entfällt im späteren Prompt (die KI muss es nicht mehr abfragen). Was offen bleibt, wird in der Prompt-Ausgabe als <em>offene Rückfrage</em> an Sie formuliert. Grün = harte rechtliche Grundlage, Gelb = fachlicher Standard abgeleitet aus §12 ArbSchG.</p>
 
   <div class="check-list" id="unterweisung-check">
     <!-- items werden per JS injiziert fuer Zustandspersistenz -->
   </div>
+  <div id="check-status" class="check-status warn">— noch offen —</div>
 
-  <h3>KI-Prompt-Starter (nach bestandener Checkliste)</h3>
-  <div class="prompt-box">Erstelle einen Unterweisungsentwurf für folgende Tätigkeit:
+  <h3>Prompt-Formular</h3>
+  <p class="search-meta">Auswahlfelder werden beim Prompt-Bau ausgewertet. Lassen Sie Felder leer, wenn die KI selbst Rückfragen stellen soll.</p>
 
-Tätigkeit: <span class="placeholder">[TÄTIGKEIT, z.B. Bedienung eines Gabelstaplers im Lager]</span>
-Beruf/Zielgruppe: <span class="placeholder">[z.B. Azubi 1. Lehrjahr, Fachkraft für Lagerlogistik]</span>
-Sprachniveau: <span class="placeholder">[A2 / B1 / B2 / Muttersprachniveau]</span>
-Betriebliche Besonderheiten: <span class="placeholder">[kurze Stichpunkte, anonymisiert]</span>
+  <form class="prompt-form" id="u-form" onsubmit="return false">
+    <label>Beruf
+      <select id="u-beruf"><option value="">— bitte wählen —</option></select>
+    </label>
+    <label>Lernfeld (Bezug, optional)
+      <select id="u-lernfeld" disabled><option value="">erst Beruf wählen</option></select>
+    </label>
+    <label>Lehrjahr
+      <select id="u-lehrjahr">
+        <option value="">— offen —</option>
+        <option value="1">1. Lehrjahr</option>
+        <option value="2">2. Lehrjahr</option>
+        <option value="3">3. Lehrjahr</option>
+      </select>
+    </label>
+    <label>Sprachniveau (mündlich, GER)
+      <select id="u-sprache">
+        <option value="">— offen —</option>
+        <option value="A2">A2 — einfache Wendungen</option>
+        <option value="B1">B1 — Alltagsthemen</option>
+        <option value="B2">B2 — komplexere Themen</option>
+        <option value="C1">C1 — Fachsprache</option>
+      </select>
+    </label>
+    <label>Schriftsprache
+      <select id="u-schrift">
+        <option value="">— offen —</option>
+        <option value="geuebt">geübt — längere Texte lesen/schreiben</option>
+        <option value="unsicher">unsicher — kurze Texte, Rechtschreibung wackelig</option>
+        <option value="gering">sehr unsicher — Bildsprache und Audio nötig</option>
+      </select>
+      <span class="hint">Unabhängig vom mündlichen Niveau. Quelle: LEO-Studie.</span>
+    </label>
+    <label>Tätigkeit / Thema
+      <input id="u-taetigkeit" type="text" placeholder="z.B. Kommissionierung mit Handhubwagen">
+      <span class="hint">So konkret wie möglich — Staplerfahren ist nicht gleich Staplerfahren.</span>
+    </label>
+    <label class="full">Betriebliche Besonderheiten (optional, pseudonymisiert)
+      <textarea id="u-kontext" rows="2" placeholder="z.B. Schmalgangregal, nur ein Azubi pro Schicht, Schichtübergabe 14:00"></textarea>
+    </label>
+    <label class="full" style="flex-direction: row; align-items: center; gap: 0.5rem">
+      <input type="checkbox" id="u-container" style="width: auto; margin: 0">
+      <span>Container-Modus: erst Diagnose, dann Entwurf <span class="hint" style="display:block">— empfohlen für fortgeschrittene Teilnehmer. Die KI analysiert zuerst, was die Kombination bedeutet, bevor sie schreibt.</span></span>
+    </label>
+    <label class="full" style="flex-direction: row; align-items: center; gap: 0.5rem">
+      <input type="checkbox" id="u-schnell" style="width: auto; margin: 0">
+      <span>Schnellmodus <span class="hint" style="display:block">— für erfahrene Ausbilder: harte Voraussetzungen gelten als erfüllt, KI stellt keine Rückfragen mehr, kompakter Entwurf.</span></span>
+    </label>
+  </form>
 
-ANFORDERUNGEN:
-- Struktur: Einstieg, Gefährdungen, Regeln, praktischer Teil, Verständnisfragen
-- Bezug auf §12 ArbSchG und relevante DGUV-Schriften nennen
-- Keine personenbezogenen Daten im Entwurf
-- Am Ende: 3 Verständnisfragen zum Abgleich mit dem Teilnehmer
+  <button class="generate-btn" onclick="buildUnterweisungPrompt()">Prompt erzeugen</button>
 
-WICHTIG: Dieser Entwurf ist eine VORLAGE. Die inhaltliche und rechtliche Prüfung und die Dokumentation (Datum, Teilnehmer, Unterschrift) liegen bei mir als sachkundigem Unterweiser.<button class="copy-btn" onclick="copyPromptBox(this)">Kopieren</button></div>
+  <div id="u-output" style="display:none">
+    <h3 style="cursor:pointer; display:flex; align-items:center; gap:0.3rem" onclick="togglePromptBox(this)" title="Klicken zum Ein-/Ausblenden">Generierter Prompt <span class="toggle-icon" style="font-size:0.8rem; color:var(--grey)">▼</span></h3>
+    <div class="prompt-box" id="u-prompt-box"><button class="download-btn" onclick="downloadPromptBox(this)">Download</button><button class="copy-btn" onclick="copyPromptBox(this)">Kopieren</button></div>
+  </div>
 
   <details>
   <summary>Verantwortungskern: Was die KI nicht übernimmt</summary>
   <ul style="margin-top:0.4rem">
     <li><strong>Sachkunde</strong> &mdash; Bewertung, ob der Inhalt fachlich korrekt und auf den Betrieb anwendbar ist</li>
-    <li><strong>Gefährdungsbeurteilung</strong> &mdash; muss <em>vorab</em> vorliegen, die KI kann sie nicht erstellen</li>
+    <li><strong>Gefährdungsbeurteilung</strong> &mdash; muss <em>vorab</em> vorliegen (§5 ArbSchG), die KI kann sie nicht erstellen</li>
     <li><strong>Durchführung</strong> &mdash; die Unterweisung selbst muss eine sachkundige Person halten</li>
     <li><strong>Dokumentation</strong> &mdash; Datum, Teilnehmer, Unterschrift sind rechtlich bindend und bleiben beim Ausbilder</li>
     <li><strong>Verständnisprüfung</strong> &mdash; ob die Teilnehmenden es verstanden haben, kann nur ein Mensch im Gespräch feststellen</li>
@@ -257,21 +352,55 @@ WICHTIG: Dieser Entwurf ist eine VORLAGE. Die inhaltliche und rechtliche Prüfun
   </details>
 </div>
 
+<!-- ===== MODUS B ===== -->
 <div class="tab-panel" id="p-modus-b">
   <h3>Einweisung: kurz und pragmatisch</h3>
-  <p>Für nicht-sicherheitskritische Geräte oder Abläufe (Drucker, interne Software, Ablagesystem). Keine formale Dokumentationspflicht, aber eine klare Struktur hilft dem Azubi trotzdem.</p>
-  <div class="prompt-box">Erstelle eine kurze Einweisung (max. 1 Seite) für:
+  <p>Für nicht-sicherheitskritische Geräte oder Abläufe (Drucker, interne Software, Ablagesystem). Keine formale Dokumentationspflicht, aber eine klare Struktur hilft dem Azubi trotzdem. Bei Sicherheits- oder Gefährdungsbezug immer Modus A verwenden.</p>
 
-Gerät/Ablauf: <span class="placeholder">[z.B. Ablagesystem im Lager / Bürodrucker XY]</span>
-Zielgruppe: <span class="placeholder">[z.B. neuer Azubi, 1. Woche]</span>
+  <form class="prompt-form" id="e-form" onsubmit="return false">
+    <label>Beruf / Zielgruppe (optional)
+      <select id="e-beruf"><option value="">— offen —</option></select>
+    </label>
+    <label>Rolle der Zielperson
+      <select id="e-rolle">
+        <option value="">— offen —</option>
+        <option value="neu-azubi">Neuer Azubi, erste Woche</option>
+        <option value="azubi-1lj">Azubi 1. Lehrjahr</option>
+        <option value="azubi-2lj">Azubi 2. Lehrjahr</option>
+        <option value="azubi-3lj">Azubi 3. Lehrjahr</option>
+        <option value="praktikant">Praktikant</option>
+        <option value="mitarbeiter-neu">Neuer Mitarbeiter (keine Azubi-Rolle)</option>
+      </select>
+    </label>
+    <label class="full">Gerät oder Ablauf (konkret)
+      <input id="e-thema" type="text" placeholder="z.B. Ablagesystem Warenein-/ausgang, Bürodrucker HP 4250, Paketdienst-Software Phönix">
+    </label>
+    <label>Umfang
+      <select id="e-umfang">
+        <option value="kurz">Kurz (1/2 Seite, 5 Minuten Erklärung)</option>
+        <option value="normal" selected>Normal (1 Seite, 15 Minuten)</option>
+        <option value="ausfuehrlich">Ausführlich (2 Seiten, Schritt-für-Schritt mit Screenshots-Beschreibung)</option>
+      </select>
+    </label>
+    <label>Sprachniveau
+      <select id="e-sprache">
+        <option value="">— offen —</option>
+        <option value="A2">A2 — einfache Sprache</option>
+        <option value="B1">B1 — Alltagssprache</option>
+        <option value="B2">B2 — gehobene Sprache</option>
+      </select>
+    </label>
+    <label class="full">Besonderheiten (optional, pseudonymisiert)
+      <textarea id="e-kontext" rows="2" placeholder="z.B. Azubi hat Lese-Unsicherheit, bitte viel mit Bildbeschreibung arbeiten. Drucker steht im Treppenhaus, Platz knapp."></textarea>
+    </label>
+  </form>
 
-STRUKTUR:
-1. Zweck und Einordnung
-2. Schritt-für-Schritt-Bedienung
-3. Typische Fehler und wie man sie vermeidet
-4. Wen ansprechen bei Problemen
+  <button class="generate-btn" onclick="buildEinweisungPrompt()">Prompt erzeugen</button>
 
-HINWEIS: Dies ist eine Einweisung, KEINE Unterweisung nach §12 ArbSchG.<button class="copy-btn" onclick="copyPromptBox(this)">Kopieren</button></div>
+  <div id="e-output" style="display:none">
+    <h3 style="cursor:pointer; display:flex; align-items:center; gap:0.3rem" onclick="togglePromptBox(this)" title="Klicken zum Ein-/Ausblenden">Generierter Prompt <span class="toggle-icon" style="font-size:0.8rem; color:var(--grey)">▼</span></h3>
+    <div class="prompt-box" id="e-prompt-box"></div>
+  </div>
 </div>
 </section>
 
@@ -279,7 +408,12 @@ HINWEIS: Dies ist eine Einweisung, KEINE Unterweisung nach §12 ArbSchG.<button 
 <!-- ============ KARTE 5: MATERIAL ============ -->
 <section class="card" id="karte-5">
 <h2><span class="card-number">5</span>Material analysieren und überarbeiten</h2>
-<p>Effektiver als Generieren aus dem Nichts: lassen Sie die KI <em>vorhandenes</em> Material prüfen und verbessern. Das reduziert Halluzinationen und behält Ihre Fachsprache bei.</p>
+<p>Effektiver als Generieren aus dem Nichts: lassen Sie die KI <em>vorhandenes</em> Material mit einem <strong>Zustandsprompt</strong> (Diagnoseprüfung eines Textes) prüfen und verbessern. Das reduziert Halluzinationen und behält Ihre Fachsprache bei.</p>
+
+<details>
+<summary>Was ist ein Zustandsprompt?</summary>
+<p style="margin-top:0.5rem">Ein Zustandsprompt stellt keine Frage &mdash; er prüft einen bestehenden Text entlang definierter Achsen. Die KI wird zur Diagnose-Instanz, nicht zur Autorin. Im Ergebnis erhalten Sie eine Liste konkreter Schwachstellen mit gezielten Änderungsvorschlägen, keine Neufassung. Vorteile: Ihre Fachsprache bleibt erhalten, Halluzinationen sind selten, Sie behalten die Kontrolle über den finalen Text.</p>
+</details>
 
 <h3>Zustandsprüfung: 5 Achsen</h3>
 <ul>
@@ -290,37 +424,72 @@ HINWEIS: Dies ist eine Einweisung, KEINE Unterweisung nach §12 ArbSchG.<button 
   <li><strong>Ton</strong> &mdash; wirkt der Text wertschätzend und professionell?</li>
 </ul>
 
-<div class="prompt-box">Analysiere den folgenden Text entlang dieser 5 Achsen:
-(1) Vollständigkeit (2) Eindeutigkeit (3) Empfängerrisiko (4) Struktur (5) Ton
+<form class="prompt-form" id="m-form" onsubmit="return false">
+  <label>Beruf der Zielgruppe (optional)
+    <select id="m-beruf"><option value="">— offen —</option></select>
+  </label>
+  <label>Lehrjahr (optional)
+    <select id="m-lehrjahr">
+      <option value="">— offen —</option>
+      <option value="1">1. Lehrjahr</option>
+      <option value="2">2. Lehrjahr</option>
+      <option value="3">3. Lehrjahr</option>
+    </select>
+  </label>
+  <label>Zweck des Materials
+    <select id="m-zweck">
+      <option value="">— offen —</option>
+      <option value="unterweisung">Unterweisungsentwurf</option>
+      <option value="einweisung">Einweisung</option>
+      <option value="beratung">Beratungsgesprächs-Leitfaden</option>
+      <option value="pruefung">Prüfungs-/Übungsaufgabe</option>
+      <option value="lernmaterial">Lernmaterial / Arbeitsblatt</option>
+      <option value="sonst">Sonstiges</option>
+    </select>
+  </label>
+  <label>Sprachniveau der Zielgruppe
+    <select id="m-sprache">
+      <option value="">— offen —</option>
+      <option value="A2">A2</option>
+      <option value="B1">B1</option>
+      <option value="B2">B2</option>
+      <option value="C1">C1</option>
+    </select>
+  </label>
+  <label class="full">Zu analysierender Text (hier einfügen)
+    <textarea id="m-text" rows="6" placeholder="Fügen Sie hier den Text ein, der analysiert werden soll."></textarea>
+  </label>
+  <label class="full" style="flex-direction: row; align-items: center; gap: 0.5rem">
+    <input type="checkbox" id="m-container" style="width: auto; margin: 0">
+    <span>Container-Modus: erst prüfen welche Achsen für diesen Text überhaupt relevant sind, dann analysieren <span class="hint" style="display:block">— verhindert irrelevante Kritik bei Kurztexten.</span></span>
+  </label>
+</form>
 
-Zielgruppe: <span class="placeholder">[z.B. Azubis 1. LJ, Fachkraft für Lagerlogistik]</span>
-Zweck: <span class="placeholder">[z.B. Unterweisungsentwurf / Beratungsgespräch / Prüfungsaufgabe]</span>
+<button class="generate-btn" onclick="buildMaterialPrompt()">Prompt erzeugen</button>
 
-TEXT:
-<span class="placeholder">[Eigenen Text hier einfügen]</span>
-
-AUFGABE:
-1. Nenne pro Achse: was ist OK, was ist schwach, konkrete Verbesserung
-2. Schlage KEINE komplette Neufassung vor, sondern gezielte Eingriffe
-3. Wenn etwas rechtlich fragwürdig wirkt, markiere es mit ⚠ und erkläre kurz
-
-Am Ende: zusammenfassende Einschätzung in 2-3 Sätzen.<button class="copy-btn" onclick="copyPromptBox(this)">Kopieren</button></div>
+<div id="m-output" style="display:none">
+  <h3>Generierter Prompt</h3>
+  <div class="prompt-box" id="m-prompt-box"></div>
+</div>
 </section>
 
 
 <!-- ============ KARTE 6: BERATUNG ============ -->
 <section class="card" id="karte-6">
 <h2><span class="card-number">6</span>Ausbildungsberatung</h2>
-<p>Für die Beratung eines Azubis ist die Diff zwischen zwei KIs selbst Information: wo beide übereinstimmen, sind Sie auf sicherem Grund; wo sie abweichen, lohnt sich ein zweiter Gedanke.</p>
+<p>Für die Beratung eines Azubis ist die Differenz zwischen zwei KIs selbst Information: wo beide übereinstimmen, sind Sie auf sicherem Grund; wo sie abweichen, lohnt sich ein zweiter Gedanke. Siehe <a href="doku/#multi-ki">Doku &gt; Multi-KI-Muster</a>.</p>
 
 <div class="info-box">
-  <strong>Keine Personendaten.</strong> Beschreibe die Situation generisch: Lehrjahr, Tätigkeitsfeld, beobachtetes Verhalten. Namen und persönliche Details bleiben draußen.
+  <strong>Keine Personendaten.</strong> Beschreiben Sie die Situation generisch: Lehrjahr, Beruf, Tätigkeitsfeld, beobachtetes Verhalten. Namen und persönliche Details bleiben draußen. Siehe <a href="doku/#datenschutz">Doku &gt; Datenschutz</a>.
 </div>
 
-<h3>Ausgangslage beschreiben</h3>
-<div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.6rem; margin:0.6rem 0">
-  <label style="font-size:0.9rem">Kontext
-    <select id="beratung-context" style="width:100%; padding:0.4rem; border-radius:4px; border:1px solid #c8d8e8; margin-top:0.2rem">
+<form class="prompt-form" id="b-form" onsubmit="return false">
+  <label>Beruf des Azubis
+    <select id="b-beruf"><option value="">— bitte wählen —</option></select>
+  </label>
+  <label>Kontext
+    <select id="b-context">
+      <option value="">— offen —</option>
       <option value="praktikant">Praktikant, noch nicht in Ausbildung</option>
       <option value="berufsorientierung">Berufsorientierung / Wahl-Unsicherheit</option>
       <option value="azubi-1lj">Azubi 1. Lehrjahr</option>
@@ -328,8 +497,9 @@ Am Ende: zusammenfassende Einschätzung in 2-3 Sätzen.<button class="copy-btn" 
       <option value="azubi-3lj">Azubi 3. Lehrjahr, vor Prüfung</option>
     </select>
   </label>
-  <label style="font-size:0.9rem">Anlass
-    <select id="beratung-anlass" style="width:100%; padding:0.4rem; border-radius:4px; border:1px solid #c8d8e8; margin-top:0.2rem">
+  <label>Anlass
+    <select id="b-anlass">
+      <option value="">— offen —</option>
       <option value="passung">Passung Beruf / Person</option>
       <option value="leistung">Leistungsabfall oder -auffälligkeit</option>
       <option value="foerderung">Fördermöglichkeiten</option>
@@ -338,28 +508,22 @@ Am Ende: zusammenfassende Einschätzung in 2-3 Sätzen.<button class="copy-btn" 
       <option value="pruefungsangst">Prüfungsangst / Prüfungsvorbereitung</option>
     </select>
   </label>
+  <label class="full">Beobachtete Situation (2-3 Sätze, pseudonymisiert)
+    <textarea id="b-situation" rows="3" placeholder="z.B. Azubi erscheint zunehmend unpünktlich, wirkt in Teamgesprächen zurückgezogen, Leistung in Kommissionier-Aufgaben hat seit 3 Wochen nachgelassen."></textarea>
+  </label>
+</form>
+
+<button class="generate-btn" onclick="buildBeratungPrompt()">Prompt erzeugen</button>
+
+<div id="b-output" style="display:none">
+  <h3 style="cursor:pointer; display:flex; align-items:center; gap:0.3rem" onclick="togglePromptBox(this)" title="Klicken zum Ein-/Ausblenden">Generierter Prompt — an 2 KIs schicken <span class="toggle-icon" style="font-size:0.8rem; color:var(--grey)">▼</span></h3>
+  <div class="prompt-box" id="b-prompt-box"></div>
 </div>
-
-<h3>Triangulations-Prompt (an 2 KIs schicken)</h3>
-<div class="prompt-box">Ich bereite ein Beratungsgespräch mit einem Azubi vor.
-
-Kontext: <span class="placeholder">[aus Dropdown oben]</span>
-Anlass: <span class="placeholder">[aus Dropdown oben]</span>
-Beruf: <span class="placeholder">[z.B. Fachkraft für Lagerlogistik]</span>
-Beobachtete Situation (anonym): <span class="placeholder">[2-3 Sätze, ohne Namen oder Details]</span>
-
-AUFGABE:
-1. Welche drei bis fünf Fragen sollte ich im Gespräch offen stellen?
-2. Welche möglichen Ursachen sollte ich im Kopf haben?
-3. Welche konkreten Schritte kämen als Hilfsangebote in Frage?
-4. Was sollte ich NICHT tun oder sagen?
-
-Antworte strukturiert und knapp. Keine Diagnose, sondern Orientierung.<button class="copy-btn" onclick="copyPromptBox(this)">Kopieren</button></div>
 
 <details>
 <summary>So nutzen Sie die Triangulation</summary>
 <ol style="margin-top:0.5rem; padding-left: 1.4rem">
-  <li>Prompt oben kopieren, Platzhalter anpassen</li>
+  <li>Prompt oben kopieren</li>
   <li>An KI 1 schicken (z.&nbsp;B. ChatGPT) &mdash; Antwort speichern</li>
   <li>Dasselbe an KI 2 schicken (z.&nbsp;B. Claude) &mdash; Antwort speichern</li>
   <li>Beide Antworten vergleichen: Wo stimmen sie überein? Wo weichen sie ab?</li>
@@ -372,21 +536,66 @@ Antworte strukturiert und knapp. Keine Diagnose, sondern Orientierung.<button cl
 <!-- ============ KARTE 7: FACHGESPRÄCHE ============ -->
 <section class="card" id="karte-7">
 <h2><span class="card-number">7</span>Fachgespräche &amp; Prüfungsvorbereitung</h2>
-<p>Aufgabensätze, Leitfragen und Feedback-Formulierungen lassen sich mit KI effizient entwerfen &mdash; wenn Sie den Prüfungsrahmen präzise vorgeben.</p>
+<p>Aufgabensätze, Leitfragen und Feedback-Formulierungen lassen sich mit KI effizient entwerfen &mdash; wenn Sie den Prüfungsrahmen präzise vorgeben. Der Lernfeld-Auszug aus dem Rahmenlehrplan wird automatisch in den Prompt eingebettet.</p>
 
-<div class="prompt-box">Erstelle <span class="placeholder">[ANZAHL]</span> Übungsfragen für ein Fachgespräch zur Vorbereitung auf die <span class="placeholder">[Zwischen-/Abschluss-]</span>prüfung.
+<div class="warn-box">
+  <strong>Was die KI nicht aus sich weiß:</strong>
+  <ul style="margin-top:0.3rem; margin-bottom:0">
+    <li>Welche Themen in der Zwischen- vs. Abschlussprüfung relevant sind — sagen Sie es im Prompt explizit.</li>
+    <li>Welche Lernfeld-Inhalte gelten — nutzen Sie den Lernfeld-Bezug unten, er wird wörtlich eingebunden.</li>
+    <li>Was „leicht", „mittel", „schwer" für diesen Beruf bedeutet — nutzen Sie die semantischen Stufen (Grundkenntnisse / Vertiefung / Transfer), die werden beruf-spezifisch im Prompt erklärt.</li>
+  </ul>
+</div>
 
-Beruf: <span class="placeholder">[z.B. Kfm. Spedition und Logistikdienstleistung]</span>
-Lernfeld/Themenbereich: <span class="placeholder">[z.B. Lernfeld 7 &mdash; Güterbeförderung planen]</span>
-Schwierigkeitsgrad: <span class="placeholder">[leicht / mittel / schwer]</span>
+<div class="info-box">
+  <strong>Prüfungskataloge (IHK-AkA):</strong> Die aktuellen (2. Auflage, Winter 2025/2026) sind urheberrechtlich geschützt und <em>nicht</em> frei einbindbar. Über <a href="https://m.u-form-shop.de" target="_blank" rel="noopener">u-form-shop.de</a> beziehen und Themenkreise manuell in den Prompt kopieren. Mehr dazu in der <a href="doku/#lehrplaene">Doku</a>.
+</div>
 
-FORMAT pro Frage:
-- Frage
-- Erwartete Kernpunkte in der Antwort (3-5 Stichworte)
-- Mögliche Nachfrage zur Vertiefung
-- Typischer Fehler, auf den zu achten ist
+<h3>Prompt-Formular</h3>
+<form class="prompt-form" id="f-form" onsubmit="return false">
+  <label>Beruf
+    <select id="f-beruf"><option value="">— bitte wählen —</option></select>
+  </label>
+  <label>Lernfeld (Volltext wird eingebettet)
+    <select id="f-lernfeld" disabled><option value="">erst Beruf wählen</option></select>
+  </label>
+  <label>Prüfungsteil
+    <select id="f-pruefung">
+      <option value="">— offen —</option>
+      <option value="zp">Zwischenprüfung</option>
+      <option value="ap1">Abschlussprüfung Teil 1</option>
+      <option value="ap2">Abschlussprüfung Teil 2</option>
+      <option value="ap">Abschlussprüfung</option>
+    </select>
+  </label>
+  <label>Schwierigkeitsstufe
+    <select id="f-stufe">
+      <option value="">— offen —</option>
+      <option value="grund">Grundkenntnisse (Fakten, Begriffe)</option>
+      <option value="vertiefung">Vertiefung (Zusammenhänge, Verfahren)</option>
+      <option value="transfer">Transferleistung (neue Situation, Abwägung)</option>
+    </select>
+    <span class="hint">Beruf-spezifisch kalibriert: „Transfer" bei FL heißt Wenn-Dann am konkreten Objekt, bei Spedition Fallabwägung.</span>
+  </label>
+  <label>Anzahl Fragen
+    <input id="f-anzahl" type="number" min="1" max="20" value="5">
+  </label>
+  <label>Format
+    <select id="f-format">
+      <option value="offen">Offene Fragen (Fachgespräch)</option>
+      <option value="mc">Multiple Choice</option>
+      <option value="fallstudie">Fallstudie + Teilfragen</option>
+      <option value="gemischt">Gemischt</option>
+    </select>
+  </label>
+</form>
 
-Am Ende: kurzer Hinweis, welche Lernfeld-Inhalte die Fragen abdecken.<button class="copy-btn" onclick="copyPromptBox(this)">Kopieren</button></div>
+<button class="generate-btn" onclick="buildFachgespraechPrompt()">Prompt erzeugen</button>
+
+<div id="f-output" style="display:none">
+  <h3>Generierter Prompt</h3>
+  <div class="prompt-box" id="f-prompt-box"></div>
+</div>
 </section>
 
 
@@ -395,6 +604,14 @@ Am Ende: kurzer Hinweis, welche Lernfeld-Inhalte die Fragen abdecken.<button cla
 <h2><span class="card-number">8</span>Eigene Prompts speichern</h2>
 <p>Speichern Sie gelungene Prompts lokal in Ihrem Browser, um sie später wiederzufinden. Die Daten verlassen Ihr Gerät nicht.</p>
 
+<h3>Weiterführendes Werkzeug: Prüfmodus-Karte</h3>
+<div class="info-box" style="background:#fafbfc; border-color:#c8d8e8">
+  <p style="margin-bottom:0.4rem"><strong>Was der Prüfmodus leistet:</strong> Ein eigenes KI-Fenster wird in einen reinen Diagnose-Modus versetzt. Die KI erzeugt dort <em>nichts Neues</em>, sondern prüft vorliegendes Material (1, 2 oder mehr Elemente) auf Konsistenz, Lücken, Widersprüche. Ergebnis: strukturierter Befundbericht mit Ampel-Einordnung (grün/gelb/rot).</p>
+  <p style="margin-bottom:0.4rem"><strong>Wann sinnvoll:</strong> Vor dem Versand eines Unterweisungsentwurfs, beim Vergleich von zwei KI-Antworten, bei Reklamations- oder Beratungstexten. Er ersetzt die 5-Achsen-Prüfung aus Karte 5 nicht, sondern ergänzt sie für den Mehr-Element-Vergleich.</p>
+  <p style="margin-bottom:0"><strong>Zur vollen Karte</strong> (Aktivierungsprompt, Diagnoseauftrag, 4 Beispiele, 6 KI-Profile mit Stärken im Prüfmodus): <a href="https://jako-odyc.github.io/prompt-dash/operator-card.html" target="_blank" rel="noopener">Prüfmodus-Karte öffnen</a>. Eine für den Ausbildungscoach-Kontext angepasste Variante folgt.</p>
+</div>
+
+<h3>Eigene Prompts speichern</h3>
 <div style="margin:0.6rem 0">
   <input id="prompt-title" type="text" placeholder="Titel des Prompts" style="width:100%; padding:0.5rem; border:1px solid #c8d8e8; border-radius:4px; margin-bottom:0.4rem">
   <textarea id="prompt-text" rows="6" placeholder="Prompt-Text" style="width:100%; padding:0.5rem; border:1px solid #c8d8e8; border-radius:4px; font-family:Consolas, monospace; font-size:0.85rem"></textarea>
@@ -403,14 +620,18 @@ Am Ende: kurzer Hinweis, welche Lernfeld-Inhalte die Fragen abdecken.<button cla
 
 <h3>Gespeicherte Prompts</h3>
 <div id="saved-prompts" class="search-meta">Noch keine Prompts gespeichert.</div>
+
+<p class="search-meta" style="margin-top:1rem">Tiefer einsteigen: <a href="doku/#cowork">Cowork-Profile &amp; 20-Fragen-Interview</a> in der Doku.</p>
 </section>
 
 
 <div class="ref">
-  <p><strong>Datengrundlagen:</strong> KMK-Rahmenlehrpläne (Büromanagement 2013 i.d.F. 2025, Fachkraft für Lagerlogistik 2004, Berufskraftfahrer 2000 i.d.F. 2017), BIBB-Verordnungen (Lagerlogistik/Fachlagerist 2004, Spedition 2004, Büromanagement 2025), sterac Ausbildungsrahmenplan Spedition.</p>
-  <p><strong>Hinweis zur Begriffssuche:</strong> Die Lehrpläne verwenden formale Fachsprache. Alltagsbegriffe wie „Stapler" kommen nicht vor &mdash; gesucht werden sollte z.&nbsp;B. nach „Flurförderzeug", „Ladehilfsmittel", „Kommissionierung" oder „Güter".</p>
+  <p><strong>Weitere Seiten:</strong> <a href="doku/">Dokumentation (Rechtsrahmen, Sprache, Cowork, Multi-KI, FAQ)</a> · <a href="https://edupad.ch/p/cR3mlekNEV" target="_blank" rel="noopener">Edupad (Workshop-Notizen)</a> · <a href="../">Prompt-Dash (Büroalltag)</a></p>
+  <p><strong>Datengrundlagen:</strong> KMK-Rahmenlehrpläne — <a href="https://www.kmk.org/fileadmin/Dateien/pdf/Bildung/BeruflicheBildung/rlp/Kaufleute_Bueromanagement_13-09-27_idFv_25-03-20-mitEL.pdf" target="_blank" rel="noopener">Büromanagement 2013 i.d.F. 2025</a>, Fachkraft für Lagerlogistik 2004, Berufskraftfahrer 2000 i.d.F. 2017. BIBB-Verordnungen: <a href="https://www.gesetze-im-internet.de/lwlogausbv/BJNR188700004.html" target="_blank" rel="noopener">LWLogAusbV (Lagerlogistik/Fachlagerist)</a>, <a href="https://www.gesetze-im-internet.de/kflbausbv_2014/" target="_blank" rel="noopener">KflBAusbV (Büromanagement)</a>, <a href="https://www.gesetze-im-internet.de/bkfausbv_2017/" target="_blank" rel="noopener">BKFAusbV (Berufskraftfahrer)</a>, Spedition 2004. Sterac Ausbildungsrahmenplan Spedition. BerufeNet-Steckbriefe der Bundesagentur für Arbeit (Stand 2024). Materialgenerator 1.0.</p>
+  <p><strong>Hinweis zur Begriffssuche:</strong> Die Lehrpläne verwenden formale Fachsprache. Alltagsbegriffe wie „Stapler" kommen nicht vor &mdash; gesucht werden sollte z.&nbsp;B. nach „Kommissionierung", „Gefahrgut", „Ladehilfsmittel" oder „Güter". Treffer lassen sich per Klick erweitern, um mehr Kontext zu sehen.</p>
   <p><strong>Kontakt:</strong> Jaroslav Kois &mdash; jaro_kois@web.de</p>
   <p><em>Kein Rechtsrat. Dieses Werkzeug ersetzt keine Sachkunde.</em></p>
+  <p style="margin-top:0.8rem"><span style="display:inline-block; background:var(--blue-light); color:var(--accent); padding:0.2rem 0.6rem; border-radius:4px; font-size:0.85rem; font-weight:600">Stand: 2026-04-18</span> — Rechtsverweise nach ArbSchG/DGUV V1. Prüfungskataloge aktuell 2. Auflage (Winter 2025/2026). BerufeNet-Daten Azubi-Kohorte 2024. Nächste Überprüfung empfohlen nach Neuordnung der Lagerberufe oder bei §-Änderung ArbSchG.</p>
 
   <div style="margin-top:1.5rem; display:flex; gap:1.5rem; align-items:flex-start; flex-wrap:wrap;">
     <div style="flex-shrink:0; text-align:center;">
@@ -444,18 +665,44 @@ Am Ende: kurzer Hinweis, welche Lernfeld-Inhalte die Fragen abdecken.<button cla
 
 <script>
 // ============ GEMEINSAM ============
-function copyPromptBox(btn) {
+function getPromptBoxText(btn) {
   const box = btn.parentElement;
-  const text = Array.from(box.childNodes)
-    .filter(n => n !== btn)
+  return Array.from(box.childNodes)
+    .filter(n => n.nodeType === 3 || (n.nodeType === 1 && !n.classList?.contains('copy-btn') && !n.classList?.contains('download-btn')))
     .map(n => n.textContent)
     .join('')
     .replace(/\[([^\]]+)\]/g, '[$1]');
+}
+function copyPromptBox(btn) {
+  const text = getPromptBoxText(btn);
   navigator.clipboard.writeText(text).then(() => {
     btn.textContent = 'Kopiert ✓';
     btn.classList.add('copied');
     setTimeout(() => { btn.textContent = 'Kopieren'; btn.classList.remove('copied'); }, 2000);
   });
+}
+function togglePromptBox(header) {
+  const box = header.nextElementSibling;
+  const icon = header.querySelector('.toggle-icon');
+  if (!box) return;
+  if (box.style.display === 'none') { box.style.display = ''; if (icon) icon.textContent = '▼'; }
+  else { box.style.display = 'none'; if (icon) icon.textContent = '▶'; }
+}
+window.togglePromptBox = togglePromptBox;
+function downloadPromptBox(btn) {
+  const text = getPromptBoxText(btn);
+  const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  const filename = `ausbildungscoach-prompt-${ts}.txt`;
+  const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  btn.textContent = 'Gespeichert ✓';
+  setTimeout(() => { btn.textContent = 'Download'; }, 2000);
 }
 
 // ============ KARTE 3: BEGRIFFSSUCHE ============
@@ -466,7 +713,7 @@ const searchMeta = document.getElementById('search-meta');
 const searchResults = document.getElementById('search-results');
 const searchFilters = document.getElementById('search-filters');
 
-fetch('curricula-db.json')
+fetch('curricula-db.json?v=20260418a')
   .then(r => {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return r.json();
@@ -502,8 +749,18 @@ function runSearch() {
 
   let totalHits = 0;
   const out = [];
-  const SNIPPET_RADIUS = 100;
+  const SHORT_RADIUS = 100;
+  const LONG_RADIUS = 450;
   const MAX_HITS_PER_DOC = 5;
+
+  function buildSnippet(text, matchIdx, matchLen, radius) {
+    const start = Math.max(0, matchIdx - radius);
+    const end = Math.min(text.length, matchIdx + matchLen + radius);
+    let s = text.slice(start, end);
+    if (start > 0) s = '…' + s;
+    if (end < text.length) s = s + '…';
+    return s;
+  }
 
   CURRICULA.docs.forEach(doc => {
     if (!activeBerufe.has(doc.beruf_key)) return;
@@ -511,12 +768,10 @@ function runSearch() {
     let m;
     re.lastIndex = 0;
     while ((m = re.exec(doc.text)) !== null && hits.length < MAX_HITS_PER_DOC) {
-      const start = Math.max(0, m.index - SNIPPET_RADIUS);
-      const end = Math.min(doc.text.length, m.index + q.length + SNIPPET_RADIUS);
-      let snippet = doc.text.slice(start, end);
-      if (start > 0) snippet = '…' + snippet;
-      if (end < doc.text.length) snippet = snippet + '…';
-      hits.push(snippet);
+      hits.push({
+        shortSnip: buildSnippet(doc.text, m.index, q.length, SHORT_RADIUS),
+        longSnip: buildSnippet(doc.text, m.index, q.length, LONG_RADIUS),
+      });
     }
     if (hits.length === 0) return;
     totalHits += hits.length;
@@ -528,7 +783,7 @@ function runSearch() {
           &nbsp;&middot;&nbsp; ${escapeHtml(doc.quelle)}
           &nbsp;&middot;&nbsp; ${hits.length} Treffer
         </div>
-        ${hits.map(s => `<div class="sr-snippet">${escapeHtml(s).replace(re, '<mark>$&</mark>')}</div>`).join('')}
+        ${hits.map(h => `<div class="sr-snippet" onclick="toggleSnippet(this)"><span class="sr-short">${escapeHtml(h.shortSnip).replace(re, '<mark>$&</mark>')}</span><span class="sr-long">${escapeHtml(h.longSnip).replace(re, '<mark>$&</mark>')}</span><span class="sr-toggle">Mehr Kontext ▾</span></div>`).join('')}
       </div>
     `);
   });
@@ -542,6 +797,13 @@ function runSearch() {
 searchBtn.addEventListener('click', runSearch);
 searchInput.addEventListener('keydown', e => { if (e.key === 'Enter') runSearch(); });
 searchFilters.addEventListener('change', () => { if (searchInput.value.trim().length >= 2) runSearch(); });
+
+function toggleSnippet(el) {
+  el.classList.toggle('expanded');
+  const toggle = el.querySelector('.sr-toggle');
+  if (toggle) toggle.textContent = el.classList.contains('expanded') ? 'Weniger ▴' : 'Mehr Kontext ▾';
+}
+window.toggleSnippet = toggleSnippet;
 
 
 // ============ KARTE 4: CHECKLISTE ============
@@ -558,10 +820,30 @@ const CHECKLISTE = [
   { id: 10, kat: 'weich', text: 'Verhalten bei Störung, Unfall, Brand ist Bestandteil', src: 'abgeleitet aus §12 ArbSchG; fachlich Standard' },
 ];
 
+function getCheckState() {
+  return JSON.parse(localStorage.getItem('ausb-check') || '{}');
+}
+
+function updateCheckStatus() {
+  const el = document.getElementById('check-status');
+  if (!el) return;
+  const s = getCheckState();
+  const hartOffen = CHECKLISTE.filter(it => it.kat === 'hart' && !s[it.id]);
+  const hartCount = CHECKLISTE.filter(it => it.kat === 'hart').length;
+  const hartOk = hartCount - hartOffen.length;
+  if (hartOffen.length === 0) {
+    el.className = 'check-status ok';
+    el.textContent = `✓ Alle ${hartCount} harten Voraussetzungen bestätigt. Prompt kann erstellt werden.`;
+  } else {
+    el.className = 'check-status warn';
+    el.textContent = `⚠ ${hartOk}/${hartCount} harte Voraussetzungen bestätigt — offene Punkte werden im Prompt als Rückfragen formuliert.`;
+  }
+}
+
 function renderChecklist() {
   const container = document.getElementById('unterweisung-check');
   if (!container) return;
-  const state = JSON.parse(localStorage.getItem('ausb-check') || '{}');
+  const state = getCheckState();
   container.innerHTML = CHECKLISTE.map(it => `
     <label class="check-item ${state[it.id] ? 'done' : ''}">
       <input type="checkbox" data-id="${it.id}" ${state[it.id] ? 'checked' : ''}>
@@ -575,14 +857,718 @@ function renderChecklist() {
   container.querySelectorAll('input[type="checkbox"]').forEach(cb => {
     cb.addEventListener('change', e => {
       const id = e.target.dataset.id;
-      const s = JSON.parse(localStorage.getItem('ausb-check') || '{}');
+      const s = getCheckState();
       if (e.target.checked) s[id] = 1; else delete s[id];
       localStorage.setItem('ausb-check', JSON.stringify(s));
       e.target.closest('.check-item').classList.toggle('done', e.target.checked);
+      updateCheckStatus();
     });
   });
+  updateCheckStatus();
 }
 renderChecklist();
+
+
+// ============ KARTE 4: BERUF-PROFILE + LERNFELD ============
+let BERUF_PROFILE = null;
+const LERNFELD_CACHE = {}; // berufKey -> [{nr, titel, lj, startIdx, endIdx, text}]
+// Mapping auf curricula-db.json (fl und fll teilen sich RLP/ARP)
+const CURRICULA_KEY_MAP = { fl: 'fll' };
+
+fetch('beruf-profile.json?v=20260418a')
+  .then(r => r.ok ? r.json() : null)
+  .then(d => { BERUF_PROFILE = d; fillBerufDropdown(); })
+  .catch(() => { BERUF_PROFILE = null; fillBerufDropdown(); });
+
+function parseLernfelder(text) {
+  const out = [];
+  const seen = new Set();
+  const re = /Lernfeld\s+(\d+)[:\s–—-]+([^\n]{10,120})/g;
+  let m;
+  const hits = [];
+  while ((m = re.exec(text)) !== null) {
+    const nr = parseInt(m[1], 10);
+    let titel = m[2].replace(/\s+/g, ' ').trim();
+    const ljMatch = titel.match(/(\d)\.\s*Ausbildungsjahr/);
+    const lj = ljMatch ? ljMatch[1] : null;
+    titel = titel.replace(/\s*\d\.\s*Ausbildungsjahr\s*$/, '').trim();
+    if (titel.length < 8 || !/^[A-ZÄÖÜ]/.test(titel)) continue;
+    const key = nr + '|' + titel;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    hits.push({ nr, titel, lj, startIdx: m.index });
+  }
+  // Ende-Index = Start des nächsten Lernfeld-Headers oder 2500 Zeichen ab Start
+  for (let i = 0; i < hits.length; i++) {
+    const next = hits[i + 1];
+    const maxEnd = hits[i].startIdx + 2500;
+    hits[i].endIdx = next ? Math.min(next.startIdx, maxEnd) : maxEnd;
+    hits[i].text = text.slice(hits[i].startIdx, hits[i].endIdx).replace(/\s+/g, ' ').trim();
+  }
+  return hits.sort((a, b) => a.nr - b.nr);
+}
+
+function fillBerufDropdown() {
+  const sel = document.getElementById('u-beruf');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— bitte wählen —</option>';
+  const source = BERUF_PROFILE
+    ? Object.entries(BERUF_PROFILE)
+        .filter(([k]) => !k.startsWith('_'))
+        .map(([k, v]) => [k, v.name + (v.dauer_jahre ? ' (' + v.dauer_jahre + '-jährig)' : '')])
+    : (CURRICULA ? Object.entries(CURRICULA.berufe) : []);
+  source.forEach(([key, label]) => {
+    const opt = document.createElement('option');
+    opt.value = key; opt.textContent = label;
+    sel.appendChild(opt);
+  });
+  // Lehrjahr-Dropdown bei BKF/Spedition ggf. eingrenzen — aktuell statisch 1-3, FL-Spezifika werden beim Bau erklärt
+  sel.removeEventListener('change', onBerufChange);
+  sel.addEventListener('change', onBerufChange);
+}
+
+function onBerufChange(e) {
+  const berufKey = e.target.value;
+  const lf = document.getElementById('u-lernfeld');
+  const ljSel = document.getElementById('u-lehrjahr');
+  lf.innerHTML = '<option value="">— kein Bezug —</option>';
+  if (!berufKey) { lf.disabled = true; lf.innerHTML = '<option value="">erst Beruf wählen</option>'; return; }
+
+  // Lehrjahr-Optionen je nach Beruf (FL hat nur 1+2, andere 1-3)
+  const dauer = BERUF_PROFILE && BERUF_PROFILE[berufKey] ? BERUF_PROFILE[berufKey].dauer_jahre : 3;
+  ljSel.innerHTML = '<option value="">— offen —</option>';
+  for (let i = 1; i <= dauer; i++) {
+    const o = document.createElement('option'); o.value = i; o.textContent = i + '. Lehrjahr';
+    ljSel.appendChild(o);
+  }
+
+  // RLP-Key mappen (fl -> fll, weil curricula-db.json kombiniert)
+  const rlpKey = CURRICULA_KEY_MAP[berufKey] || berufKey;
+  if (!CURRICULA) { lf.disabled = true; return; }
+  const rlpDoc = CURRICULA.docs.find(d => d.beruf_key === rlpKey && (d.doktyp === 'RLP' || d.doktyp === 'ARP+RLP'));
+  if (!rlpDoc) { lf.disabled = true; return; }
+  const felder = parseLernfelder(rlpDoc.text);
+  LERNFELD_CACHE[berufKey] = felder;
+  felder.forEach(f => {
+    const opt = document.createElement('option');
+    opt.value = f.nr + '|' + f.titel;
+    opt.textContent = `LF ${f.nr} — ${f.titel}${f.lj ? ' (' + f.lj + '. LJ)' : ''}`;
+    lf.appendChild(opt);
+  });
+  lf.disabled = false;
+}
+
+function findLernfeldText(berufKey, nr, titel) {
+  const arr = LERNFELD_CACHE[berufKey];
+  if (!arr) return null;
+  return arr.find(f => f.nr === parseInt(nr, 10) && f.titel === titel);
+}
+
+// Fallback: falls beruf-profile.json nicht lädt, versuchen wir nach kurzer Zeit trotzdem
+setTimeout(() => { if (!document.getElementById('u-beruf').options.length || document.getElementById('u-beruf').options.length < 2) fillBerufDropdown(); }, 800);
+
+
+// ============ KARTE 4: PROMPT-BUILDER ============
+const RECHTSBLOCK = `RECHTSRAHMEN (§12 ArbSchG · §13 ArbSchG · DGUV V1 §4 · verkürzt) — NUR ALS ORIENTIERUNG FÜR DICH. DIESE TEXTBLÖCKE NICHT WÖRTLICH IN DEN ENTWURF ÜBERNEHMEN. Im Entwurf reicht ein kurzer Hinweis wie "gemäß §12 ArbSchG" — der vollständige Gesetzestext gehört NICHT in eine Unterweisung, die einem Azubi vorgelesen wird.
+
+- §12 Abs. 1: Der Arbeitgeber hat die Beschäftigten über Sicherheit und Gesundheitsschutz bei der Arbeit während ihrer Arbeitszeit ausreichend und angemessen zu unterweisen. Die Unterweisung umfasst Anweisungen und Erläuterungen, die eigens auf den Arbeitsplatz oder den Aufgabenbereich ausgerichtet sind. Sie muss bei Einstellung, Veränderung im Aufgabenbereich, Einführung neuer Arbeitsmittel/Technologie vor Aufnahme der Tätigkeit erfolgen, an die Gefährdungsentwicklung angepasst sein und erforderlichenfalls regelmäßig wiederholt werden.
+- §13: Verantwortlich ist der Arbeitgeber; zuverlässige und fachkundige Personen können schriftlich mit Aufgaben beauftragt werden.
+- DGUV V1 §4: Die Unterweisung muss mindestens einmal jährlich erfolgen und ist zu dokumentieren.`;
+
+const SPRACHE_REGELN = {
+  A2: '- Max. 12 Wörter pro Satz. Keine Nebensätze. Keine Fachbegriffe ohne Erklärung. Beispiele aus dem Alltag. Aktive Verben.',
+  B1: '- Max. 15 Wörter pro Satz. Fachbegriffe beim ersten Vorkommen in Klammern erklären. Aktiv statt Passiv. Keine Nominalisierungen.',
+  B2: '- Fachbegriffe dürfen bleiben. Nominalisierungen sparsam. Klar strukturierte Absätze.',
+  C1: '- Fachsprache erlaubt. Auf Kohärenz und Präzision achten.'
+};
+
+const SCHRIFT_REGELN = {
+  geuebt: '',
+  unsicher: '- Bildsprache einsetzen. Aufgaben visuell strukturieren. Stichpunkte statt Fließtext wo sinnvoll.',
+  gering: '- Symbole/Piktogramme statt Text. Anweisungen auch als mündlich/vertont denkbar. Checklisten mit Bildern. Partnerarbeit mit geübtem Kollegen empfehlen.'
+};
+
+function buildUnterweisungPrompt() {
+  const beruf = document.getElementById('u-beruf');
+  const berufKey = beruf.value;
+  const berufName = berufKey ? beruf.options[beruf.selectedIndex].textContent : null;
+  const lfVal = document.getElementById('u-lernfeld').value;
+  const lehrjahr = document.getElementById('u-lehrjahr').value;
+  const sprache = document.getElementById('u-sprache').value;
+  const schrift = document.getElementById('u-schrift').value;
+  const taetigkeit = document.getElementById('u-taetigkeit').value.trim();
+  const kontext = document.getElementById('u-kontext').value.trim();
+
+  const schnell = document.getElementById('u-schnell')?.checked;
+  const state = getCheckState();
+  const erfuellt = schnell
+    ? CHECKLISTE.filter(it => it.kat === 'hart' || state[it.id])
+    : CHECKLISTE.filter(it => state[it.id]);
+  const offenHart = schnell ? [] : CHECKLISTE.filter(it => !state[it.id] && it.kat === 'hart');
+
+  let lines = [];
+  lines.push('Du bist erfahrener Ausbilder. Erstelle einen Unterweisungsentwurf gemäß §12 ArbSchG.');
+  lines.push('');
+  lines.push(RECHTSBLOCK);
+  lines.push('');
+
+  // Kontextblock
+  lines.push('KONTEXT:');
+  if (berufName) lines.push(`- Beruf: ${berufName}`);
+  let lfText = null;
+  if (lfVal) {
+    const [nr, titel] = lfVal.split('|');
+    lines.push(`- Lernfeld-Bezug: LF ${nr} — ${titel}`);
+    const lfObj = findLernfeldText(berufKey, nr, titel);
+    if (lfObj && lfObj.text) lfText = lfObj.text;
+  }
+
+  // Beruf-/Lehrjahr-Profil aus beruf-profile.json einfügen
+  if (BERUF_PROFILE && berufKey && BERUF_PROFILE[berufKey]) {
+    const prof = BERUF_PROFILE[berufKey];
+    const ljText = lehrjahr && prof.lehrjahre ? prof.lehrjahre[lehrjahr] : null;
+    if (prof.kopf || ljText) {
+      lines.push('');
+      lines.push('ZIELPROFIL DES BERUFS (Kompetenzen, die in der Ausbildung erarbeitet werden — noch nicht vorausgesetzt. Quellen: BerufeNet, KMK-Lehrplan, Materialgenerator):');
+      if (prof.kopf) lines.push('- ' + prof.kopf);
+      if (ljText) lines.push('- ' + lehrjahr + '. Lehrjahr: ' + ljText);
+    }
+  }
+  if (lehrjahr) lines.push(`- Lehrjahr: ${lehrjahr}. Ausbildungsjahr`);
+  if (taetigkeit) lines.push(`- Tätigkeit/Thema: ${taetigkeit}`);
+  if (kontext) lines.push(`- Betriebliche Besonderheiten: ${kontext}`);
+  if (!berufName && !taetigkeit) lines.push('- (keine Angaben — bitte vor der Generierung erfragen)');
+  lines.push('');
+
+  // Lernfeld-Volltext einbetten
+  if (lfText) {
+    lines.push('LERNFELD-AUSZUG AUS DEM KMK-RAHMENLEHRPLAN (amtliches Werk, gemeinfrei) — als Kontext beim Entwurf berücksichtigen, nicht wörtlich übernehmen:');
+    lines.push('---');
+    lines.push(lfText);
+    lines.push('---');
+    lines.push('');
+  }
+
+  // Sprache
+  if (sprache || schrift) {
+    lines.push('SPRACHE UND ZUGÄNGLICHKEIT:');
+    if (sprache) {
+      lines.push(`- Mündliches Niveau: ${sprache}`);
+      lines.push(SPRACHE_REGELN[sprache]);
+    }
+    if (schrift) {
+      const label = { geuebt: 'geübt', unsicher: 'unsicher', gering: 'sehr unsicher' }[schrift];
+      lines.push(`- Schriftsprache: ${label}`);
+      if (SCHRIFT_REGELN[schrift]) lines.push(SCHRIFT_REGELN[schrift]);
+    }
+    lines.push('');
+  }
+
+  // Checkliste: erfüllt
+  if (erfuellt.length > 0) {
+    lines.push('BEREITS ERFÜLLTE VORAUSSETZUNGEN (nicht mehr abfragen):');
+    erfuellt.forEach(it => lines.push(`- ${it.text} (${it.src})`));
+    lines.push('');
+  }
+
+  // Checkliste: offen → Rückfragen
+  if (offenHart.length > 0) {
+    lines.push('OFFENE HARTE VORAUSSETZUNGEN — stelle mir dazu ZUERST Rückfragen, bevor du den Entwurf erstellst:');
+    offenHart.forEach(it => lines.push(`- ${it.text} (${it.src})`));
+    lines.push('');
+  }
+
+  // Container-Modus: Diagnose zuerst, dann Entwurf
+  const container = document.getElementById('u-container')?.checked;
+  if (container) {
+    lines.push('ARBEITSWEISE: ZWEI SCHRITTE');
+    lines.push('');
+    lines.push('SCHRITT A — Diagnose (vor dem Entwurf):');
+    lines.push('1. Was bedeutet die Kombination aus Beruf, Lehrjahr, Tätigkeit, Sprachniveau konkret für diese Unterweisung?');
+    lines.push('2. Welche typischen Stolpersteine sind zu erwarten (sprachlich, kognitiv, betrieblich)?');
+    lines.push('3. Welche Vereinfachungen oder Schwerpunktverschiebungen sind nötig?');
+    lines.push('4. Welche Informationen fehlen mir im Prompt noch, um einen passgenauen Entwurf zu erstellen?');
+    lines.push('');
+    lines.push('SCHRITT B — Entwurf (erst nach Diagnose):');
+  } else {
+    lines.push('ANFORDERUNGEN AN DEN ENTWURF:');
+  }
+  lines.push('- Struktur: Einstieg, Gefährdungen, Regeln, praktischer Teil, Verständnisfragen');
+  lines.push('- Konkreter Bezug auf §12 ArbSchG und einschlägige DGUV-Schriften');
+  lines.push('- Keine personenbezogenen Daten');
+  lines.push('- Am Ende: 3 Verständnisfragen');
+  lines.push('- Wenn Kontextangaben fehlen, stelle Rückfragen, bevor du generierst — rate nicht.');
+  lines.push('');
+  lines.push('HINWEIS: Dieser Entwurf ist eine VORLAGE. Sachkunde, Gefährdungsbeurteilung, Durchführung und Dokumentation liegen beim sachkundigen Ausbilder.');
+
+  const text = lines.join('\n');
+  const out = document.getElementById('u-output');
+  const box = document.getElementById('u-prompt-box');
+  out.style.display = 'block';
+  box.textContent = text;
+  const dlBtn = document.createElement('button');
+  dlBtn.className = 'download-btn';
+  dlBtn.textContent = 'Download';
+  dlBtn.addEventListener('click', () => downloadPromptBox(dlBtn));
+  box.appendChild(dlBtn);
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = 'Kopieren';
+  btn.addEventListener('click', () => copyPromptBox(btn));
+  box.appendChild(btn);
+  out.scrollIntoView({ block: 'start', behavior: 'smooth' });
+}
+window.buildUnterweisungPrompt = buildUnterweisungPrompt;
+
+
+// ============ KARTE 7: FACHGESPRÄCH PROMPT-BUILDER ============
+const STUFE_KALIBRIERUNG = {
+  grund: {
+    default: 'Reine Faktenabfrage: Was ist X, wie heißt Y, welche Schritte umfasst Z. Keine Abwägung nötig.',
+    fl: 'Objektbezogene Fragen am konkreten Ding: „Wozu ist das gut?", „Woran erkenne ich das?". Keine Tabellen-/Kennzahlbezüge.',
+    fll: 'Faktenabfrage mit erstem Zahlenbezug (Kennzahlen, Volumina). Klare Begriffsabgrenzungen.',
+    spedition: 'Faktenabfrage zu Fachbegriffen, Verkehrsträgern, Dokumenten; Grundregeln INCOTERMS / AGB.',
+    bkf: 'Faktenabfrage zu Fahrzeug, Sozialvorschriften, Schildern; Grundregeln Lenk-/Ruhezeiten.',
+    buero: 'Faktenabfrage zu Büroabläufen, Rechnungswesen-Grundbegriffen, Rechtsformen.'
+  },
+  vertiefung: {
+    default: 'Zusammenhänge erklären, Verfahren beschreiben, einfache Kalkulationen.',
+    fl: 'Abfolgen am Objekt erklären („Wie gehst du vor, wenn ..."); einfache Wenn-Dann-Verknüpfungen.',
+    fll: 'Kalkulationen (ABC-Analyse, Umschlagshäufigkeit), Prozesszusammenhänge, einfache LVS-Logik.',
+    spedition: 'Verfahrensbeschreibungen (Sammelgut, Zollabwicklung), Kalkulationen, Wenn-Dann bei Verzug/Schaden.',
+    bkf: 'Zusammenhänge Lenkzeit-Pause-Tagesschicht, ADR-Kategorien, Abfahrtkontrolle-Logik.',
+    buero: 'Verfahren Rechnungswesen, Personaleinsatz, strukturierte Angebotserstellung.'
+  },
+  transfer: {
+    default: 'Unbekannte Situation, mehrere plausible Handlungen — Azubi muss abwägen, begründen, entscheiden.',
+    fl: 'Wenn-Dann an einer konkreten Lagersituation: neue Waren, neuer Platz, neuer Ablauf. Der Azubi muss die Routinen auf das Neue übertragen.',
+    fll: 'Fallabwägung mit Zahlen: Route A vs. B, Lagerlayout-Varianten, Kennzahl-Interpretation mit Handlungsempfehlung.',
+    spedition: 'Komplexe Fallstudie mit mehreren Optionen (Verkehrsträger-Wahl bei gegebenen Constraints), Rechtsrisiko-Abwägung, Kundengespräch.',
+    bkf: 'Kritische Situation (Stau, Gefahrgut-Leck, Kundenbeschwerde) — Entscheidung treffen und begründen unter Zeitdruck.',
+    buero: 'Mehrstufige Situationen (Reklamation, Personalauswahl, Finanzierungsentscheidung) — Abwägung und kommunikativer Umgang.'
+  }
+};
+
+const PRUEFUNG_LABEL = {
+  zp: 'Zwischenprüfung',
+  ap1: 'Abschlussprüfung Teil 1 (gestreckt)',
+  ap2: 'Abschlussprüfung Teil 2 (gestreckt)',
+  ap: 'Abschlussprüfung'
+};
+
+function fillBerufDropdownFachgespraech() {
+  const sel = document.getElementById('f-beruf');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— bitte wählen —</option>';
+  const source = BERUF_PROFILE
+    ? Object.entries(BERUF_PROFILE).filter(([k]) => !k.startsWith('_')).map(([k, v]) => [k, v.name + (v.dauer_jahre ? ' (' + v.dauer_jahre + '-jährig)' : '')])
+    : (CURRICULA ? Object.entries(CURRICULA.berufe) : []);
+  source.forEach(([key, label]) => {
+    const opt = document.createElement('option');
+    opt.value = key; opt.textContent = label;
+    sel.appendChild(opt);
+  });
+  sel.removeEventListener('change', onBerufChangeFachgespraech);
+  sel.addEventListener('change', onBerufChangeFachgespraech);
+}
+
+function onBerufChangeFachgespraech(e) {
+  const berufKey = e.target.value;
+  const lf = document.getElementById('f-lernfeld');
+  lf.innerHTML = '<option value="">— kein Lernfeld-Bezug —</option>';
+  if (!berufKey) { lf.disabled = true; lf.innerHTML = '<option value="">erst Beruf wählen</option>'; return; }
+  const rlpKey = CURRICULA_KEY_MAP[berufKey] || berufKey;
+  if (!CURRICULA) { lf.disabled = true; return; }
+  const rlpDoc = CURRICULA.docs.find(d => d.beruf_key === rlpKey && (d.doktyp === 'RLP' || d.doktyp === 'ARP+RLP'));
+  if (!rlpDoc) { lf.disabled = true; return; }
+  const felder = parseLernfelder(rlpDoc.text);
+  LERNFELD_CACHE[berufKey] = felder;
+  felder.forEach(f => {
+    const opt = document.createElement('option');
+    opt.value = f.nr + '|' + f.titel;
+    opt.textContent = `LF ${f.nr} — ${f.titel}${f.lj ? ' (' + f.lj + '. LJ)' : ''}`;
+    lf.appendChild(opt);
+  });
+  lf.disabled = false;
+}
+
+// Initialisierung — delayed, damit BERUF_PROFILE geladen sein kann
+setTimeout(fillBerufDropdownFachgespraech, 900);
+
+function buildFachgespraechPrompt() {
+  const berufSel = document.getElementById('f-beruf');
+  const berufKey = berufSel.value;
+  const berufName = berufKey ? berufSel.options[berufSel.selectedIndex].textContent : null;
+  const lfVal = document.getElementById('f-lernfeld').value;
+  const pruef = document.getElementById('f-pruefung').value;
+  const stufe = document.getElementById('f-stufe').value;
+  const anzahl = parseInt(document.getElementById('f-anzahl').value || '5', 10);
+  const format = document.getElementById('f-format').value;
+
+  let lfText = null, lfHeader = null;
+  if (lfVal) {
+    const [nr, titel] = lfVal.split('|');
+    lfHeader = `LF ${nr} — ${titel}`;
+    const lfObj = findLernfeldText(berufKey, nr, titel);
+    if (lfObj && lfObj.text) lfText = lfObj.text;
+  }
+
+  const stufeText = stufe ? (STUFE_KALIBRIERUNG[stufe][berufKey] || STUFE_KALIBRIERUNG[stufe].default) : null;
+  const stufeLabel = { grund: 'Grundkenntnisse', vertiefung: 'Vertiefung', transfer: 'Transferleistung' }[stufe];
+
+  const lines = [];
+  lines.push(`Du bist Prüfer bzw. Ausbilder. Erstelle ${anzahl} Übungsfragen für ein Fachgespräch zur Prüfungsvorbereitung.`);
+  lines.push('');
+  lines.push('KONTEXT:');
+  if (berufName) lines.push(`- Beruf: ${berufName}`);
+  if (pruef) lines.push(`- Prüfungsteil: ${PRUEFUNG_LABEL[pruef]}`);
+  if (lfHeader) lines.push(`- Lernfeld-Bezug: ${lfHeader}`);
+  if (stufe) {
+    lines.push(`- Schwierigkeitsstufe: ${stufeLabel}`);
+    lines.push(`  (beruf-spezifisch: ${stufeText})`);
+  }
+  lines.push(`- Format: ${{ offen: 'Offene Fragen', mc: 'Multiple Choice', fallstudie: 'Fallstudie mit Teilfragen', gemischt: 'Gemischte Formate' }[format]}`);
+  lines.push('');
+
+  if (lfText) {
+    lines.push('LERNFELD-AUSZUG AUS DEM KMK-RAHMENLEHRPLAN (amtliches Werk, gemeinfrei) — orientiere dich an den dort genannten Kompetenzen, nicht an allgemeinem Lehrbuchwissen:');
+    lines.push('---');
+    lines.push(lfText);
+    lines.push('---');
+    lines.push('');
+  }
+
+  // BerufeNet Kopf
+  if (BERUF_PROFILE && berufKey && BERUF_PROFILE[berufKey] && BERUF_PROFILE[berufKey].kopf) {
+    lines.push('ZIELPROFIL DES BERUFS (Kompetenzen, die in der Ausbildung erarbeitet werden — Fragen testen, wie weit der Azubi auf dem Weg dahin ist. Quelle: BerufeNet):');
+    lines.push('- ' + BERUF_PROFILE[berufKey].kopf);
+    lines.push('');
+  }
+
+  lines.push('FORMAT je Frage:');
+  lines.push('- Frage (Formulierung wie in der Prüfung)');
+  lines.push('- Erwartete Kernpunkte (3-5 Stichworte)');
+  if (format === 'mc') lines.push('- 4 Antwortmöglichkeiten, 1 richtige, mit Begründung warum die anderen falsch sind');
+  if (format === 'fallstudie' || format === 'gemischt') lines.push('- Kurze Fallbeschreibung (3-5 Sätze)');
+  lines.push('- Mögliche Nachfrage zur Vertiefung');
+  lines.push('- Typischer Fehler, auf den zu achten ist');
+  lines.push('');
+
+  lines.push('HINWEISE:');
+  lines.push('- Wenn Prüfungsteil offen gelassen: bitte zuerst rückfragen.');
+  lines.push('- Wenn kein Lernfeld-Bezug gewählt: weise explizit darauf hin, dass die Fragen nicht an einem konkreten RLP orientiert sind.');
+  lines.push('- Bleibe in der Schwierigkeitsstufe — mische nicht Grundkenntnisse mit Transferleistung.');
+  lines.push('- Am Ende: kurze Zusammenfassung, welche Kompetenzen aus dem Lernfeld die Fragen abdecken (falls gewählt).');
+  lines.push('');
+  lines.push('WICHTIG: Die offiziellen IHK-AkA-Prüfungskataloge (2. Auflage, 2025/26) sind urheberrechtlich geschützt. Du kennst sie nicht im Wortlaut. Deine Fragen sind Übungsfragen im Geist der AO + RLP, keine Abbildung des Katalogs.');
+
+  const text = lines.join('\n');
+  const out = document.getElementById('f-output');
+  const box = document.getElementById('f-prompt-box');
+  out.style.display = 'block';
+  box.textContent = text;
+  const dlBtn = document.createElement('button');
+  dlBtn.className = 'download-btn';
+  dlBtn.textContent = 'Download';
+  dlBtn.addEventListener('click', () => downloadPromptBox(dlBtn));
+  box.appendChild(dlBtn);
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = 'Kopieren';
+  btn.addEventListener('click', () => copyPromptBox(btn));
+  box.appendChild(btn);
+  out.scrollIntoView({ block: 'start', behavior: 'smooth' });
+}
+window.buildFachgespraechPrompt = buildFachgespraechPrompt;
+
+
+// ============ KARTE 6: BERATUNG PROMPT-BUILDER ============
+const CONTEXT_LABEL = {
+  praktikant: 'Praktikant/in, noch nicht in Ausbildung',
+  berufsorientierung: 'Berufsorientierung / Wahl-Unsicherheit',
+  'azubi-1lj': 'Azubi im 1. Lehrjahr',
+  'azubi-2lj': 'Azubi im 2. Lehrjahr',
+  'azubi-3lj': 'Azubi im 3. Lehrjahr, vor Prüfung'
+};
+const ANLASS_LABEL = {
+  passung: 'Passung Beruf / Person',
+  leistung: 'Leistungsabfall oder Auffälligkeit',
+  foerderung: 'Fördermöglichkeiten identifizieren',
+  konflikt: 'Konflikt mit Kollegen / Anleitung',
+  motivation: 'Motivation / Perspektive',
+  pruefungsangst: 'Prüfungsangst / Prüfungsvorbereitung'
+};
+
+function fillBerufDropdownBeratung() {
+  const sel = document.getElementById('b-beruf');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— bitte wählen —</option>';
+  const source = BERUF_PROFILE
+    ? Object.entries(BERUF_PROFILE).filter(([k]) => !k.startsWith('_')).map(([k, v]) => [k, v.name + (v.dauer_jahre ? ' (' + v.dauer_jahre + '-jährig)' : '')])
+    : (CURRICULA ? Object.entries(CURRICULA.berufe) : []);
+  source.forEach(([key, label]) => {
+    const opt = document.createElement('option');
+    opt.value = key; opt.textContent = label;
+    sel.appendChild(opt);
+  });
+}
+setTimeout(fillBerufDropdownBeratung, 900);
+
+function buildBeratungPrompt() {
+  const berufSel = document.getElementById('b-beruf');
+  const berufKey = berufSel.value;
+  const berufName = berufKey ? berufSel.options[berufSel.selectedIndex].textContent : null;
+  const context = document.getElementById('b-context').value;
+  const anlass = document.getElementById('b-anlass').value;
+  const situation = document.getElementById('b-situation').value.trim();
+
+  const lines = [];
+  lines.push('Ich bereite ein Beratungsgespräch mit einem Azubi vor. Du sollst mir Orientierung geben — keine Diagnose, keine Ferndiagnose einer Person.');
+  lines.push('');
+  lines.push('KONTEXT:');
+  if (berufName) lines.push(`- Beruf: ${berufName}`);
+  if (context) lines.push(`- Rolle/Phase: ${CONTEXT_LABEL[context]}`);
+  if (anlass) lines.push(`- Anlass: ${ANLASS_LABEL[anlass]}`);
+  if (situation) {
+    lines.push('- Beobachtete Situation (pseudonymisiert):');
+    lines.push('  ' + situation);
+  }
+  if (!situation) lines.push('- Beobachtete Situation: (leer — bitte zuerst rückfragen)');
+  lines.push('');
+
+  // Beruf-Profil (Kopf) als ZIELKOMPETENZEN deklarieren — NICHT als Ist-Stand des Azubis
+  if (BERUF_PROFILE && berufKey && BERUF_PROFILE[berufKey] && BERUF_PROFILE[berufKey].kopf) {
+    lines.push('ZIELKOMPETENZEN DES BERUFS (wohin die Ausbildung führt, NICHT was der/die Azubi bereits kann):');
+    lines.push('- ' + BERUF_PROFILE[berufKey].kopf);
+    lines.push('Nutze dieses Profil nur als Referenz, wohin die Entwicklung zielt. Ein Azubi ist auf dem Weg dahin — Lücken sind normal, keine Defizitkategorie.');
+    lines.push('');
+  }
+
+  lines.push('AUFGABE:');
+  lines.push('1. Welche 3-5 Fragen sollten im Gespräch offen gestellt werden (Gesprächseröffnung, kein Verhör)?');
+  lines.push('2. Welche möglichen Ursachen sollte ich im Kopf haben? Nenne 3-5 Hypothesen, keine Entscheidung.');
+  lines.push('3. Welche konkreten Schritte kämen als Hilfsangebote in Frage? Nenne 3-5 Optionen, abgestuft.');
+  lines.push('4. Was sollte ich NICHT tun oder sagen? Nenne 2-3 typische Fallen.');
+  lines.push('5. Welche Informationen fehlen mir, die ich vor dem Gespräch noch einholen sollte?');
+  lines.push('');
+  lines.push('HINWEISE:');
+  lines.push('- Antworte strukturiert und knapp. Bullet-Points sind erwünscht.');
+  lines.push('- Keine Diagnose, nur Orientierung. Kein Kategorisieren der Person.');
+  lines.push('- Wenn die Situation unvollständig beschrieben ist, stelle zuerst Rückfragen.');
+  lines.push('- Berücksichtigen Sie das Zielprofil: Sprachniveau, Schulabschluss-Milieu, typische Abstraktionsebene des Ausbildungsberufs — dorthin entwickelt sich der/die Azubi, ist aber noch nicht dort.');
+
+  const text = lines.join('\n');
+  const out = document.getElementById('b-output');
+  const box = document.getElementById('b-prompt-box');
+  out.style.display = 'block';
+  box.textContent = text;
+  const dlBtn = document.createElement('button');
+  dlBtn.className = 'download-btn';
+  dlBtn.textContent = 'Download';
+  dlBtn.addEventListener('click', () => downloadPromptBox(dlBtn));
+  box.appendChild(dlBtn);
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = 'Kopieren';
+  btn.addEventListener('click', () => copyPromptBox(btn));
+  box.appendChild(btn);
+  out.scrollIntoView({ block: 'start', behavior: 'smooth' });
+}
+window.buildBeratungPrompt = buildBeratungPrompt;
+
+
+// ============ KARTE 5: MATERIAL PROMPT-BUILDER ============
+const ZWECK_LABEL = {
+  unterweisung: 'Unterweisungsentwurf (§12 ArbSchG)',
+  einweisung: 'Einweisung (informell)',
+  beratung: 'Beratungsgesprächs-Leitfaden',
+  pruefung: 'Prüfungs-/Übungsaufgabe',
+  lernmaterial: 'Lernmaterial / Arbeitsblatt',
+  sonst: 'Sonstiges'
+};
+
+function fillBerufDropdownMaterial() {
+  const sel = document.getElementById('m-beruf');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— offen —</option>';
+  const source = BERUF_PROFILE
+    ? Object.entries(BERUF_PROFILE).filter(([k]) => !k.startsWith('_')).map(([k, v]) => [k, v.name + (v.dauer_jahre ? ' (' + v.dauer_jahre + '-jährig)' : '')])
+    : (CURRICULA ? Object.entries(CURRICULA.berufe) : []);
+  source.forEach(([key, label]) => {
+    const opt = document.createElement('option');
+    opt.value = key; opt.textContent = label;
+    sel.appendChild(opt);
+  });
+}
+setTimeout(fillBerufDropdownMaterial, 900);
+
+function buildMaterialPrompt() {
+  const berufSel = document.getElementById('m-beruf');
+  const berufKey = berufSel.value;
+  const berufName = berufKey ? berufSel.options[berufSel.selectedIndex].textContent : null;
+  const lj = document.getElementById('m-lehrjahr').value;
+  const zweck = document.getElementById('m-zweck').value;
+  const sprache = document.getElementById('m-sprache').value;
+  const text = document.getElementById('m-text').value.trim();
+  const container = document.getElementById('m-container').checked;
+
+  const lines = [];
+  lines.push('Du erhältst einen Text zur Prüfung. Deine Aufgabe ist DIAGNOSE, nicht Neufassung.');
+  lines.push('');
+  lines.push('ZIELGRUPPE UND ZWECK:');
+  if (berufName) lines.push(`- Beruf: ${berufName}`);
+  if (lj) lines.push(`- Lehrjahr: ${lj}. Ausbildungsjahr`);
+  if (zweck) lines.push(`- Zweck des Materials: ${ZWECK_LABEL[zweck]}`);
+  if (sprache) lines.push(`- Sprachniveau der Zielgruppe: ${sprache}`);
+  if (!berufName && !zweck) lines.push('- (wenig Kontext — bitte vor der Analyse rückfragen)');
+  lines.push('');
+
+  if (container) {
+    lines.push('ARBEITSWEISE: ZWEI SCHRITTE');
+    lines.push('');
+    lines.push('SCHRITT A — Relevanz-Prüfung:');
+    lines.push('Prüfe vor der Analyse, welche der fünf Achsen für DIESEN konkreten Text überhaupt sinnvoll sind. Bei einem 3-Satz-Merkzettel ist „Struktur" irrelevant, bei einer Unterweisung aber zentral. Nenne die ausgewählten Achsen kurz begründet.');
+    lines.push('');
+    lines.push('SCHRITT B — Diagnose (nur an den ausgewählten Achsen):');
+  } else {
+    lines.push('DIAGNOSE entlang dieser 5 Achsen:');
+  }
+  lines.push('(1) Vollständigkeit — fehlen Punkte, die rechtlich oder fachlich da sein müssten?');
+  lines.push('(2) Eindeutigkeit — gibt es Formulierungen, die unterschiedlich verstanden werden können?');
+  lines.push('(3) Empfängerrisiko — passt Sprache und Niveau zur Zielgruppe?');
+  lines.push('(4) Struktur — ist der Aufbau logisch, Abschnitte klar getrennt?');
+  lines.push('(5) Ton — wirkt der Text wertschätzend und professionell?');
+  lines.push('');
+  lines.push('AUFGABE pro Achse:');
+  lines.push('- Was ist OK (1 Satz)');
+  lines.push('- Was ist schwach (1-2 Sätze mit konkretem Zitat aus dem Text)');
+  lines.push('- Konkreter Verbesserungsvorschlag (keine Neufassung, nur gezielter Eingriff)');
+  lines.push('');
+  lines.push('HINWEISE:');
+  lines.push('- Wenn etwas rechtlich fragwürdig wirkt, markiere es mit ⚠ und erkläre kurz.');
+  lines.push('- Schlage KEINE komplette Neufassung vor.');
+  lines.push('- Am Ende: zusammenfassende Einschätzung in 2-3 Sätzen.');
+  lines.push('');
+
+  if (text) {
+    lines.push('ZU ANALYSIERENDER TEXT:');
+    lines.push('---');
+    lines.push(text);
+    lines.push('---');
+  } else {
+    lines.push('ZU ANALYSIERENDER TEXT: (noch nicht eingefügt — bitte zuerst Rückfrage stellen)');
+  }
+
+  const prompt = lines.join('\n');
+  const out = document.getElementById('m-output');
+  const box = document.getElementById('m-prompt-box');
+  out.style.display = 'block';
+  box.textContent = prompt;
+  const dlBtn = document.createElement('button');
+  dlBtn.className = 'download-btn';
+  dlBtn.textContent = 'Download';
+  dlBtn.addEventListener('click', () => downloadPromptBox(dlBtn));
+  box.appendChild(dlBtn);
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = 'Kopieren';
+  btn.addEventListener('click', () => copyPromptBox(btn));
+  box.appendChild(btn);
+  out.scrollIntoView({ block: 'start', behavior: 'smooth' });
+}
+window.buildMaterialPrompt = buildMaterialPrompt;
+
+
+// ============ KARTE 4 MODUS B: EINWEISUNG PROMPT-BUILDER ============
+const EINWEISUNG_ROLLE = {
+  'neu-azubi': 'Neuer Azubi in der ersten Woche',
+  'azubi-1lj': 'Azubi im 1. Lehrjahr',
+  'azubi-2lj': 'Azubi im 2. Lehrjahr',
+  'azubi-3lj': 'Azubi im 3. Lehrjahr',
+  'praktikant': 'Praktikant/in',
+  'mitarbeiter-neu': 'Neuer Mitarbeiter (keine Azubi-Rolle)'
+};
+const EINWEISUNG_UMFANG = {
+  kurz: { label: 'Kurz (max. 1/2 Seite)', prompt: '- Max. 1/2 Seite, ca. 5-Minuten-Erklärung. Keine Ausschweifung.' },
+  normal: { label: 'Normal (1 Seite)', prompt: '- Ca. 1 Seite. Reicht für eine 15-minütige Erklärung am Gerät/Platz.' },
+  ausfuehrlich: { label: 'Ausführlich (2 Seiten)', prompt: '- 2 Seiten. Schritt-für-Schritt mit Hinweisen „Bildschirm zeigt jetzt...", „Knopf oben rechts drücken...".' }
+};
+
+function fillBerufDropdownEinweisung() {
+  const sel = document.getElementById('e-beruf');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— offen —</option>';
+  const source = BERUF_PROFILE
+    ? Object.entries(BERUF_PROFILE).filter(([k]) => !k.startsWith('_')).map(([k, v]) => [k, v.name + (v.dauer_jahre ? ' (' + v.dauer_jahre + '-jährig)' : '')])
+    : (CURRICULA ? Object.entries(CURRICULA.berufe) : []);
+  source.forEach(([key, label]) => {
+    const opt = document.createElement('option');
+    opt.value = key; opt.textContent = label;
+    sel.appendChild(opt);
+  });
+}
+setTimeout(fillBerufDropdownEinweisung, 900);
+
+function buildEinweisungPrompt() {
+  const berufSel = document.getElementById('e-beruf');
+  const berufKey = berufSel.value;
+  const berufName = berufKey ? berufSel.options[berufSel.selectedIndex].textContent : null;
+  const rolle = document.getElementById('e-rolle').value;
+  const thema = document.getElementById('e-thema').value.trim();
+  const umfang = document.getElementById('e-umfang').value || 'normal';
+  const sprache = document.getElementById('e-sprache').value;
+  const kontext = document.getElementById('e-kontext').value.trim();
+
+  const lines = [];
+  lines.push('Erstelle eine Einweisung (keine Unterweisung nach §12 ArbSchG) — kurz, praxisnah, strukturgebend.');
+  lines.push('');
+  lines.push('KONTEXT:');
+  if (thema) lines.push(`- Gerät/Ablauf: ${thema}`);
+  else lines.push('- Gerät/Ablauf: (nicht angegeben — bitte zuerst rückfragen)');
+  if (berufName) lines.push(`- Beruf der Zielperson: ${berufName}`);
+  if (rolle) lines.push(`- Rolle: ${EINWEISUNG_ROLLE[rolle]}`);
+  if (sprache) lines.push(`- Sprachniveau: ${sprache}`);
+  if (kontext) lines.push(`- Besonderheiten: ${kontext}`);
+  lines.push('');
+
+  lines.push('UMFANG:');
+  lines.push(EINWEISUNG_UMFANG[umfang].prompt);
+  lines.push('');
+
+  lines.push('STRUKTUR:');
+  lines.push('1. Zweck und Einordnung (warum macht man das? 2-3 Sätze)');
+  lines.push('2. Schritt-für-Schritt-Bedienung (nummerierte Schritte, aktive Verben)');
+  lines.push('3. Typische Fehler und wie man sie vermeidet (2-3 Beispiele)');
+  lines.push('4. Wen ansprechen bei Problemen');
+  lines.push('');
+
+  if (sprache === 'A2') lines.push('SPRACHREGELN: Max. 12 Wörter pro Satz. Keine Nebensätze. Fachbegriffe erklären.');
+  if (sprache === 'B1') lines.push('SPRACHREGELN: Max. 15 Wörter pro Satz. Aktiv statt Passiv. Fachbegriffe beim ersten Vorkommen in Klammern erklären.');
+  if (sprache) lines.push('');
+
+  lines.push('HINWEISE:');
+  lines.push('- Dies ist eine EINWEISUNG, KEINE Unterweisung nach §12 ArbSchG. Bei Sicherheits- oder Gefährdungsbezug verweise darauf, dass eine formale Unterweisung nötig ist.');
+  lines.push('- Wenn Kontextangaben fehlen, stelle zuerst Rückfragen.');
+  lines.push('- Keine personenbezogenen Daten verwenden.');
+
+  const text = lines.join('\n');
+  const out = document.getElementById('e-output');
+  const box = document.getElementById('e-prompt-box');
+  out.style.display = 'block';
+  box.textContent = text;
+  const dlBtn = document.createElement('button');
+  dlBtn.className = 'download-btn';
+  dlBtn.textContent = 'Download';
+  dlBtn.addEventListener('click', () => downloadPromptBox(dlBtn));
+  box.appendChild(dlBtn);
+  const btn = document.createElement('button');
+  btn.className = 'copy-btn';
+  btn.textContent = 'Kopieren';
+  btn.addEventListener('click', () => copyPromptBox(btn));
+  box.appendChild(btn);
+  out.scrollIntoView({ block: 'start', behavior: 'smooth' });
+}
+window.buildEinweisungPrompt = buildEinweisungPrompt;
 
 
 // ============ TABS (Karte 4) ============

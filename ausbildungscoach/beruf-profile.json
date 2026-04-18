@@ -1,0 +1,59 @@
+{
+  "_meta": {
+    "stand": "2026-04-18",
+    "quellen": [
+      "BerufeNet der Bundesagentur für Arbeit (Schulabschluss-Statistiken 2024, Tätigkeiten, Anforderungen)",
+      "Materialgenerator 1.0 (Spannungsfelder, Zielgruppentypen — nur BM/FLL/FL)",
+      "KMK-Rahmenlehrpläne (Lernfelder)"
+    ]
+  },
+  "buero": {
+    "name": "Kaufmann/-frau für Büromanagement",
+    "dauer_jahre": 3,
+    "kopf": "BerufeNet: Organisatorische und kaufmännisch-verwaltende Tätigkeiten (Schriftverkehr, Präsentationen, Beschaffung, Termine, Sitzungen, Dienstreisen, Personaleinsatzplanung, Kundenbetreuung, Auftragsabwicklung, Rechnungen, Zahlungseingänge). Anforderungen: Organisation, Flexibilität, kaufmännisches Denken, Kunden-/Serviceorientierung, Sorgfalt, mündliches und schriftliches Ausdrucksvermögen. Schulabschlüsse Azubis 2024: ohne HS 2 %, HS 10 %, mittlerer 52 %, Abitur 34 %.",
+    "lehrjahre": {
+      "1": "Mittlerer Abschluss/Abitur überwiegen; sprachlich typischerweise sicher (B2+ mündlich/schriftlich), bei Zugewanderten auch B1. Organisationsstark, kommunikativ, Transfer zwischen Bürosituationen gelingt. Kerninhalte (LF 1–4): Ausbildungsbetrieb erkunden, Büroprozesse gestalten, Aufträge bearbeiten, Werteströme erfassen. Didaktische Zugänge: authentische Geschäftsvorgänge, Korrespondenz-Muster, erste Buchungsfälle, Rollenspiele am Telefon.",
+      "2": "Gleiche Ausgangslage; Fachsprache Rechnungswesen, DSGVO, Personal wird dicht. Transfer: mehrstufige Prozesse denken. Kerninhalte (LF 5–8): Personalwirtschaft, Beschaffung, Kosten-/Leistungsrechnung, erste Wahlqualifikation. Didaktische Zugänge: Fallstudien, Tabellenkalkulation als Denkwerkzeug, strukturierte Geschäftsbriefe, Prozessvisualisierung.",
+      "3": "Prüfungsorientiert. Spannungsfeld (aus Materialgenerator): Effizienz vs. Sorgfalt und Fairness. Abstraktion hoch. Kerninhalte (LF 9–13): Wertschöpfungsprozesse, Projektmanagement, Wahlqualifikationen, Report/Fachgespräch. Didaktische Zugänge: Reportbegleitung, Fachgespräch-Simulation, Prüfungsaufgaben, Reflexion eigener Geschäftsprozesse."
+    }
+  },
+  "fll": {
+    "name": "Fachkraft für Lagerlogistik",
+    "dauer_jahre": 3,
+    "kopf": "BerufeNet: Wareneingang prüfen, Entladung organisieren, sachgerecht lagern (Temperatur/Luftfeuchtigkeit regulieren), Auslieferungstouren planen, Versandart wählen, Lieferungen zusammenstellen, verpacken, Begleitpapiere (Lieferscheine, Zollerklärungen) erstellen, Lkws/Container/Eisenbahnwaggons beladen, Gabelstapler bedienen, Fracht sichern; innerbetriebliche Material- und Informationsflüsse optimieren. Anforderungen: körperliche Konstitution, Organisation, Sorgfalt, räumliches Vorstellungsvermögen, Umsicht (Fördersysteme, Hebezeuge, Gefahrstoffe). Schulabschlüsse Azubis 2024: ohne HS 3 %, HS 37 %, mittlerer 48 %, Abitur 9 %.",
+    "lehrjahre": {
+      "1": "Sprachlich typischerweise B1–B2 mündlich, schriftlich schwächer; Fachsprache wird über Hantieren erschlossen. Abstraktion eher niedrig, Transfer funktioniert am konkreten Gegenstand. Aus Materialgenerator: praktisch begabt, logistikinteressiert, wenig strukturierte Lerngewohnheiten. Kerninhalte (LF 1–5): Güter annehmen, lagern, pflegen, kommissionieren, verpacken, versenden. Didaktische Zugänge: Bildsprache, Realgegenstände, Piktogramme (Gefahrstoffe), kurze Sätze, Demonstration vor Erklärung.",
+      "2": "Wachsende Komplexität: Kennzahlen, LVS-Systeme, Gefahrstoff-Recht. Spannungsfeld (aus Materialgenerator): Lagereffizienz vs. Arbeitssicherheit und Nachhaltigkeit. Transfer auf Zahlen/Tabellen ist die zentrale Hürde. Kerninhalte (LF 6–8): Touren planen, Güter verladen und versenden, beschaffen, Kennzahlen ermitteln. Didaktische Zugänge: konkrete Betriebsfälle, einfache Tabellen, Rechnen mit Einheiten, Lagerlayout-Visualisierung, viel mündliche Sicherung vor schriftlichem Festhalten.",
+      "3": "Prüfungsjahr; sprachlich-schriftliche Wiedergabe betrieblicher Abläufe ist die eigentliche Hürde. Kerninhalte (LF 9–12): Güter beschaffen, Kennzahlen analysieren, Logistikprozesse optimieren, besondere Leistungen durchführen. Didaktische Zugänge: Fachgespräch-Training an Kommissionier-/Tour-Szenarien, Prüfungsformulierungen üben, Checklisten, Schritt-für-Schritt-Strukturen, Staplerführerschein als Motivationsanker."
+    }
+  },
+  "fl": {
+    "name": "Fachlagerist/-in",
+    "dauer_jahre": 2,
+    "kopf": "BerufeNet: Warenannahme/-prüfung, Güter erfassen, auspacken, Zustand prüfen, sortieren, sachgerecht lagern. Lagerbestand kontrollieren, Inventuren. Versand: verpacken, Begleitpapiere ausfüllen, Liefereinheiten zusammenstellen, Lkws beladen, kennzeichnen, sichern. Gefahrgutverordnung und Zollbestimmungen beachten. Transportgeräte und Fördermittel (Gabelstapler, Sortieranlagen). Anforderungen: körperliche Konstitution (Kälte, schweres Heben), Organisation, Sorgfalt, räumliches Vorstellungsvermögen, Umsicht. Deutsch wird NICHT als Anforderung genannt (Kontrast zu FLL). Schulabschlüsse Azubis 2024: ohne HS 8 %, HS 57 %, mittlerer 27 %, Abitur 4 %.",
+    "lehrjahre": {
+      "1": "Überwiegend HS-Abschluss, bedeutender Anteil ohne HS. Sprachlich typischerweise A2–B1, bei Zugewanderten teilweise niedriger. Schriftsprache ist regelmäßig die Hürde. Aus Materialgenerator: Frustrationstoleranz schwankend, sozialpädagogisch zu flankieren. Abstraktion niedrig, Transfer nur am konkreten Objekt. Kerninhalte (LF 1–5, gemeinsam mit FLL 1. LJ): Güter annehmen, lagern, pflegen, kommissionieren, verpacken. Didaktische Zugänge: starke Bildsprache, reale Gegenstände, sehr kurze Sätze, Wiederholung, viel Mündliches, klare Routinen, positive Rückmeldung.",
+      "2": "Wachsende Eigenverantwortung; Verstehen betrieblicher Abläufe. Schriftliche Aufgaben bleiben die Hürde; Fachgespräch in der Abschlussprüfung zentral. Kerninhalte (LF 6–9): Güter im Betrieb transportieren, kommissionieren, verladen, versenden. Didaktische Zugänge: Rollenspiele, Fachgespräch an konkreter Lagersituation, Reduzierung auf Kernvokabular, Visualisierung vor Verschriftlichung, enge Strukturvorgaben bei Texten."
+    }
+  },
+  "spedition": {
+    "name": "Kaufmann/-frau für Spedition und Logistikdienstleistung",
+    "dauer_jahre": 3,
+    "kopf": "BerufeNet: Organisieren Versand/Umschlag/Lagerung. Logistikkette überwachen (Versender, Fracht-/Verkehrs-/Umschlagsunternehmen, Lagerbetreiber, Versicherung, Endkunde). Kundenberatung (Transportmittel, Verpackung). Preise kalkulieren, Angebote ausarbeiten, Verträge vorbereiten, Versicherungsschutz. Waren-/Fracht-/Zollpapiere, Auftragsabwicklung, Reklamationen, Schadenregulierung, Abrechnung, Mahnwesen. Anforderungen: Sorgfalt, kaufmännisches Denken, Kundenorientierung, Kommunikationsfähigkeit, Verhandlungsgeschick. Schulfächer: Englisch + weitere Fremdsprachen, Erdkunde/Geografie. Arbeitsort primär Büro. Schulabschlüsse Azubis 2024: ohne HS 2 %, HS 7 %, mittlerer 48 %, Abitur 40 % — deutlich akademischeres Milieu als FLL/FL.",
+    "lehrjahre": {
+      "1": "Mittlerer Abschluss/Abitur überwiegen; sprachlich typischerweise B2+, Englisch in der Praxis oft notwendig. Gute Abstraktions-/Transferfähigkeit, wirtschaftliches Interesse. Kerninhalte (LF 1–5): Spedition als Dienstleister, Güter lagern/umschlagen, Sammelgut-/Straßengüterverkehr. Didaktische Zugänge: Fallstudien, Dokumentenarbeit (Frachtbrief/CMR), Tarif- und Routenbeispiele, Englisch-Fachvokabular.",
+      "2": "Höhere Komplexität: internationale Verkehrsträger, Zollrecht. Fachsprache Deutsch + Englisch wird dicht. Kerninhalte (LF 6–9): Eisenbahn-, See-, Luft-, Binnenschifffahrt, Sammelgut-/Speditionslogistik, Export/Import. Didaktische Zugänge: INCOTERMS-Fälle, reale Ausschreibungen, Vergleichsrechnungen Verkehrsträger, Englisch-Geschäftskommunikation.",
+      "3": "Prüfungsnah. Hohe Abstraktion bei Kalkulation, Marketing, Finanzierung, internationalem Geschäft. Sprachliche Präzision in Angebotsschreiben/Reklamationsbearbeitung zentral. Kerninhalte (LF 10–13): Kalkulation, Finanzierung, Marketing, Personal, Fremdsprache. Didaktische Zugänge: Projektarbeit, Fachgespräch an realen Sendungsfällen, Rollenspiele Kundengespräch, Prüfungsformate."
+    }
+  },
+  "bkf": {
+    "name": "Berufskraftfahrer/-in",
+    "dauer_jahre": 3,
+    "kopf": "BerufeNet: Gütertransport (Lkw) oder Personenverkehr (Bus). Straßenverkehrsregeln In-/Ausland. Übernahme-/Abfahrtskontrolle (Räder, Motor, Bremsen). Transportgut/Gepäck annehmen, Gewicht verteilen, Papiere kontrollieren, Fracht-Beschilderung. Anforderungen: Verantwortungsbewusstsein (Betriebssicherheit, Lenkzeiten), Umsicht und Konzentration (Rangieren), Beobachtungsgenauigkeit, Entscheidungsfähigkeit/Reaktionsgeschwindigkeit (Gefahrensituationen), technisches Verständnis. Arbeitsort primär am Steuer; daneben Freien, Lagerhäuser, Werkstätten. Schulabschlüsse Azubis 2024: ohne HS 6 %, HS 44 %, mittlerer 35 %, Abitur 6 %, Sonstige 9 % (höchster Anteil Quer-/Umschüler unter den fünf Berufen).",
+    "lehrjahre": {
+      "1": "HS-Abschluss und mittlerer Abschluss überwiegen. Häufig Umschüler/Quereinsteiger. Sprachlich sehr heterogen, A2–B2 mündlich; Schriftsprache oft schwach. Praktisch-technisches Interesse, Abstraktion niedrig bis mittel, Transfer am Fahrzeug. Kerninhalte (LF 1–5): Fahrzeuge bewegen/beurteilen, kontrollieren, Güter und Personen befördern, technische Zusammenhänge. Didaktische Zugänge: Fahrzeug als Lernort, Bildsprache, Kurzvideos, einfache Checklisten, Schlüsselzahl 95 / Grundqualifikation als roter Faden.",
+      "2": "Schwerpunkt verschiebt sich auf Rechtsvorschriften (Sozialvorschriften, Lenk-/Ruhezeiten, Gefahrgut ADR). Schriftliche Dokumentation (Fahrtenschreiber, Ladelisten) wird zentral — hier entsteht der Förderbedarf. Kerninhalte (LF 6–9): Güter-/Personentransport planen und durchführen, Fracht- und Begleitpapiere, Sozialvorschriften. Didaktische Zugänge: reale Dokumente, Rollenspiele Kontrolle/Polizei, Symbol-/Piktogrammarbeit (ADR), kleinschrittige Regelerklärung.",
+      "3": "Prüfungsnah. Abstraktion bei Kalkulation/Kundenkommunikation, oft Bruchstelle für sprachschwächere Azubis. Kerninhalte (LF 10–12): besondere Beförderungsleistungen, Gefahrgut, wirtschaftliches Fahren, Kundenkontakt, Kostenrechnung. Didaktische Zugänge: Fachgespräch-Training an Fahrauftrags-Szenarien, Kalkulationsbeispiele im Realkontext (Diesel, Maut), Reduktion auf Kernwortschatz bei schriftlichen Aufgaben, Berufsstolz als Motivationsanker."
+    }
+  }
+}
