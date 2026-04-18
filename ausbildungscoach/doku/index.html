@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<!--
+  SYNC-HINWEIS: Diese Datei existiert in zwei Repos.
+  - Entwicklung: odyc-monorepo/docs/ausbildungscoach/doku/index.html
+  - GitHub Pages: ausbildungscoach/doku/index.html (jako-odyc.github.io/prompt-dash/ausbildungscoach/doku/)
+  Nach Aenderungen BEIDE Kopien committen und pushen.
+-->
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ausbildungscoach — Dokumentation</title>
+<meta name="theme-color" content="#1e3a5f">
+<link rel="icon" type="image/svg+xml" href="../icon.svg">
+<style>
+  :root {
+    --bg: #f0f4f8; --card: #fff; --accent: #1e3a5f; --accent-light: #2d5986;
+    --green: #2d6a4f; --yellow: #b5830b; --red: #9b2226; --grey: #666;
+    --blue-light: #e8f0fe; --blue-border: #4a90d9;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 17px; background: var(--bg); color: var(--accent); line-height: 1.6; }
+
+  .nav { background: var(--accent); color: white; padding: 0.5rem 1rem; position: sticky; top: 0; z-index: 100; display: flex; flex-wrap: wrap; gap: 0.3rem; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+  .nav a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.8rem; padding: 0.25rem 0.5rem; border-radius: 3px; white-space: nowrap; }
+  .nav a:hover { background: rgba(255,255,255,0.15); color: white; }
+  .nav .nav-title { font-weight: bold; font-size: 0.9rem; color: white; margin-right: 0.5rem; }
+  .nav .nav-back { background: rgba(255,255,255,0.15); color: white; font-weight: 600; }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 1rem; }
+  h1 { font-size: 1.7rem; margin-bottom: 0.3rem; }
+  h2 { font-size: 1.25rem; margin: 1.5rem 0 0.5rem; border-bottom: 2px solid var(--accent); padding-bottom: 0.25rem; }
+  h3 { font-size: 1.05rem; margin: 1rem 0 0.3rem; }
+  .subtitle { color: var(--grey); font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+  .card { background: var(--card); border-radius: 8px; padding: 1.2rem; margin-bottom: 1rem; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .card-number { display: inline-block; background: var(--accent); color: white; width: 1.8rem; height: 1.8rem; border-radius: 50%; text-align: center; line-height: 1.8rem; font-weight: bold; font-size: 0.85rem; margin-right: 0.5rem; vertical-align: middle; }
+
+  .info-box { background: var(--blue-light); border: 1px solid #b3cce6; border-radius: 6px; padding: 0.8rem; margin: 0.5rem 0; font-size: 0.9rem; }
+  .warn-box { background: #fff3cd; border: 1px solid var(--yellow); border-radius: 6px; padding: 0.8rem; margin: 0.5rem 0; font-size: 0.9rem; }
+  .legal-box { background: #fafbfc; border-left: 3px solid var(--accent); padding: 0.8rem 1rem; margin: 0.8rem 0; font-size: 0.88rem; font-family: Georgia, serif; }
+  .legal-box .legal-head { font-weight: 600; color: var(--accent); margin-bottom: 0.3rem; font-family: 'Segoe UI', system-ui, sans-serif; }
+  .legal-box ol { padding-left: 1.4rem; }
+  .legal-box p { margin: 0.3rem 0; }
+
+  /* Ampel */
+  .traffic { display: flex; gap: 0.5rem; margin: 0.5rem 0; flex-wrap: wrap; }
+  .light { padding: 0.8rem; border-radius: 6px; flex: 1; min-width: 180px; }
+  .light-green { background: #d8f3dc; border: 2px solid var(--green); }
+  .light-yellow { background: #fff3cd; border: 2px solid var(--yellow); }
+  .light-red { background: #f8d7da; border: 2px solid var(--red); }
+  .light h4 { font-size: 0.95rem; margin-bottom: 0.3rem; }
+  .light p, .light ul { font-size: 0.88rem; }
+
+  /* Prompt-Boxen */
+  .prompt-box { background: #1e3a5f; color: #e0e8f0; border-radius: 6px; padding: 1rem; font-family: 'Consolas', 'Courier New', monospace; font-size: 0.88rem; white-space: pre-wrap; margin: 0.5rem 0; line-height: 1.5; }
+  .prompt-box .placeholder { color: #ffd166; font-weight: bold; }
+
+  /* Vergleich */
+  .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; margin: 0.5rem 0; }
+  .compare-box { border-radius: 6px; padding: 0.8rem; font-size: 0.88rem; }
+  .compare-bad { background: #f8d7da; border: 1px solid #e0b0b0; }
+  .compare-good { background: #d8f3dc; border: 1px solid #a0d0a0; }
+
+  /* KI-Grid */
+  .ki-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem; margin: 0.5rem 0; }
+  .ki-card { border: 1px solid #ddd; border-radius: 6px; padding: 0.8rem; background: #fafbfc; }
+  .ki-card h4 { margin-bottom: 0.3rem; }
+
+  ul { padding-left: 1.2rem; margin: 0.3rem 0; }
+  li { margin: 0.2rem 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; margin: 0.5rem 0; }
+  th, td { border: 1px solid #c8d8e8; padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; }
+  th { background: var(--blue-light); }
+  .ref { font-size: 0.85rem; color: var(--grey); margin-top: 2rem; border-top: 1px solid #ddd; padding-top: 0.5rem; }
+  details { margin: 0.5rem 0; }
+  details summary { cursor: pointer; padding: 0.4rem 0; color: var(--accent-light); font-weight: 600; }
+  details summary:hover { color: var(--accent); }
+  code.inline { background: #eef2f7; padding: 0 0.3rem; border-radius: 3px; font-size: 0.9em; }
+
+  .stand { display: inline-block; background: var(--blue-light); color: var(--accent); padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.85rem; font-weight: 600; }
+
+  @media (max-width: 600px) {
+    body { font-size: 16px; }
+    .container { padding: 0.6rem; }
+    .card { padding: 0.9rem; }
+    .nav a { font-size: 0.9rem; padding: 0.3rem 0.6rem; }
+    .nav .nav-title { font-size: 1rem; }
+    .compare { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <span class="nav-title">Ausbildungscoach · Doku</span>
+  <a href="../" class="nav-back">← zur App</a>
+  <a href="#grundlagen">Grundlagen</a>
+  <a href="#recht">Recht</a>
+  <a href="#datenschutz">Datenschutz</a>
+  <a href="#lehrplaene">Lehrpläne</a>
+  <a href="#sprache">Sprache</a>
+  <a href="#cowork">Cowork</a>
+  <a href="#multi-ki">Multi-KI</a>
+  <a href="#faq">FAQ</a>
+</nav>
+
+<div class="container">
+
+<h1>Ausbildungscoach — Dokumentation</h1>
+<p class="subtitle">Hintergrund, Rechtsrahmen und Werkzeuge für die KI-gestützte Ausbildungsarbeit. Als Nachschlagwerk gedacht — nicht zum Durchlesen in einem Stück.</p>
+<p style="margin-bottom:1.5rem"><span class="stand">Stand: 2026-04-18</span> · App-Version nach Triangulations-Durchlauf</p>
+
+<div class="info-box">
+  <strong>Was diese Doku ist:</strong> Eine Ergänzung zur <a href="../">App</a>. Während die App fertige Werkzeuge bereitstellt, erklärt die Doku, warum die Werkzeuge so gebaut sind, welche rechtlichen Rahmen gelten, wie KI technisch arbeitet und welche Strategien sich bewährt haben. Wer nur das Werkzeug braucht, kann die Doku überspringen.
+</div>
+
+
+<!-- ============ 1 GRUNDLAGEN ============ -->
+<section class="card" id="grundlagen">
+<h2><span class="card-number">1</span>Grundlagen — Wie Sprachmodelle arbeiten</h2>
+
+<p>Ein Sprachmodell hat keine Datenbank, in der es nachschlägt. Es hat Muster aus Milliarden Trainingsdokumenten und schätzt bei jeder Antwort, welches Wort statistisch als nächstes käme. Das Ergebnis kann brillant sein — oder eine eloquent vorgetragene Fiktion.</p>
+
+<h3>Drei Grundwahrheiten</h3>
+<ul>
+  <li><strong>KI antwortet statistisch, nicht logisch.</strong> Sie berechnet die wahrscheinlichste Fortsetzung — nicht die richtige.</li>
+  <li><strong>KI weiß nicht, was sie nicht weiß.</strong> Sie rät lieber, als zuzugeben, dass sie etwas nicht kennt. Das ist die Quelle der sogenannten Halluzinationen.</li>
+  <li><strong>KI hat keinen Kontext zu Ihrem Betrieb.</strong> Je enger der Kontext (Ihr eigenes Material, klare Vorgaben, ein spezifischer Beruf), desto belastbarer die Antwort.</li>
+</ul>
+
+<h3>Drei Stufen des Promptings</h3>
+<table>
+<thead><tr><th>Stufe</th><th>Beispiel</th><th>Stärke</th><th>Schwäche</th></tr></thead>
+<tbody>
+<tr><td><strong>1. Frei</strong></td><td>„Erklär mir FIFO"</td><td>Brainstorming, Exploration</td><td>unpräzise, nicht reproduzierbar</td></tr>
+<tr><td><strong>2. Systematisch</strong></td><td>„Du bist Ausbilder für … Erstelle eine Unterweisung zu … für Lehrjahr … Niveau …"</td><td>reproduzierbar, strukturiert</td><td>KI rät bei Lücken</td></tr>
+<tr><td><strong>3. Maschinenoptimiert</strong></td><td>Mega-Prompt mit 13 Parametern, Validierungsregeln, Rückfragen-Auftrag</td><td>maximale Qualität, klare Regeln</td><td>kaum kreativer Raum, Aufwand</td></tr>
+</tbody>
+</table>
+<p>Die App arbeitet auf Stufe 2 — systematische Prompts mit Platzhaltern und Rahmen. Wenn Sie tiefer gehen möchten, siehe <a href="#cowork">Cowork-Profile</a>.</p>
+
+<h3>Bausteine eines systematischen Prompts</h3>
+<ol>
+  <li><strong>Rolle/Perspektive</strong> — „Du bist Ausbilder für Fachlageristen …"</li>
+  <li><strong>Aufgabe</strong> — „Erstelle eine Unterweisung zur Folienwickelmaschine …"</li>
+  <li><strong>Zielgruppe</strong> — „Azubi im 2. Lehrjahr, Sprachniveau B1"</li>
+  <li><strong>Kontext &amp; Zusatzmaterial</strong> — „Berücksichtige diese Betriebsanleitung …"</li>
+  <li><strong>Format</strong> — „Gliederung in 4-Schritt-Methode + Quiz"</li>
+  <li><strong>Beispiele / Stilvorgaben</strong> — „Nimm diese Formulierung als Maßstab …"</li>
+</ol>
+
+<h3>Rückfragen und Selbstprüfung einbauen</h3>
+<p>KI fragt von sich aus nicht nach, wenn etwas unklar ist — sie rät. Mit zwei zusätzlichen Zeilen am Prompt-Ende ändern Sie das:</p>
+<div class="prompt-box">Wenn im Prompt Unklarheiten sind, stelle Rückfragen, bevor du generierst.
+Prüfe vor Ausgabe, ob alle Punkte erfüllt sind. Wenn nicht → verbessere.</div>
+<p>Das ist der Kern von Stufe 3 — aber schon auf Stufe 2 nutzbar.</p>
+
+<h3>Zustandsprompt und Container-Modus</h3>
+<p>Zwei weiterentwickelte Prompt-Formen, die in der App in mehreren Karten optional angeboten werden:</p>
+<ul>
+  <li><strong>Zustandsprompt</strong> (Karte 5): Die KI analysiert einen bestehenden Text entlang fester Achsen (Vollständigkeit, Eindeutigkeit, Empfängerrisiko, Struktur, Ton), ohne eine Neufassung zu liefern. Ihre Fachsprache bleibt erhalten, Halluzinationen sind selten. Sie entscheiden am Ende.</li>
+  <li><strong>Container-Modus</strong> (Karten 4 und 5): Die KI arbeitet zweistufig. Schritt A ist Diagnose („Was bedeutet die Kombination aus Beruf + Lehrjahr + Sprachniveau?"), Schritt B ist Entwurf. Sichtbar gemacht wird, <em>wie</em> die KI die Vorgaben interpretiert — der Nutzer kann eingreifen, bevor der Text entsteht. Empfohlen für fortgeschrittene Teilnehmer.</li>
+</ul>
+
+<h3>Typische KI-Profile im Vergleich</h3>
+<div class="ki-grid">
+  <div class="ki-card"><h4>ChatGPT</h4><p>dialogorientiert, empathisch, kreativ. Gut für Entwürfe und Unterweisungen. Manchmal zu ausschmückend.</p></div>
+  <div class="ki-card"><h4>Claude</h4><p>sehr strukturiert, sachlich, gute Lehrtexte. Gut für Prüfungsfragen und Bewertungsbögen.</p></div>
+  <div class="ki-card"><h4>Perplexity</h4><p>research-first, liefert Quellen. Gut für Faktenprüfung und Rechtsbezug.</p></div>
+  <div class="ki-card"><h4>Gemini</h4><p>faktenpräzise, technisch, aktuell. Gut für technische Themen und Rechtslagen.</p></div>
+  <div class="ki-card"><h4>DeepSeek</h4><p>technisch, knapp, logisch. Gut für Tabellen und Fachthemen.</p></div>
+</div>
+<p>Mehr dazu unter <a href="#multi-ki">Multi-KI-Muster</a>.</p>
+</section>
+
+
+<!-- ============ 2 RECHTSRAHMEN ============ -->
+<section class="card" id="recht">
+<h2><span class="card-number">2</span>Rechtsrahmen der Unterweisung</h2>
+
+<p>Unterweisungen sind keine Empfehlung, sondern Pflicht. Der Rahmen kommt aus vier Quellen, die in der App (Karte 4) zusammenwirken:</p>
+
+<div class="legal-box">
+<div class="legal-head">§ 12 ArbSchG — Unterweisung</div>
+<ol>
+  <li>Der Arbeitgeber hat die Beschäftigten über Sicherheit und Gesundheitsschutz bei der Arbeit während ihrer Arbeitszeit ausreichend und angemessen zu unterweisen. Die Unterweisung umfasst Anweisungen und Erläuterungen, die eigens auf den Arbeitsplatz oder den Aufgabenbereich der Beschäftigten ausgerichtet sind. Die Unterweisung muss bei der Einstellung, bei Veränderungen im Aufgabenbereich, der Einführung neuer Arbeitsmittel oder einer neuen Technologie vor Aufnahme der Tätigkeit der Beschäftigten erfolgen. Die Unterweisung muss an die Gefährdungsentwicklung angepasst sein und erforderlichenfalls regelmäßig wiederholt werden.</li>
+  <li>Bei einer Arbeitnehmerüberlassung trifft die Pflicht zur Unterweisung den Entleiher. Er hat die Unterweisung unter Berücksichtigung der Qualifikation und der Erfahrung der Personen, die ihm zur Arbeitsleistung überlassen werden, vorzunehmen. Die sonstigen Arbeitsschutzpflichten des Verleihers bleiben unberührt.</li>
+</ol>
+</div>
+
+<div class="legal-box">
+<div class="legal-head">§ 13 ArbSchG — Verantwortliche Personen (Auszug)</div>
+<p>Verantwortlich für die Erfüllung der sich aus diesem Abschnitt ergebenden Pflichten sind neben dem Arbeitgeber: der gesetzliche Vertreter, das vertretungsberechtigte Organ, der vertretungsberechtigte Gesellschafter, Personen, die mit der Leitung eines Unternehmens oder einer Dienststelle beauftragt sind, sowie Personen, die beauftragt sind, in eigener Verantwortung Aufgaben wahrzunehmen, die dem Arbeitgeber obliegen.</p>
+<p>Der Arbeitgeber kann zuverlässige und fachkundige Personen schriftlich damit beauftragen, ihm obliegende Aufgaben nach diesem Gesetz in eigener Verantwortung wahrzunehmen.</p>
+</div>
+
+<div class="legal-box">
+<div class="legal-head">§ 5 ArbSchG — Gefährdungsbeurteilung (Grundgedanke)</div>
+<p>Der Arbeitgeber hat durch eine Beurteilung der für die Beschäftigten mit ihrer Arbeit verbundenen Gefährdung zu ermitteln, welche Maßnahmen des Arbeitsschutzes erforderlich sind. Die Gefährdungsbeurteilung muss <em>vor</em> der Unterweisung vorliegen — sie ist deren Grundlage, nicht deren Ergebnis.</p>
+</div>
+
+<div class="legal-box">
+<div class="legal-head">DGUV Vorschrift 1 § 4 — Unterweisung (Auszug)</div>
+<p>Der Unternehmer hat die Versicherten über Sicherheit und Gesundheitsschutz bei der Arbeit, insbesondere über die mit ihrer Arbeit verbundenen Gefährdungen und die Maßnahmen zu ihrer Verhütung, im Rahmen der Gefährdungsbeurteilung zu unterweisen. Die Unterweisung muss erforderlichenfalls, mindestens aber einmal jährlich, erfolgen; sie ist zu dokumentieren.</p>
+</div>
+
+<h3>Was die KI nicht übernehmen kann</h3>
+<ul>
+  <li><strong>Sachkunde</strong> — Bewertung, ob der Inhalt fachlich korrekt und auf den Betrieb anwendbar ist.</li>
+  <li><strong>Gefährdungsbeurteilung</strong> — muss vorab vorliegen, die KI kann sie nicht erstellen.</li>
+  <li><strong>Durchführung</strong> — die Unterweisung selbst muss eine sachkundige Person halten.</li>
+  <li><strong>Dokumentation</strong> — Datum, Teilnehmer, Unterschrift sind rechtlich bindend und bleiben beim Ausbilder.</li>
+  <li><strong>Verständnisprüfung</strong> — ob die Teilnehmenden es verstanden haben, kann nur ein Mensch im Gespräch feststellen.</li>
+</ul>
+
+<h3>Unterweisung vs. Einweisung</h3>
+<div class="compare">
+  <div class="compare-box compare-good">
+    <strong>Unterweisung (§12 ArbSchG)</strong>
+    <ul>
+      <li>verpflichtend, dokumentiert, unterschrieben</li>
+      <li>arbeitsplatz- und tätigkeitsbezogen</li>
+      <li>sachkundige Person erforderlich</li>
+      <li>vor Tätigkeitsaufnahme + mindestens jährlich</li>
+    </ul>
+  </div>
+  <div class="compare-box compare-bad">
+    <strong>Einweisung (keine formale Pflicht)</strong>
+    <ul>
+      <li>praktische Erklärung eines Geräts/Ablaufs</li>
+      <li>z.&nbsp;B. Bürokopierer, Ablagesystem</li>
+      <li>keine Dokumentationspflicht</li>
+      <li>ersetzt <em>keine</em> Unterweisung bei sicherheitsrelevanten Tätigkeiten</li>
+    </ul>
+  </div>
+</div>
+
+<p class="ref" style="margin-top:1rem">Die Gesetzestexte sind verkürzt wiedergegeben — maßgeblich sind die Fassungen unter <a href="https://www.gesetze-im-internet.de/arbschg/" target="_blank" rel="noopener">gesetze-im-internet.de/arbschg</a> und <a href="https://publikationen.dguv.de/regelwerk/vorschriften/1/dguv-vorschrift-1" target="_blank" rel="noopener">DGUV Vorschrift 1</a>.</p>
+</section>
+
+
+<!-- ============ 3 DATENSCHUTZ ============ -->
+<section class="card" id="datenschutz">
+<h2><span class="card-number">3</span>Datenschutz — Pseudonymisieren statt anonymisieren</h2>
+
+<p>„Anonymisiert" und „pseudonymisiert" werden im Alltag oft vermischt. Für die Praxis ist der Unterschied wichtig:</p>
+
+<table>
+<thead><tr><th>Begriff</th><th>Bedeutung</th><th>Typisches Beispiel</th></tr></thead>
+<tbody>
+<tr><td><strong>Anonymisiert</strong></td><td>Personenbezug <em>dauerhaft</em> entfernt — Rückschluss auf die Person nicht mehr möglich.</td><td>„Ein Azubi" ohne jeden Kontext</td></tr>
+<tr><td><strong>Pseudonymisiert</strong></td><td>Klarname ersetzt — Rückschluss mit Zusatzwissen bleibt theoretisch möglich.</td><td>„Azubi A, 2. Lehrjahr, Lagerlogistik"</td></tr>
+</tbody>
+</table>
+
+<p>In der KI-Nutzung arbeiten Sie fast immer mit <strong>Pseudonymisierung</strong>: Sie ersetzen Namen, Geburtsdaten, konkrete Firmen- und Adressdaten, behalten aber den fachlich relevanten Kontext (Lehrjahr, Tätigkeit, beobachtetes Verhalten).</p>
+
+<h3>Drei Schritte zur Pseudonymisierung in Word</h3>
+<ol>
+  <li><strong>Dokument duplizieren</strong> — Original bleibt unverändert. Arbeitsdatei z.&nbsp;B. <code class="inline">beratung_AzubiA.docx</code>.</li>
+  <li><strong>Suchen-und-Ersetzen</strong> (<kbd>Strg</kbd>+<kbd>H</kbd>): Vorname → „A.", Nachname → weglassen, Firma → „Speditionsbetrieb", konkrete Orte → „Region", Geburtsdatum → „LJ 2007" oder entfernen.</li>
+  <li><strong>Sichtkontrolle</strong> — ein letztes Lesen auf eindeutige Kombinationen. Auch ohne Namen kann eine Beschreibung identifizierend sein, wenn mehrere selten kombinierte Merkmale zusammenkommen (z.&nbsp;B. Standort + Schicht + Eintrittsjahr + besondere Qualifikation). Merkmale, die einzeln unauffällig wirken, können zusammen eine Person eindeutig machen.</li>
+</ol>
+
+<p class="info-box">Im Workshop wird dieser Schritt <em>live</em> an einem Beispieldokument durchgespielt. Bitte Word verfügbar halten.</p>
+
+<h3>Ampel für die KI-Nutzung</h3>
+<div class="traffic">
+  <div class="light light-green">
+    <h4>✓ Grün — geht</h4>
+    <ul>
+      <li>Fachliche Fragen, allgemeine Sachverhalte</li>
+      <li>Entwürfe mit pseudonymisierten Beispielen („Azubi A, 2. LJ")</li>
+      <li>Prüfung öffentlich verfügbarer Texte</li>
+    </ul>
+  </div>
+  <div class="light light-yellow">
+    <h4>⚠ Gelb — mit Einschränkung</h4>
+    <ul>
+      <li>Betriebsinterne Abläufe nur generisch beschreiben</li>
+      <li>Berufsbezogene Szenarien ohne Namen/Daten</li>
+      <li>KI-Ausgabe prüfen, bevor sie weitergereicht wird</li>
+    </ul>
+  </div>
+  <div class="light light-red">
+    <h4>✗ Rot — nicht</h4>
+    <ul>
+      <li>Klarnamen, Geburtsdaten, Adressen von Azubis</li>
+      <li>Gesundheits-, Leistungs-, Konfliktdaten</li>
+      <li>Kunden-, Personal- oder Vertragsdaten</li>
+      <li>Reale Fotos hochladen, betriebliche Dokumente teilen</li>
+    </ul>
+  </div>
+</div>
+</section>
+
+
+<!-- ============ 4 LEHRPLÄNE & PRÜFUNGSKATALOGE ============ -->
+<section class="card" id="lehrplaene">
+<h2><span class="card-number">4</span>Lehrpläne und Prüfungskataloge als Kontext</h2>
+
+<p>Die KI kennt keinen spezifischen Beruf im Detail — sie kennt Muster aus vielen Berufen. Je präziser Sie den Lehrplan- oder Prüfungsbezug in den Prompt einbauen, desto belastbarer die Antwort.</p>
+
+<h3>Was rechtlich frei verwendbar ist</h3>
+<ul>
+  <li><strong>KMK-Rahmenlehrpläne</strong> — amtliches Werk, <a href="https://www.gesetze-im-internet.de/urhg/__5.html" target="_blank" rel="noopener">§5 UrhG</a> gemeinfrei. In der App in der Begriffssuche (Karte 3) integriert. Der passende Lernfeld-Volltext wird in den Karten 4 und 7 automatisch in den Prompt eingebettet, wenn ein Lernfeld gewählt wird.</li>
+  <li><strong>Ausbildungsverordnungen (AO)</strong> — Bundesrecht, ebenfalls gemeinfrei. <a href="https://www.gesetze-im-internet.de/lwlogausbv/BJNR188700004.html" target="_blank" rel="noopener">LWLogAusbV (Lagerlogistik 2004)</a>, <a href="https://www.gesetze-im-internet.de/kflbausbv_2014/" target="_blank" rel="noopener">KflBAusbV (Büromanagement 2014)</a>, <a href="https://www.gesetze-im-internet.de/bkfausbv_2017/" target="_blank" rel="noopener">BKFAusbV (Berufskraftfahrer 2017)</a>.</li>
+  <li><strong>Ausbildungsrahmenpläne</strong> — Anhang zur AO, ebenfalls frei.</li>
+  <li><strong>BerufeNet-Steckbriefe der Bundesagentur für Arbeit</strong> — öffentliches Informationsangebot, in der App als Dokumenttyp in die Suche integriert (Karte 3). Enthält u.&nbsp;a. Schulabschluss-Statistiken der Ausbildungsanfänger 2024, BerufeNet-Tätigkeiten und Anforderungen. Diese Daten fließen automatisch als Berufsprofil in die Prompts der Karten 4, 6 und 7 ein, wenn ein Beruf gewählt wird.</li>
+</ul>
+
+<h3>Was <em>nicht</em> frei verwendbar ist</h3>
+<div class="warn-box">
+  <strong>IHK-AkA-Prüfungskataloge</strong> (Aufgabenstelle für kaufmännische Abschluss- und Zwischenprüfungen, IHK Nürnberg für Mittelfranken): urheberrechtlich geschützt, kostenpflichtig über <a href="https://m.u-form-shop.de" target="_blank" rel="noopener">u-form-shop.de</a>. Der Volltext darf <strong>nicht</strong> in öffentliche Tools integriert werden — nur einzelne Themenkreise als Zitat (§51 UrhG) sind erlaubt. Nutzung im eigenen Unterricht nach rechtmäßigem Erwerb ist unproblematisch.
+</div>
+
+<h3>Neueste Auflagen (Stand 2026-04)</h3>
+<ul>
+  <li><strong>Fachkraft für Lagerlogistik</strong> — 2. Auflage, erstmals gültig Winter 2025/2026. Ältere Nachdrucke 2018 sind für Prüfungen ab dieser Periode überholt.</li>
+  <li><strong>Fachlagerist/in</strong> — 2. Auflage, gleicher Zeitraum.</li>
+  <li><strong>Ausbildungsverordnung LWLogAusbV 2004</strong> — unverändert gültig.</li>
+</ul>
+
+<h3>Zwei Wege, den Lehrplan in den Prompt zu bringen</h3>
+<div class="compare">
+  <div class="compare-box compare-bad">
+    <strong>✗ Link im Prompt angeben</strong>
+    <p>„Lies den Rahmenlehrplan unter www…" — funktioniert nur bei KIs mit aktivem Web-Zugang (Perplexity, ChatGPT Pro mit Browsing, Claude mit Tools). Bei freiem ChatGPT oder offline-Modus: <em>unsicher</em>.</p>
+  </div>
+  <div class="compare-box compare-good">
+    <strong>✓ Auszug kopieren</strong>
+    <p>Den relevanten Lernfeld-Absatz aus Karte 3 (Begriffssuche) oder direkt aus dem PDF kopieren und in die Prompt-Box einfügen. Die KI hat den Wortlaut, keine Halluzination möglich.</p>
+  </div>
+</div>
+</section>
+
+
+<!-- ============ 5 STRATEGIEN SPRACHDEFIZITE ============ -->
+<section class="card" id="sprache">
+<h2><span class="card-number">5</span>Strategien bei sprachlichen Defiziten</h2>
+
+<p>Viele Azubis haben Sprachniveaus zwischen A2 und B1, manche auch Lese- und Schreibunsicherheiten, die vom mündlichen Sprachniveau unabhängig sind. Die App unterscheidet daher <strong>zwei Achsen</strong>:</p>
+
+<h3>Achse 1 — Mündliches Sprachniveau (GER)</h3>
+<table>
+<thead><tr><th>Niveau</th><th>Merkmal</th><th>Prompt-Konsequenz</th></tr></thead>
+<tbody>
+<tr><td><strong>A2</strong></td><td>Einfache, häufige Wendungen. Kurze Sätze.</td><td>Max. 12 Wörter pro Satz. Keine Nebensätze. Keine Fachbegriffe ohne Erklärung. Beispiele aus dem Alltag.</td></tr>
+<tr><td><strong>B1</strong></td><td>Alltagsthemen verstehen und beschreiben.</td><td>Max. 15 Wörter pro Satz. Fachbegriffe beim ersten Vorkommen in Klammern erklären. Aktiv statt Passiv.</td></tr>
+<tr><td><strong>B2</strong></td><td>Komplexere Texte zu vertrauten Themen.</td><td>Fachbegriffe dürfen bleiben. Nominalisierungen sparsam.</td></tr>
+<tr><td><strong>C1</strong></td><td>Fachtexte verstehen.</td><td>Fachsprache, aber auf Kohärenz prüfen.</td></tr>
+</tbody>
+</table>
+
+<h3>Achse 2 — Schriftsprache</h3>
+<p>Unabhängig vom mündlichen Niveau. Die Bezeichnungen aus der <a href="https://leo.blogs.uni-hamburg.de/" target="_blank" rel="noopener">LEO-Studie</a> der Universität Hamburg sind respektvoll und in der Erwachsenenbildung etabliert.</p>
+<table>
+<thead><tr><th>Stufe</th><th>Merkmal</th><th>Prompt-Konsequenz</th></tr></thead>
+<tbody>
+<tr><td><strong>geübt</strong></td><td>Längere Texte lesen und schreiben ohne Schwierigkeiten.</td><td>keine Einschränkung</td></tr>
+<tr><td><strong>unsicher</strong></td><td>Kurze Texte ja, längere anstrengend. Rechtschreibung unsicher.</td><td>Bildsprache einsetzen. Aufgaben visuell strukturieren. Vorlese-Option anbieten.</td></tr>
+<tr><td><strong>sehr unsicher</strong></td><td>Einzelne Wörter und kurze Sätze. Längere Texte nicht zugänglich.</td><td>Symbole/Piktogramme statt Text. Mündliche/vertonte Anweisungen. Checklisten mit Bildern. Partnerarbeit mit geübtem Kollegen.</td></tr>
+</tbody>
+</table>
+
+<h3>Vierschritt-Methode für Fachbegriffe</h3>
+<p>Wenn Sie einen Fachbegriff einführen lassen, bewährt sich diese Struktur im Prompt:</p>
+<ol>
+  <li><strong>Begriff nennen</strong> — genaue Benennung, nicht umschreiben.</li>
+  <li><strong>Alltagsanalogie</strong> — ein Bild aus der Alltagswelt des Azubis.</li>
+  <li><strong>Konsequenz</strong> — was passiert, wenn ich es richtig/falsch mache?</li>
+  <li><strong>Lösung/Vorgehen</strong> — wie mache ich es richtig? 3-5 Schritte.</li>
+</ol>
+<p>Diese Methode wird von der App (Karte 5, Materialanalyse) beim Prompt-Aufbau automatisch vorgeschlagen.</p>
+
+<h3>Häufige Fehler bei heterogenen Gruppen</h3>
+<ul>
+  <li><strong>Ein Material für alle.</strong> Besser: denselben Prompt mit drei Sprachniveaus durchlaufen, drei Versionen in der Schublade.</li>
+  <li><strong>Sprachniveau wird geraten.</strong> Besser: mit dem Azubi eine kurze Eingangsdiagnose machen (10 Minuten Lesen + Gespräch).</li>
+  <li><strong>Einschätzung bleibt stabil.</strong> Sprachniveau kann sich schnell ändern — halbjährlich neu einschätzen.</li>
+</ul>
+</section>
+
+
+<!-- ============ 6 COWORK-PROFILE ============ -->
+<section class="card" id="cowork">
+<h2><span class="card-number">6</span>Best Practice: Cowork-Profile</h2>
+
+<p>Ein Profil, das die KI vor jedem Auftrag liest, spart auf Dauer viel Zeit. Statt in jedem Chat erneut zu erklären, wer Sie sind und wie Sie arbeiten, pflegen Sie drei kleine Textdateien und legen sie im Claude-Cowork-Arbeitsbereich ab. Die Idee stammt aus dem <a href="https://ruben.substack.com/p/claude-cowork-20" target="_blank" rel="noopener">Claude-Cowork-Setup von Ruben Hassid</a> und lässt sich auch auf ChatGPT (Custom GPT / Projects) übertragen.</p>
+
+<h3>Drei Kerndateien</h3>
+<table>
+<thead><tr><th>Datei</th><th>Inhalt</th><th>Umfang</th></tr></thead>
+<tbody>
+<tr><td><code class="inline">about-me.md</code></td><td>Wer Sie sind, wie Sie arbeiten, Qualitätsstandards, Ihre Regeln für die KI</td><td>unter 2.000 Tokens</td></tr>
+<tr><td><code class="inline">anti-ai-writing-style.md</code></td><td>Wörter, die nicht vorkommen sollen („delve", „tapestry", „Unterstützung"), verbotene Satzmuster</td><td>unter 500 Tokens</td></tr>
+<tr><td><code class="inline">my-company.md</code></td><td>Konkrete Ziele mit Zahlen, Plattformen und Kanäle, bewusst abgelehnte Aufgabenfelder</td><td>unter 1.000 Tokens</td></tr>
+</tbody>
+</table>
+
+<h3>Global Instruction</h3>
+<div class="prompt-box">Vor jeder Aufgabe lies alle Dateien in ABOUT ME/: about-me, anti-ai-writing-style, my-company.
+Lies NICHT OUTPUTS/ oder TEMPLATES/, außer ich verweise ausdrücklich auf eine Datei.</div>
+
+<h3>Das 20-Fragen-Interview zur Erstellung von about-me.md</h3>
+<p>Statt die Datei manuell zu schreiben, lassen Sie die KI Sie interviewen. Sechs Blöcke, je 3-4 Fragen. Die KI komprimiert die Antworten am Ende zu einer Datei unter 2.000 Tokens.</p>
+
+<div class="prompt-box">Du hilfst mir, meine about-me.md-Datei zu erstellen.
+Deine Aufgabe: interviewe mich mit 20 Fragen, dann fasse die Antworten in einer
+komprimierten about-me.md unter 2.000 Tokens zusammen.
+
+FRAGENBLÖCKE:
+1. WER ICH BIN (3 Fragen) — Rolle, Branche, Besonderheiten
+2. WIE ICH ARBEITE (4 Fragen) — Prozesse, Tempo, Werkzeuge
+3. WAS GUTES AUSSIEHT (4 Fragen) — Qualitätsstandards, Beispiele
+4. WAS DU HASST (4 Fragen) — No-Gos, typische KI-Fehler in meinem Feld
+5. DEINE REGELN (3 Fragen) — feste Vorgaben, die immer gelten
+6. DEINE MEINUNGEN (3 Fragen) — Positionen, die in meiner Arbeit sichtbar sein sollen
+
+Stelle jeweils eine Frage, warte auf meine Antwort, dann die nächste.
+Am Ende: Zusammenfassung in about-me.md-Format, mit Abschnittsüberschriften.</div>
+
+<h3>Anwendung im Ausbildungscoach-Kontext</h3>
+<p>Ein Ausbildungs-spezifisches Profil könnte Abschnitte enthalten wie:</p>
+<ul>
+  <li><strong>Mein Beruf:</strong> Ausbilder für Fachkräfte für Lagerlogistik, 15 Jahre Praxis</li>
+  <li><strong>Mein Betrieb:</strong> Spedition, 40 MA, 4 Azubis, gemischte Sprachniveaus A2-B2</li>
+  <li><strong>Meine Qualitätsstandards:</strong> Unterweisungen max. 1 Seite, Praxisbezug Pflicht, Bildsprache wo möglich</li>
+  <li><strong>Meine No-Gos:</strong> Juristensprache, Passivkonstruktionen, Emojis, Sternchen, generische Aufzählungen ohne Beispiel</li>
+  <li><strong>Meine festen Regeln:</strong> Jede Unterweisung endet mit 3 Kontrollfragen. Jeder Schritt mit aktivem Verb. Sprachniveau wird explizit angegeben.</li>
+</ul>
+
+<p>Die KI liest dieses Profil bei jedem neuen Auftrag automatisch mit — Sie müssen es nicht mehr jedes Mal im Prompt wiederholen.</p>
+
+<p class="ref">Der Ansatz funktioniert auf <strong>Claude</strong> im Cowork-Arbeitsbereich, auf <strong>ChatGPT</strong> über Custom-Instructions oder Projekt-Anweisungen, und auf <strong>Gemini</strong> über Gems.</p>
+</section>
+
+
+<!-- ============ 7 MULTI-KI ============ -->
+<section class="card" id="multi-ki">
+<h2><span class="card-number">7</span>Multi-KI-Muster (Triangulation)</h2>
+
+<p>Wo mehrere KIs unabhängig dasselbe Ergebnis liefern, sind Sie auf solidem Grund. Wo sie abweichen, ist der Moment für eigenes Nachdenken — nicht für Mehrheitsentscheidung. Der Ansatz wird in verschiedenen Formen praktiziert, bekannt u.&nbsp;a. durch <a href="https://blockbuster.thoughtleader.school/p/reid-hoffmans-1-ai-advisor-runs-54" target="_blank" rel="noopener">Parth Patils agentic multi-prompting</a>.</p>
+
+<h3>Einfachstes Muster: Zwei KIs, ein Prompt</h3>
+<ol>
+  <li>Prompt kopieren (z.&nbsp;B. aus Karte 6 der App).</li>
+  <li>An KI 1 schicken (z.&nbsp;B. ChatGPT). Antwort speichern.</li>
+  <li>Denselben Prompt an KI 2 schicken (z.&nbsp;B. Claude). Antwort speichern.</li>
+  <li>Beide Antworten nebeneinander legen und vergleichen.</li>
+</ol>
+
+<h3>Auswertung</h3>
+<div class="compare">
+  <div class="compare-box compare-good">
+    <strong>Konsens</strong>
+    <p>Beide KIs sagen Ähnliches → solide Orientierung. Umsetzen.</p>
+  </div>
+  <div class="compare-box compare-bad">
+    <strong>Divergenz</strong>
+    <p>KIs weichen deutlich ab → eigener Gedankenbedarf. Nicht der Mehrheit folgen — selbst nachprüfen, welche Position besser zum Betrieb passt.</p>
+  </div>
+</div>
+
+<h3>Erweiterung: Drei parallele Agenten</h3>
+<p>Der Ansatz von Parth Patil geht weiter: ein Projekt wird in einen Ordner gelegt, und drei Agenten (Claude Code, OpenAI Codex, Gemini CLI) bearbeiten es parallel in verschiedene Richtungen. Für das Büro ist das meist zu aufwändig — zwei KIs reichen.</p>
+
+<h3>Welche KI für welche Aufgabe?</h3>
+<table>
+<thead><tr><th>Aufgabe</th><th>Primäre KI</th><th>Zweitmeinung</th></tr></thead>
+<tbody>
+<tr><td>Unterweisungsentwurf</td><td>ChatGPT (flüssig, anleitungsstark)</td><td>Claude (strukturiert)</td></tr>
+<tr><td>Prüfungsfragen</td><td>Claude (logisch, sauber)</td><td>ChatGPT (lebendiger)</td></tr>
+<tr><td>Rechtlicher Bezug</td><td>Perplexity (Quellen)</td><td>Gemini (aktuell)</td></tr>
+<tr><td>Beratungsgespräch</td><td>ChatGPT (dialogorientiert)</td><td>Claude (Perspektivenvielfalt)</td></tr>
+<tr><td>Faktencheck</td><td>Perplexity</td><td>Gemini</td></tr>
+</tbody>
+</table>
+
+<h3>Anti-Kontaminationsregel</h3>
+<div class="warn-box">
+  <strong>Nicht dasselbe Modell zweimal fragen.</strong> Wenn Sie Claude für einen Entwurf genutzt haben, lassen Sie ihn nicht denselben Entwurf bewerten — es entsteht eine Bias-Schleife. Zweitmeinung immer von einem anderen Anbieter.
+</div>
+</section>
+
+
+<!-- ============ 8 FAQ ============ -->
+<section class="card" id="faq">
+<h2><span class="card-number">8</span>FAQ und typische Fallstricke</h2>
+
+<details open>
+<summary>Warum liefert die KI bei mir andere Ergebnisse als im Workshop?</summary>
+<p style="margin-top:0.5rem">KI ist nie ganz deterministisch. Jeder Prompt liefert leicht andere Formulierungen. Die Struktur bleibt gleich — wenn Sie konsistente Ergebnisse brauchen, präzisieren Sie die Rolle, das Format und die Beispiele. Siehe <a href="#grundlagen">Grundlagen</a>.</p>
+</details>
+
+<details>
+<summary>Darf ich die KI-Ausgabe direkt als Unterweisung verwenden?</summary>
+<p style="margin-top:0.5rem">Nein. KI-Ausgaben sind Entwürfe, keine fertigen Unterweisungen. Die rechtliche Verantwortung liegt bei einer sachkundigen Person (§12 ArbSchG). Der Entwurf muss fachlich geprüft, betrieblich angepasst und mündlich durchgeführt werden. Siehe <a href="#recht">Rechtsrahmen</a>.</p>
+</details>
+
+<details>
+<summary>Was, wenn die KI etwas behauptet, was nachweislich falsch ist?</summary>
+<p style="margin-top:0.5rem">Das sind Halluzinationen — plausible, aber erfundene Inhalte. Zwei Gegenmittel: (a) Prüfung mit einer zweiten KI (Triangulation), (b) Lehrplan-Auszug direkt in den Prompt kopieren, damit die KI auf echten Wortlaut arbeitet. Siehe <a href="#lehrplaene">Lehrpläne als Kontext</a>.</p>
+</details>
+
+<details>
+<summary>Darf ich ein Azubi-Profil mit der KI besprechen?</summary>
+<p style="margin-top:0.5rem">Nur pseudonymisiert. Keine Klarnamen, keine Geburtsdaten, keine Gesundheitsdaten. Siehe <a href="#datenschutz">Datenschutz</a> und die Ampel in Karte 2 der App.</p>
+</details>
+
+<details>
+<summary>Welche KI ist die beste?</summary>
+<p style="margin-top:0.5rem">Keine ist pauschal die beste. Jede hat Stärken. Für Unterweisungen ist ChatGPT meist flüssiger, für Prüfungsfragen ist Claude strukturierter, für Fakten ist Perplexity belastbarer. Siehe <a href="#multi-ki">Multi-KI-Muster</a>.</p>
+</details>
+
+<details>
+<summary>Wie speichere ich gelungene Prompts?</summary>
+<p style="margin-top:0.5rem">Drei Wege: (a) In der App, Karte 8 — lokal im Browser, verlässt Ihr Gerät nicht. (b) <strong>Download-Button</strong> neben jeder generierten Prompt-Box (Karten 4, 5, 6, 7) — speichert den Prompt als <code class="inline">.txt</code>-Datei auf Ihre Festplatte. (c) In Ihrem Cowork-Profil unter <code class="inline">TEMPLATES/</code>. Siehe <a href="#cowork">Cowork-Profile</a>.</p>
+</details>
+
+<details>
+<summary>Warum steht bei „leicht / mittel / schwer" jetzt „Grundkenntnisse / Vertiefung / Transferleistung"?</summary>
+<p style="margin-top:0.5rem">Weil „leicht für Fachlageristen" nicht dasselbe bedeutet wie „leicht für Speditionskaufleute" — die Milieus und Lehrpläne unterscheiden sich zu stark. Die semantischen Stufen sind beruf-übergreifend gleich, werden aber im Prompt <em>beruf-spezifisch</em> erklärt: „Transferleistung" heißt bei FL „Wenn-Dann am konkreten Objekt", bei Spedition „Fallabwägung mit mehreren Optionen".</p>
+</details>
+
+<details>
+<summary>Wer aktualisiert die Rechtsverweise?</summary>
+<p style="margin-top:0.5rem">Jaroslav Kois, manuell. Die in Karte 4 eingebetteten Textbausteine zu §12/§13 ArbSchG und DGUV V1 §4 sind am <strong>Stand-Datum</strong> (siehe Footer) aktuell. Bei einer ArbSchG-Novelle oder einer Neuordnung der Lagerberufe müssen App und Doku nachgezogen werden. Wenn Sie eine solche Änderung bemerken, Mail an jaro_kois@web.de. Maßgeblich bleibt stets der amtliche Wortlaut unter <a href="https://www.gesetze-im-internet.de/arbschg/" target="_blank" rel="noopener">gesetze-im-internet.de</a>.</p>
+</details>
+
+<details>
+<summary>Ist die Pseudonymisierungs-Praxis formal DSGVO-geprüft?</summary>
+<p style="margin-top:0.5rem">Nein. Die Empfehlungen in Karte 2 und Abschnitt 3 sind an bewährten Verwaltungspraktiken orientiert, aber nicht von einem Datenschutzbeauftragten abgenommen. Für Ihren Betrieb gilt: Wenn dort ein DSB benannt ist, klären Sie die KI-Nutzung mit ihm ab. Bei Behörden und großen Unternehmen existieren oft eigene KI-Richtlinien, die Vorrang haben. Im Zweifel: keine personenbezogenen Daten in die KI.</p>
+</details>
+
+<details>
+<summary>Was tun, wenn der Chat sich „verliert" oder widersprüchlich wird?</summary>
+<p style="margin-top:0.5rem">Einen frischen Chat starten. Sehr lange Chats akkumulieren Kontext und werden schlechter. Nach ~20 Nachrichten: Kernpunkte zusammenfassen lassen, neuen Chat öffnen, Zusammenfassung einfügen.</p>
+</details>
+
+<details>
+<summary>Muss ich den Prüfungskatalog kaufen?</summary>
+<p style="margin-top:0.5rem">Wenn Sie Prüfungen vorbereiten: ja — aktuelle 2. Auflage über <a href="https://m.u-form-shop.de" target="_blank" rel="noopener">u-form-shop.de</a>. Die Verordnung und der Rahmenlehrplan reichen für allgemeine Unterweisungen aus und sind gemeinfrei.</p>
+</details>
+
+</section>
+
+
+<div class="ref">
+  <p><strong>Quellen und Grundlagen:</strong></p>
+  <ul>
+    <li>Gesetze: <a href="https://www.gesetze-im-internet.de/arbschg/" target="_blank" rel="noopener">ArbSchG</a> · <a href="https://publikationen.dguv.de/regelwerk/vorschriften/1/dguv-vorschrift-1" target="_blank" rel="noopener">DGUV V1</a> · <a href="https://www.gesetze-im-internet.de/lwlogausbv/BJNR188700004.html" target="_blank" rel="noopener">LWLogAusbV</a> · <a href="https://www.gesetze-im-internet.de/urhg/" target="_blank" rel="noopener">UrhG</a></li>
+    <li>Prüfungen: <a href="https://www.ihk-aka.de/pruefungskataloge" target="_blank" rel="noopener">IHK-AkA</a> · <a href="https://m.u-form-shop.de" target="_blank" rel="noopener">U-Form-Shop</a></li>
+    <li>Cowork und Multi-KI: <a href="https://ruben.substack.com/p/claude-cowork-20" target="_blank" rel="noopener">Ruben Hassid — Claude Cowork 2.0</a> · <a href="https://blockbuster.thoughtleader.school/p/reid-hoffmans-1-ai-advisor-runs-54" target="_blank" rel="noopener">Parth Patil — Multi-Agent Advisor</a></li>
+    <li>Sprachniveaus: <a href="https://leo.blogs.uni-hamburg.de/" target="_blank" rel="noopener">LEO-Studie, Universität Hamburg</a></li>
+  </ul>
+  <p style="margin-top:0.8rem"><strong>Kontakt:</strong> Jaroslav Kois — jaro_kois@web.de · Friedrich-List-Schule Darmstadt</p>
+  <p><em>Kein Rechtsrat. Die Dokumentation ersetzt keine Sachkunde und keine juristische Beratung.</em></p>
+  <p style="margin-top:1rem"><span class="stand">Stand: 2026-04-18</span> — Letzte Aktualisierung der Rechtsverweise und Prüfungskatalog-Auflagen. Nächste Überprüfung empfohlen, sobald eine Neuordnung der Lagerberufe verkündet wird.</p>
+</div>
+
+</div>
+
+</body>
+</html>
