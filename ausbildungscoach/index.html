@@ -157,11 +157,6 @@
   <strong>Wichtig:</strong> Dieses Werkzeug ersetzt <em>keine</em> Sachkunde. Es hilft beim Strukturieren, Prüfen und Erzeugen von Material. Die rechtliche Verantwortung für Unterweisungen und Beratung bleibt beim qualifizierten Ausbilder.
 </div>
 
-<div class="info-box" id="quickstart-box" style="border-color: var(--green); background: #e8f5ec">
-  <strong>Schnell zum ersten Prompt:</strong> <a href="#karte-4">Karte 4</a> öffnen → Beruf wählen → „Prompt erzeugen" → Kopieren. Fertig. Detailwissen über <a href="doku/">Doku</a> später.
-  <button onclick="document.getElementById('quickstart-box').style.display='none'; localStorage.setItem('ausb-quickstart-dismissed','1')" style="float:right; background:transparent; border:0; color:var(--grey); cursor:pointer; font-size:0.9rem" aria-label="schließen">✕</button>
-</div>
-<script>if (localStorage.getItem('ausb-quickstart-dismissed')) { document.getElementById('quickstart-box').style.display = 'none'; }</script>
 
 
 <!-- ============ KARTE 1: KI VERSTEHEN ============ -->
@@ -175,11 +170,10 @@
 </ul>
 
 <h3>Begleitendes Edupad</h3>
-<p>Für den Workshop und die Weiterarbeit gibt es ein gemeinsames Edupad, in dem Teilnehmende Notizen, Prompts und Beispiele teilen können:</p>
-<p><a href="https://edupad.ch/p/cR3mlekNEV" target="_blank" rel="noopener">edupad.ch/p/cR3mlekNEV</a></p>
+<p>Für den Workshop und die Weiterarbeit gibt es ein gemeinsames <a href="https://edupad.ch/p/cR3mlekNEV" target="_blank" rel="noopener"><strong>EDUPAD</strong></a>, in dem Teilnehmende Notizen, Prompts und Beispiele teilen können.</p>
 
 <h3>Dokumentation zum Nachlesen</h3>
-<p>Vertiefende Hintergründe (Rechtsrahmen, Sprachstrategien, Datenschutz, Cowork-Profile, Multi-KI-Muster, FAQ) stehen in der Doku: <a href="doku/">Dokumentation öffnen</a>.</p>
+<p>Vertiefende Hintergründe (Rechtsrahmen, Sprachstrategien, Datenschutz, Cowork-Profile, Multi-KI-Muster, FAQ) stehen in der <a href="doku/"><strong>DOKUMENTATION</strong></a>.</p>
 
 <details>
 <summary>Mehr zur Funktionsweise</summary>
@@ -220,8 +214,8 @@
 </div>
 
 <h3>Pseudonymisieren in Word &mdash; drei Schritte</h3>
-<ol>
-  <li><strong>Dokument duplizieren</strong> — Original bleibt unverändert. Arbeitsdatei z.&nbsp;B. <code>beratung_AzubiA.docx</code>.</li>
+<ol style="padding-left: 2.5rem; margin: 0.6rem 0">
+  <li style="margin-bottom: 0.4rem"><strong>Dokument duplizieren</strong> — Original bleibt unverändert. Arbeitsdatei z.&nbsp;B. <code>beratung_AzubiA.docx</code>.</li>
   <li><strong>Suchen-und-Ersetzen</strong> (<kbd>Strg</kbd>+<kbd>H</kbd>): Vorname → „A.", Nachname → weglassen, Firma → „Speditionsbetrieb", konkrete Orte → „Region", Geburtsdatum → „LJ 2007" oder entfernen.</li>
   <li><strong>Sichtkontrolle</strong> — ein letztes Lesen auf eindeutige Kombinationen: auch ohne Namen kann eine Beschreibung identifizierend sein, wenn mehrere selten kombinierte Merkmale zusammenkommen (z.&nbsp;B. Standort + Schicht + Eintrittsjahr). Merkmale, die einzeln nichts sagen, können zusammen eine Person eindeutig machen.</li>
 </ol>
@@ -251,7 +245,7 @@
 <!-- ============ KARTE 4: UNTERWEISUNGEN & EINWEISUNGEN ============ -->
 <section class="card" id="karte-4">
 <h2><span class="card-number">4</span>Unterweisungen §12 ArbSchG und Einweisungen</h2>
-<p>Zwei verwandte, aber rechtlich unterschiedliche Formate: <strong>Unterweisungen</strong> sind pflichtig und dokumentiert, <strong>Einweisungen</strong> sind praktische Erklärungen ohne formale Pflicht. Die KI unterstützt beim Entwurf, die Verantwortung bleibt beim sachkundigen Ausbilder.</p>
+<p>Zwei verwandte, aber rechtlich unterschiedliche Formate: <strong>Unterweisungen</strong> sind verpflichtend und zu dokumentieren, <strong>Einweisungen</strong> sind praktische Erklärungen ohne formale Pflicht. Die KI unterstützt beim Entwurf, die Verantwortung bleibt beim Sachkundigen.</p>
 
 <details open>
 <summary>Abgrenzung Unterweisung / Einweisung</summary>
@@ -633,6 +627,8 @@
   <p><em>Kein Rechtsrat. Dieses Werkzeug ersetzt keine Sachkunde.</em></p>
   <p style="margin-top:0.8rem"><span style="display:inline-block; background:var(--blue-light); color:var(--accent); padding:0.2rem 0.6rem; border-radius:4px; font-size:0.85rem; font-weight:600">Stand: 2026-04-18</span> — Rechtsverweise nach ArbSchG/DGUV V1. Prüfungskataloge aktuell 2. Auflage (Winter 2025/2026). BerufeNet-Daten Azubi-Kohorte 2024. Nächste Überprüfung empfohlen nach Neuordnung der Lagerberufe oder bei §-Änderung ArbSchG.</p>
 
+  <p style="margin-top:1rem"><button onclick="downloadOfflineCopy()" style="padding:0.4rem 0.9rem; border-radius:4px; font-size:0.9rem; cursor:pointer; background:var(--accent); color:white; border:1px solid var(--accent)">⬇ Offline-Kopie herunterladen</button> &nbsp;<span style="font-size:0.82rem; color:var(--grey)">Lädt die komplette Seite mit Ihren eigenen Einträgen als HTML-Datei auf den Computer — funktioniert danach ohne Internet.</span></p>
+
   <div style="margin-top:1.5rem; display:flex; gap:1.5rem; align-items:flex-start; flex-wrap:wrap;">
     <div style="flex-shrink:0; text-align:center;">
       <p style="font-size:0.85rem; color:var(--grey); margin-bottom:0.3rem;">Auf dem Smartphone öffnen:</p>
@@ -713,7 +709,8 @@ const searchMeta = document.getElementById('search-meta');
 const searchResults = document.getElementById('search-results');
 const searchFilters = document.getElementById('search-filters');
 
-fetch('curricula-db.json?v=20260418a')
+// Offline-Kopie: wenn CURRICULA_EMBEDDED schon gesetzt, skip fetch
+(window.CURRICULA_EMBEDDED ? Promise.resolve({ ok: true, json: () => Promise.resolve(window.CURRICULA_EMBEDDED) }) : fetch('curricula-db.json?v=20260418a'))
   .then(r => {
     if (!r.ok) throw new Error('HTTP ' + r.status);
     return r.json();
@@ -875,8 +872,7 @@ const LERNFELD_CACHE = {}; // berufKey -> [{nr, titel, lj, startIdx, endIdx, tex
 // Mapping auf curricula-db.json (fl und fll teilen sich RLP/ARP)
 const CURRICULA_KEY_MAP = { fl: 'fll' };
 
-fetch('beruf-profile.json?v=20260418a')
-  .then(r => r.ok ? r.json() : null)
+(window.BERUF_PROFILE_EMBEDDED ? Promise.resolve(window.BERUF_PROFILE_EMBEDDED) : fetch('beruf-profile.json?v=20260418a').then(r => r.ok ? r.json() : null))
   .then(d => { BERUF_PROFILE = d; fillBerufDropdown(); })
   .catch(() => { BERUF_PROFILE = null; fillBerufDropdown(); });
 
@@ -1569,6 +1565,48 @@ function buildEinweisungPrompt() {
   out.scrollIntoView({ block: 'start', behavior: 'smooth' });
 }
 window.buildEinweisungPrompt = buildEinweisungPrompt;
+
+
+// ============ OFFLINE-KOPIE ============
+var _originalHTML = null;
+(function() {
+  if (location.protocol !== 'file:') {
+    fetch(location.href).then(function(r) { return r.text(); }).then(function(t) { _originalHTML = t; }).catch(function() {});
+  }
+})();
+
+function downloadOfflineCopy() {
+  var check = localStorage.getItem('ausb-check') || '';
+  var prompts = localStorage.getItem('ausb-prompts') || '';
+  function buildOffline(html) {
+    html = html.replace(/\n<!-- Eingebettete Daten \(Offline-Kopie\) -->\n[\s\S]*?<!-- \/Eingebettete Daten -->\n/, '');
+    html = html.replace(/ · Offline-Kopie vom [\d\.\-]+/g, '');
+    // JSON-Daten + localStorage-Seeds als <script>-Block vor schließendem </body> einbetten
+    var embedBlock = '\n<!-- Eingebettete Daten (Offline-Kopie) -->\n<script>\n';
+    if (CURRICULA) embedBlock += 'window.CURRICULA_EMBEDDED = ' + JSON.stringify(CURRICULA) + ';\n';
+    if (BERUF_PROFILE) embedBlock += 'window.BERUF_PROFILE_EMBEDDED = ' + JSON.stringify(BERUF_PROFILE) + ';\n';
+    if (check) embedBlock += 'try{localStorage.setItem("ausb-check", ' + JSON.stringify(check) + ');}catch(e){}\n';
+    if (prompts) embedBlock += 'try{localStorage.setItem("ausb-prompts", ' + JSON.stringify(prompts) + ');}catch(e){}\n';
+    embedBlock += '<\/script>\n<!-- /Eingebettete Daten -->\n';
+    html = html.replace('</body>', embedBlock + '</body>');
+    var today = new Date().toLocaleDateString('de-DE');
+    html = html.replace(/Stand: 2026-04-18<\/span>/, 'Stand: 2026-04-18 · Offline-Kopie vom ' + today + '</span>');
+    var blob = new Blob([html], { type: 'text/html; charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'ausbildungscoach-offline.html';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+  if (_originalHTML) {
+    buildOffline(_originalHTML);
+  } else {
+    fetch(location.href).then(function(r) { return r.text(); }).then(buildOffline).catch(function() {
+      alert('Die Offline-Kopie benötigt eine Online-Verbindung beim erstmaligen Laden. Bitte öffnen Sie die Seite direkt über die URL, dann klicken Sie erneut auf „Offline-Kopie herunterladen".');
+    });
+  }
+}
+window.downloadOfflineCopy = downloadOfflineCopy;
 
 
 // ============ TABS (Karte 4) ============
