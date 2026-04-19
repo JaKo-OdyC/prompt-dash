@@ -19,7 +19,6 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="apple-touch-icon" href="icon.svg">
-<script src="vendor/qrcode-generator.js"></script>
 <style>
   :root {
     --bg: #f0f4f8; --card: #fff; --accent: #1e3a5f; --accent-light: #2d5986;
@@ -48,20 +47,19 @@
   .copy-btn { position: absolute; top: 0.5rem; right: 0.5rem; background: rgba(255,255,255,0.15); color: #ccc; border: none; padding: 0.3rem 0.7rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
   .copy-btn:hover { background: rgba(255,255,255,0.25); color: white; }
   .copy-btn.copied { background: var(--green); color: white; }
+
+  /* Karte 1: Dreisprung S1/S2/S3 */
+  .dreisprung-intro { background: var(--blue-light); border-left: 3px solid var(--blue-border); padding: 0.7rem 0.9rem; margin: 0.8rem 0; font-size: 0.95rem; }
+  details.dreisprung { background: #f7f9fb; border: 1px solid #d4dce4; border-radius: 6px; margin: 0.6rem 0; padding: 0.5rem 0.9rem; }
+  details.dreisprung[open] { background: #eef2f7; }
+  details.dreisprung > summary { cursor: pointer; font-weight: 600; padding: 0.3rem 0; list-style: none; outline: none; user-select: none; font-size: 0.98rem; }
+  details.dreisprung > summary::-webkit-details-marker { display: none; }
+  details.dreisprung > summary::before { content: "▶ "; display: inline-block; transition: transform 0.2s; color: var(--grey); font-size: 0.75rem; margin-right: 0.3rem; }
+  details.dreisprung[open] > summary::before { transform: rotate(90deg); }
+  .stufe-badge { display: inline-block; background: var(--accent); color: white; padding: 0.1rem 0.5rem; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; margin-right: 0.5rem; border-radius: 3px; vertical-align: middle; }
+  .stufe-hint { font-size: 0.85rem; color: var(--grey); margin: 0.5rem 0 0.4rem; padding-left: 0.5rem; border-left: 2px solid #ccc; }
   .download-btn { position: absolute; top: 0.5rem; right: 5.7rem; background: rgba(255,255,255,0.15); color: #ccc; border: none; padding: 0.3rem 0.7rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
   .download-btn:hover { background: rgba(255,255,255,0.25); color: white; }
-  .qr-btn { position: absolute; top: 0.5rem; right: 10.9rem; background: rgba(255,255,255,0.15); color: #ccc; border: none; padding: 0.3rem 0.7rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
-  .qr-btn:hover:not(:disabled) { background: rgba(255,255,255,0.25); color: white; }
-  .qr-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-  .qr-dialog { border: none; border-radius: 8px; padding: 0; max-width: 92vw; max-height: 92vh; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
-  .qr-dialog::backdrop { background: rgba(0,0,0,0.45); }
-  .qr-dialog-inner { padding: 1.5rem; text-align: center; background: white; color: var(--accent); }
-  .qr-dialog-inner h3 { margin: 0 0 0.5rem; border: none; }
-  .qr-dialog-inner .qr-meta { color: var(--grey); font-size: 0.85rem; margin-bottom: 1rem; }
-  .qr-dialog-inner #qr-canvas { margin: 0 auto; }
-  .qr-dialog-inner .qr-hint { font-size: 0.85rem; color: var(--grey); margin-top: 1rem; max-width: 360px; margin-left: auto; margin-right: auto; line-height: 1.5; text-align: left; }
-  .qr-dialog-inner .qr-close { margin-top: 1rem; background: var(--accent); color: white; border: none; padding: 0.5rem 1.2rem; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
-  .qr-dialog-inner .qr-close:hover { background: var(--accent-light); }
 
   /* Ampel */
   .traffic { display: flex; gap: 0.5rem; margin: 0.5rem 0; flex-wrap: wrap; }
@@ -193,6 +191,87 @@
 <summary>Mehr zur Funktionsweise</summary>
 <p style="margin-top:0.5rem">Ein Sprachmodell hat keine Datenbank, in der es nachschlägt. Es hat Muster aus Milliarden von Trainingsdokumenten und schätzt bei jeder Antwort, welches Wort statistisch als nächstes käme. Das Ergebnis kann brillant sein &mdash; oder eine eloquent vorgetragene Fiktion. Deshalb: je enger der Kontext (Ihr eigenes Material, klare Vorgaben, ein spezifischer Beruf), desto belastbarer die Antwort.</p>
 </details>
+
+<h3>Warum ein Coach? Der Dreisprung</h3>
+<div class="dreisprung-intro">
+  Dieselbe Aufgabe &mdash; eine <em>Unterweisung zur Nutzung von Sicherheitsmessern f&uuml;r Fachlageristen im 1. Ausbildungsjahr</em> &mdash; in drei Prompt-Stufen. Geben Sie die Prompts nacheinander in Ihre KI (ChatGPT, Claude, Perplexity, DeepSeek, &hellip;) ein und vergleichen Sie die drei Antworten.
+</div>
+
+<details class="dreisprung">
+<summary><span class="stufe-badge">S1</span>Naiver Prompt (ein Satz, ohne Kontext)</summary>
+<div class="stufe-hint">Was ein ungeduldiger Nutzer tippt. Kein Kontext, keine Zielgruppe, keine Anforderungen.</div>
+<div class="prompt-box">Schreib mir was f&uuml;r die Unterweisung zu Sicherheitsmessern bei Azubis.<button class="copy-btn" onclick="copyPromptBox(this)">Kopieren</button></div>
+</details>
+
+<details class="dreisprung">
+<summary><span class="stufe-badge">S2</span>Strukturierter Prompt (ohne Coach-Guards)</summary>
+<div class="stufe-hint">Was ein reflektierter Ausbilder selbst formuliert: Zielgruppe, Zweck, Dauer, Inhaltsstichpunkte. Aber keine Anti-Halluzinations-Regeln.</div>
+<div class="prompt-box">Erstelle eine Unterweisung zur Nutzung von Sicherheitsmessern f&uuml;r Fachlageristen im 1. Ausbildungsjahr.
+
+Zielgruppe: Auszubildende mit gemischten Deutschkenntnissen (B1-Niveau), 15-18 Jahre.
+Zweck: Pflichtunterweisung nach Arbeitsschutzgesetz, j&auml;hrlich wiederkehrend.
+Dauer: ca. 20 Minuten.
+Format: gegliedert in Abschnitte mit &Uuml;berschriften.
+
+Inhaltlich soll abgedeckt sein:
+- Welche Messer sind erlaubt / welche nicht
+- Gefahren und typische Unf&auml;lle
+- Richtige Schnittf&uuml;hrung
+- Pflege der Klinge
+- Pers&ouml;nliche Schutzausr&uuml;stung
+- Verhalten bei Verletzung
+- Rechtliche Grundlagen
+
+Bitte mit Lernzielen am Anfang.<button class="copy-btn" onclick="copyPromptBox(this)">Kopieren</button></div>
+</details>
+
+<details class="dreisprung">
+<summary><span class="stufe-badge">S3</span>Coach-Prompt (generiert vom Ausbildungscoach)</summary>
+<div class="stufe-hint"><strong>Wichtig:</strong> Diesen Prompt tippt niemand per Hand. Er entsteht in Karte 4 mit wenigen Klicks. Hier zum direkten Vergleich als Copy-Paste-Block. Enth&auml;lt: Rechtsrahmen (&sect;12/&sect;13 ArbSchG, DGUV V1 &sect;4), Berufsprofil aus BerufeNet, Sprach- und Zug&auml;nglichkeitsregeln, Anti-Halluzinations-Guards, Siezen-Guard.</div>
+<div class="prompt-box">Du bist erfahrener Ausbilder. Erstelle einen Unterweisungsentwurf gem&auml;&szlig; &sect;12 ArbSchG.
+
+RECHTSRAHMEN (&sect;12 ArbSchG &middot; &sect;13 ArbSchG &middot; DGUV V1 &sect;4 &mdash; verk&uuml;rzt) &mdash; NUR ALS ORIENTIERUNG F&Uuml;R DICH. DIESE TEXTBL&Ouml;CKE NICHT W&Ouml;RTLICH IN DEN ENTWURF &Uuml;BERNEHMEN. Im Entwurf reicht ein kurzer Hinweis wie "gem&auml;&szlig; &sect;12 ArbSchG" &mdash; der vollst&auml;ndige Gesetzestext geh&ouml;rt NICHT in eine Unterweisung, die einem Azubi vorgelesen wird.
+
+- &sect;12 Abs. 1: Der Arbeitgeber hat die Besch&auml;ftigten &uuml;ber Sicherheit und Gesundheitsschutz bei der Arbeit w&auml;hrend ihrer Arbeitszeit ausreichend und angemessen zu unterweisen. Die Unterweisung umfasst Anweisungen und Erl&auml;uterungen, die eigens auf den Arbeitsplatz oder den Aufgabenbereich ausgerichtet sind. Sie muss bei Einstellung, Ver&auml;nderung im Aufgabenbereich, Einf&uuml;hrung neuer Arbeitsmittel/Technologie vor Aufnahme der T&auml;tigkeit erfolgen, an die Gef&auml;hrdungsentwicklung angepasst sein und erforderlichenfalls regelm&auml;&szlig;ig wiederholt werden.
+- &sect;13: Verantwortlich ist der Arbeitgeber; zuverl&auml;ssige und fachkundige Personen k&ouml;nnen schriftlich mit Aufgaben beauftragt werden.
+- DGUV V1 &sect;4: Die Unterweisung muss mindestens einmal j&auml;hrlich erfolgen und ist zu dokumentieren.
+
+KONTEXT:
+- Beruf: Fachlagerist/-in (2-j&auml;hrig)
+
+ZIELPROFIL DES BERUFS (Kompetenzen, die in der Ausbildung erarbeitet werden &mdash; noch nicht vorausgesetzt. Quellen: BerufeNet, KMK-Lehrplan, Materialgenerator):
+- BerufeNet: Warenannahme/-pr&uuml;fung, G&uuml;ter erfassen, auspacken, Zustand pr&uuml;fen, sortieren, sachgerecht lagern. Lagerbestand kontrollieren, Inventuren. Versand: verpacken, Begleitpapiere ausf&uuml;llen, Liefereinheiten zusammenstellen, Lkws beladen, kennzeichnen, sichern. Gefahrgutverordnung und Zollbestimmungen beachten. Transportger&auml;te und F&ouml;rdermittel (Gabelstapler, Sortieranlagen). Anforderungen: k&ouml;rperliche Konstitution (K&auml;lte, schweres Heben), Organisation, Sorgfalt, r&auml;umliches Vorstellungsverm&ouml;gen, Umsicht. Deutsch wird NICHT als Anforderung genannt (Kontrast zu FLL). Schulabschl&uuml;sse Azubis 2024: ohne HS 8 %, HS 57 %, mittlerer 27 %, Abitur 4 %.
+- 1. Lehrjahr: &Uuml;berwiegend HS-Abschluss, bedeutender Anteil ohne HS. Sprachlich typischerweise A2&ndash;B1, bei Zugewanderten teilweise niedriger. Schriftsprache ist regelm&auml;&szlig;ig die H&uuml;rde. Aus Materialgenerator: Frustrationstoleranz schwankend, sozialp&auml;dagogisch zu flankieren. Abstraktion niedrig, Transfer nur am konkreten Objekt. Kerninhalte (LF 1&ndash;5, gemeinsam mit FLL 1. LJ): G&uuml;ter annehmen, lagern, pflegen, kommissionieren, verpacken. Didaktische Zug&auml;nge: starke Bildsprache, reale Gegenst&auml;nde, sehr kurze S&auml;tze, Wiederholung, viel M&uuml;ndliches, klare Routinen, positive R&uuml;ckmeldung.
+- Lehrjahr: 1. Ausbildungsjahr
+- T&auml;tigkeit/Thema: Nutzung von Sicherheitsmessern beim &Ouml;ffnen von Kartons, Folien und Umreifungsb&auml;ndern
+- Betriebliche Besonderheiten: Pflichtunterweisung, j&auml;hrlich wiederkehrend. Gemischte Azubi-Gruppe, teilweise Zugewanderte.
+
+SPRACHE UND ZUG&Auml;NGLICHKEIT:
+- M&uuml;ndliches Niveau: B1
+- Max. 15 W&ouml;rter pro Satz. Fachbegriffe beim ersten Vorkommen in Klammern erkl&auml;ren. Aktiv statt Passiv. Keine Nominalisierungen.
+- Schriftsprache: unsicher
+- Bildsprache einsetzen. Aufgaben visuell strukturieren. Stichpunkte statt Flie&szlig;text wo sinnvoll.
+
+ANFORDERUNGEN AN DEN ENTWURF:
+- Struktur: Einstieg, Gef&auml;hrdungen, Regeln, praktischer Teil, Verst&auml;ndnisfragen
+- Konkreter Bezug auf &sect;12 ArbSchG und einschl&auml;gige DGUV-Schriften
+- Keine personenbezogenen Daten
+- Am Ende: 3 Verst&auml;ndnisfragen
+- Wenn Kontextangaben fehlen, stelle R&uuml;ckfragen, bevor du generierst &mdash; rate nicht.
+
+HINWEIS: Dieser Entwurf ist eine VORLAGE. Sachkunde, Gef&auml;hrdungsbeurteilung, Durchf&uuml;hrung und Dokumentation liegen beim sachkundigen Ausbilder.
+
+ANTI-HALLUZINATIONS-REGELN (strikt einhalten):
+- Zul&auml;ssige Rechtsverweise: &sect;5, &sect;12, &sect;13 ArbSchG, DGUV Vorschrift 1 &sect;4, LWLogAusbV, KflBAusbV, BKFAusbV sowie der KMK-Rahmenlehrplan des Berufs. KEINE ANDEREN &sect;&sect;, KEINE DIN-/ISO-/VDI-/VDE-Normen erfinden.
+- Wenn du unsicher bist, ob eine Rechtsvorschrift existiert oder genau so zitiert wird: schreibe stattdessen "siehe einschl&auml;gige Fachliteratur" oder "bitte beim Fachverband (z.B. BGHW, DGUV) nachschlagen".
+- Keine Prozentangaben, Grenzwerte oder konkreten Zahlen erfinden, die nicht im gegebenen Kontext stehen.
+
+SPRACH-REGELN (Anrede, strikt):
+- Der Leser dieses Prompt-Ergebnisses ist ein erwachsener Ausbilder / eine Ausbilderin. Der Ausbilder wird durchg&auml;ngig gesiezt &mdash; KEIN "du/dich/dir/deine" an den Ausbilder.
+- Wenn der Entwurf selbst an einen Azubi gerichtet ist: standardm&auml;&szlig;ig ebenfalls siezen. AUSNAHME: Bei m&uuml;ndlichem Sprachniveau A2 ist Duzen gegen&uuml;ber dem Azubi erlaubt und oft angemessener.<button class="copy-btn" onclick="copyPromptBox(this)">Kopieren</button></div>
+</details>
+
+<p style="font-size:0.9rem; color:var(--grey); margin-top:0.8rem"><strong>Was beim Vergleich zu beachten ist:</strong> Wird durchgehend gesiezt, oder wechselt Du/Sie? Erfundene Paragraphen oder Normen? Taucht ein fachlich falscher Begriff auf (z.&nbsp;B. &bdquo;Ceranmesser&ldquo; als Lagerwerkzeug)? Fragt die KI bei fehlendem Kontext nach, oder r&auml;t sie drauflos? Bezieht sie sich auf den Rahmenlehrplan des Berufs?</p>
 </section>
 
 
@@ -345,7 +424,7 @@
 
   <div id="u-output" style="display:none">
     <h3 style="cursor:pointer; display:flex; align-items:center; gap:0.3rem" onclick="togglePromptBox(this)" title="Klicken zum Ein-/Ausblenden">Generierter Prompt <span class="toggle-icon" style="font-size:0.8rem; color:var(--grey)">▼</span></h3>
-    <div class="prompt-box" id="u-prompt-box"><button class="qr-btn" onclick="showQRDialog(this)">QR-Code</button><button class="download-btn" onclick="downloadPromptBox(this)">Download</button><button class="copy-btn" onclick="copyPromptBox(this)">Kopieren</button></div>
+    <div class="prompt-box" id="u-prompt-box"><button class="download-btn" onclick="downloadPromptBox(this)">Download</button><button class="copy-btn" onclick="copyPromptBox(this)">Kopieren</button></div>
   </div>
 
   <details>
@@ -679,113 +758,11 @@
 function getPromptBoxText(btn) {
   const box = btn.parentElement;
   return Array.from(box.childNodes)
-    .filter(n => n.nodeType === 3 || (n.nodeType === 1 && !n.classList?.contains('copy-btn') && !n.classList?.contains('download-btn') && !n.classList?.contains('qr-btn')))
+    .filter(n => n.nodeType === 3 || (n.nodeType === 1 && !n.classList?.contains('copy-btn') && !n.classList?.contains('download-btn')))
     .map(n => n.textContent)
     .join('')
     .replace(/\[([^\]]+)\]/g, '[$1]');
 }
-
-// QR-Code-Limits (Version 40 Binary UTF-8):
-//   ECL M ca. 2330 Bytes, ECL L ca. 2950 Bytes (experimentell gemessen).
-//   Wir versuchen erst M, dann L als Fallback.
-const QR_MAX_BYTES = 2900;  // harter Cut-off, über ECL L Max
-
-function promptQRBytes(text) {
-  return new Blob([text]).size;
-}
-
-function qrDialog() {
-  let dlg = document.getElementById('qr-global-dialog');
-  if (!dlg) {
-    dlg = document.createElement('dialog');
-    dlg.id = 'qr-global-dialog';
-    dlg.className = 'qr-dialog';
-    dlg.innerHTML = `<div class="qr-dialog-inner">
-      <h3>Prompt als QR-Code</h3>
-      <div class="qr-meta" id="qr-meta"></div>
-      <div id="qr-canvas"></div>
-      <div class="qr-hint">So funktioniert's: <strong>System-Kamera</strong> (iPhone/Android) öffnen → QR scannen → „Text kopieren" antippen → in ChatGPT, Claude oder Perplexity einfügen. Die KI-Apps selbst haben keinen QR-Scanner.</div>
-      <button class="qr-close" onclick="document.getElementById('qr-global-dialog').close()">Schließen</button>
-    </div>`;
-    document.body.appendChild(dlg);
-    // Klick auf Backdrop schließt
-    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
-  }
-  return dlg;
-}
-
-function showQRDialog(btn) {
-  const text = getPromptBoxText(btn);
-  const bytes = promptQRBytes(text);
-  if (bytes > QR_MAX_BYTES) {
-    alert(`Prompt zu lang für QR-Code (${bytes} Bytes, Limit ~${QR_MAX_BYTES}).\nBitte den Kopieren-Button nutzen.`);
-    return;
-  }
-  if (typeof qrcode === 'undefined') {
-    alert('QR-Code-Bibliothek nicht geladen. Bitte Seite neu laden.');
-    return;
-  }
-  const dlg = qrDialog();
-  const canvasDiv = dlg.querySelector('#qr-canvas');
-  const meta = dlg.querySelector('#qr-meta');
-  canvasDiv.innerHTML = '';
-  let usedECL = null;
-  try {
-    // UTF-8-Support aktivieren (wichtig für Umlaute!)
-    qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
-    // Versuch 1: ECL M (robuster); bei Overflow Versuch 2: ECL L (mehr Kapazität)
-    let qr = null;
-    for (const ecl of ['M', 'L']) {
-      try {
-        const attempt = qrcode(0, ecl);
-        attempt.addData(text, 'Byte');
-        attempt.make();
-        qr = attempt;
-        usedECL = ecl;
-        break;
-      } catch (_) { /* try next ECL */ }
-    }
-    if (!qr) throw new Error('Prompt übersteigt auch ECL-L-Kapazität.');
-    const svg = qr.createSvgTag({ cellSize: 6, margin: 4, scalable: true });
-    canvasDiv.innerHTML = svg;
-    const svgEl = canvasDiv.querySelector('svg');
-    if (svgEl) {
-      svgEl.setAttribute('width', '320');
-      svgEl.setAttribute('height', '320');
-      svgEl.style.maxWidth = '85vw';
-      svgEl.style.maxHeight = '60vh';
-    }
-    meta.textContent = `${text.length} Zeichen · ${bytes} Bytes · ECL ${usedECL}`;
-  } catch (e) {
-    alert('QR-Code konnte nicht erzeugt werden: ' + (e.message || e));
-    return;
-  }
-  dlg.showModal();
-}
-window.showQRDialog = showQRDialog;
-
-// Nach der Prompt-Generierung: QR-Button anhängen, wenn Prompt klein genug
-function attachQRButton(box) {
-  // Entferne alte qr-btn falls vorhanden (beim Regenerieren)
-  const existing = box.querySelector('.qr-btn');
-  if (existing) existing.remove();
-  const qrBtn = document.createElement('button');
-  qrBtn.className = 'qr-btn';
-  qrBtn.textContent = 'QR-Code';
-  const text = Array.from(box.childNodes)
-    .filter(n => n.nodeType === 3 || (n.nodeType === 1 && !n.classList?.contains('copy-btn') && !n.classList?.contains('download-btn') && !n.classList?.contains('qr-btn')))
-    .map(n => n.textContent).join('');
-  const bytes = promptQRBytes(text);
-  if (bytes > QR_MAX_BYTES) {
-    qrBtn.disabled = true;
-    qrBtn.title = `Prompt zu lang für QR-Code (${bytes} Bytes, Limit ~${QR_MAX_BYTES}). Bitte kopieren.`;
-  } else {
-    qrBtn.addEventListener('click', () => showQRDialog(qrBtn));
-    qrBtn.title = `${bytes} Bytes — per QR übertragbar`;
-  }
-  box.appendChild(qrBtn);
-}
-window.attachQRButton = attachQRButton;
 function copyPromptBox(btn) {
   const text = getPromptBoxText(btn);
   navigator.clipboard.writeText(text).then(() => {
@@ -1293,7 +1270,6 @@ function buildUnterweisungPrompt() {
   btn.textContent = 'Kopieren';
   btn.addEventListener('click', () => copyPromptBox(btn));
   box.appendChild(btn);
-  attachQRButton(box);
   out.scrollIntoView({ block: 'start', behavior: 'smooth' });
 }
 window.buildUnterweisungPrompt = buildUnterweisungPrompt;
@@ -1463,7 +1439,6 @@ function buildFachgespraechPrompt() {
   btn.textContent = 'Kopieren';
   btn.addEventListener('click', () => copyPromptBox(btn));
   box.appendChild(btn);
-  attachQRButton(box);
   out.scrollIntoView({ block: 'start', behavior: 'smooth' });
 }
 window.buildFachgespraechPrompt = buildFachgespraechPrompt;
@@ -1565,7 +1540,6 @@ function buildBeratungPrompt() {
   btn.textContent = 'Kopieren';
   btn.addEventListener('click', () => copyPromptBox(btn));
   box.appendChild(btn);
-  attachQRButton(box);
   out.scrollIntoView({ block: 'start', behavior: 'smooth' });
 }
 window.buildBeratungPrompt = buildBeratungPrompt;
@@ -1668,7 +1642,6 @@ function buildMaterialPrompt() {
   btn.textContent = 'Kopieren';
   btn.addEventListener('click', () => copyPromptBox(btn));
   box.appendChild(btn);
-  attachQRButton(box);
   out.scrollIntoView({ block: 'start', behavior: 'smooth' });
 }
 window.buildMaterialPrompt = buildMaterialPrompt;
@@ -1767,7 +1740,6 @@ function buildEinweisungPrompt() {
   btn.textContent = 'Kopieren';
   btn.addEventListener('click', () => copyPromptBox(btn));
   box.appendChild(btn);
-  attachQRButton(box);
   out.scrollIntoView({ block: 'start', behavior: 'smooth' });
 }
 window.buildEinweisungPrompt = buildEinweisungPrompt;
