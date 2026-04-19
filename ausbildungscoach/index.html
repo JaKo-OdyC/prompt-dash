@@ -1817,10 +1817,26 @@ function loadSavedPrompts() {
     <details style="margin-bottom:0.5rem; background:#fafbfc; padding:0.6rem; border-radius:4px">
       <summary><strong>${escapeHtml(p.title)}</strong> <span style="color:var(--grey); font-size:0.8rem">&mdash; ${new Date(p.ts).toLocaleDateString('de-DE')}</span></summary>
       <pre style="white-space:pre-wrap; font-family:Consolas, monospace; font-size:0.85rem; margin-top:0.4rem">${escapeHtml(p.text)}</pre>
-      <button onclick="deletePrompt(${i})" style="margin-top:0.4rem; background:var(--red); color:white; border:0; padding:0.3rem 0.7rem; border-radius:3px; cursor:pointer; font-size:0.8rem">Löschen</button>
+      <div style="margin-top:0.4rem; display:flex; gap:0.4rem">
+        <button onclick="copyStoredPrompt(${i}, this)" style="background:var(--accent); color:white; border:0; padding:0.3rem 0.7rem; border-radius:3px; cursor:pointer; font-size:0.8rem">Kopieren</button>
+        <button onclick="deletePrompt(${i})" style="background:var(--red); color:white; border:0; padding:0.3rem 0.7rem; border-radius:3px; cursor:pointer; font-size:0.8rem">Löschen</button>
+      </div>
     </details>
   `).join('');
 }
+
+function copyStoredPrompt(i, btn) {
+  const saved = JSON.parse(localStorage.getItem('ausb-prompts') || '[]');
+  if (!saved[i]) return;
+  navigator.clipboard.writeText(saved[i].text).then(() => {
+    const orig = btn.textContent;
+    const origBg = btn.style.background;
+    btn.textContent = 'Kopiert ✓';
+    btn.style.background = 'var(--green)';
+    setTimeout(() => { btn.textContent = orig; btn.style.background = origBg; }, 1500);
+  }).catch(e => alert('Kopieren fehlgeschlagen: ' + e.message));
+}
+window.copyStoredPrompt = copyStoredPrompt;
 
 function savePrompt() {
   const title = document.getElementById('prompt-title').value.trim();
