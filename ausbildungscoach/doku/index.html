@@ -103,13 +103,14 @@
   <a href="#cowork">Cowork</a>
   <a href="#multi-ki">Multi-KI</a>
   <a href="#faq">FAQ</a>
+  <a href="#changelog">Changelog</a>
 </nav>
 
 <div class="container">
 
 <h1>Ausbildungscoach — Dokumentation</h1>
 <p class="subtitle">Hintergrund, Rechtsrahmen und Werkzeuge für die KI-gestützte Ausbildungsarbeit. Als Nachschlagwerk gedacht — nicht zum Durchlesen in einem Stück.</p>
-<p style="margin-bottom:1.5rem"><span class="stand">Stand: 2026-04-18</span> · App-Version nach Triangulations-Durchlauf</p>
+<p style="margin-bottom:1.5rem"><span class="stand">Stand: 2026-04-19 · App v1.1.0</span> · Nach Prompt-Optimierungsrunde (Anti-Halluzinations-Guards)</p>
 
 <div class="info-box">
   <strong>Was diese Doku ist:</strong> Eine Ergänzung zur <a href="../">App</a>. Während die App fertige Werkzeuge bereitstellt, erklärt die Doku, warum die Werkzeuge so gebaut sind, welche rechtlichen Rahmen gelten, wie KI technisch arbeitet und welche Strategien sich bewährt haben. Wer nur das Werkzeug braucht, kann die Doku überspringen.
@@ -544,6 +545,36 @@ Am Ende: Zusammenfassung in about-me.md-Format, mit Abschnittsüberschriften.</d
 <p style="margin-top:0.5rem">Wenn Sie Prüfungen vorbereiten: ja — aktuelle 2. Auflage über <a href="https://m.u-form-shop.de" target="_blank" rel="noopener">u-form-shop.de</a>. Die Verordnung und der Rahmenlehrplan reichen für allgemeine Unterweisungen aus und sind gemeinfrei.</p>
 </details>
 
+</section>
+
+
+<!-- ============ CHANGELOG ============ -->
+<section class="card" id="changelog">
+<h2><span class="card-number">+</span>Changelog</h2>
+
+<h3>v1.1.0 — April 2026</h3>
+<ul>
+  <li><strong>Anti-Halluzinations-Guards in Prompts</strong> (Karten 4a, 4b, 6, 7): Paragraphen-Whitelist (§5/§12/§13 ArbSchG, DGUV V1 §4), ausdrückliches Verbot erfundener DIN/ISO-Normen, Siezen-Guard, Lernfeld-Guard mit maximal-Nummer je Beruf. Ableitung aus EXP-001-Sonde (270 Runs, April 2026).</li>
+  <li><strong>Scrollbarer Lehrplan-Volltext</strong> (Karte 3): Klick auf Treffer öffnet den gesamten KMK-RLP / BIBB-ARP / BerufeNet-Text in einem scrollbaren Panel, aktiver Match orange hervorgehoben. Ersetzt die bisherige Snippet-Expansion.</li>
+  <li><strong>Zielkompetenzen statt Ist-Stand</strong> (Karten 4, 6, 7): Berufsprofile aus BerufeNet werden im Prompt als „Kompetenzen, die in der Ausbildung erarbeitet werden — noch nicht vorausgesetzt" deklariert. Verhindert, dass die KI dem Azubi unrealistisches Können unterstellt.</li>
+  <li><strong>Offline-Kopie</strong> (Footer): Button „Offline-Kopie herunterladen" exportiert die komplette App als HTML-Datei (≈ 440 KB) mit eingebetteter Curricula-DB und Berufsprofile — funktioniert offline.</li>
+  <li><strong>Modus B (Einweisung)</strong>: Vom statischen Platzhalter-Prompt zum vollwertigen Formular mit Dropdowns (Beruf, Rolle, Thema, Umfang, Sprache, Besonderheiten).</li>
+  <li><strong>Container-Modus und Schnellmodus</strong> (Karte 4a): Container-Modus erzeugt zweistufigen Prompt (Diagnose + Entwurf). Schnellmodus überspringt Rückfragen für erfahrene Ausbilder.</li>
+  <li><strong>Sprachniveau-Achse „Schriftsprache"</strong> (LEO-Studie): geübt / unsicher / sehr unsicher — unabhängig vom mündlichen GER-Niveau.</li>
+  <li><strong>Korrektur Begriffs-Beispiele</strong> (Karte 3): Statt „Stapler" (0 Treffer) jetzt „Kommissionierung", „Gefahrgut", „Incoterms" als Default-Platzhalter.</li>
+  <li><strong>QR-Code korrigiert</strong>: Zeigt jetzt auf die richtige URL (`/prompt-dash/ausbildungscoach/`).</li>
+</ul>
+
+<h3>v1.0.0 — März 2026</h3>
+<ul>
+  <li>Initialer Wurf: 8 Karten (KI verstehen, Rahmen, Themen-Navigator, Unterweisungen, Material, Beratung, Fachgespräche, Prompts speichern)</li>
+  <li>Doku-Subseite mit 8 Abschnitten (Grundlagen, Recht, Datenschutz, Lehrpläne, Sprache, Cowork, Multi-KI, FAQ)</li>
+  <li>Curricula-DB mit KMK-RLP, BIBB-ARP, BerufeNet-Steckbriefen (5 Berufe, 12 Dokumente)</li>
+  <li>Begriffssuche über alle Lehrplan-Quellen mit Filter je Beruf</li>
+  <li>Beruf-Profile aus BerufeNet 2024 (Schulabschluss-Statistiken, Tätigkeiten, Anforderungen)</li>
+</ul>
+
+<p class="search-meta">Versionsnummer sichtbar im App-Footer. Beim Export als Offline-Kopie wird das Datum angehängt.</p>
 </section>
 
 
