@@ -13,7 +13,7 @@
 <title>Ausbildungscoach — KI-gestützte Unterstützung</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="Ausb-Coach">
+<meta name="apple-mobile-web-app-title" content="A.-Coach">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1e3a5f">
 <link rel="manifest" href="manifest.json">
@@ -32,6 +32,23 @@
   .nav a { color: rgba(255,255,255,0.85); text-decoration: none; font-size: 0.8rem; padding: 0.25rem 0.5rem; border-radius: 3px; white-space: nowrap; }
   .nav a:hover { background: rgba(255,255,255,0.15); color: white; }
   .nav .nav-title { font-weight: bold; font-size: 0.9rem; color: white; margin-right: 0.5rem; }
+  .nav-toggle { display: none; background: none; border: 0; color: white; font-size: 1.2rem; cursor: pointer; padding: 0.25rem 0.5rem; margin-left: auto; }
+  .nav-label-long { display: inline; }
+  .nav-label-short { display: none; }
+
+  /* Mobile: kompakter Header + Burger-Menu */
+  @media (max-width: 680px) {
+    .nav { padding: 0.4rem 0.6rem; gap: 0.15rem; flex-wrap: nowrap; overflow: hidden; }
+    .nav .nav-title { font-size: 0.85rem; margin-right: 0.3rem; }
+    .nav-toggle { display: inline-block; }
+    .nav a { display: none; font-size: 0.85rem; padding: 0.5rem 0.75rem; border-radius: 4px; width: 100%; }
+    .nav.open { flex-wrap: wrap; overflow: visible; padding-bottom: 0.6rem; }
+    .nav.open a { display: block; }
+    .nav.open .nav-title { width: 100%; margin-bottom: 0.3rem; }
+    .nav.open .nav-toggle { position: absolute; right: 0.5rem; top: 0.35rem; }
+    .nav-label-long { display: none; }
+    .nav-label-short { display: inline; }
+  }
 
   .container { max-width: 900px; margin: 0 auto; padding: 1rem; }
   h1 { font-size: 1.7rem; margin-bottom: 0.3rem; }
@@ -148,17 +165,22 @@
 </head>
 <body>
 
-<nav class="nav">
-  <span class="nav-title">Ausbildungscoach</span>
-  <a href="#karte-1">1 KI verstehen</a>
-  <a href="#karte-2">2 Rahmen</a>
-  <a href="#karte-3">3 Themen-Navigator</a>
-  <a href="#karte-4">4 Unterweisungen &amp; Einweisungen</a>
-  <a href="#karte-5">5 Material</a>
-  <a href="#karte-6">6 Beratung</a>
-  <a href="#karte-7">7 Fachgespräche</a>
-  <a href="#karte-8">8 Eigene Prompts</a>
+<nav class="nav" id="main-nav">
+  <span class="nav-title">A.-Coach</span>
+  <button class="nav-toggle" onclick="document.getElementById('main-nav').classList.toggle('open')" aria-label="Menü ein-/ausblenden">☰</button>
+  <a href="#karte-1"><span class="nav-label-long">1 KI verstehen</span><span class="nav-label-short">1 KI verstehen</span></a>
+  <a href="#karte-2"><span class="nav-label-long">2 Rahmen</span><span class="nav-label-short">2 Rahmen &amp; Datenschutz</span></a>
+  <a href="#karte-3"><span class="nav-label-long">3 Themen-Navigator</span><span class="nav-label-short">3 Themen-Navigator</span></a>
+  <a href="#karte-4"><span class="nav-label-long">4 Unterweisungen &amp; Einweisungen</span><span class="nav-label-short">4 Unterweisungen &amp; Einweisungen</span></a>
+  <a href="#karte-5"><span class="nav-label-long">5 Material</span><span class="nav-label-short">5 Material analysieren</span></a>
+  <a href="#karte-6"><span class="nav-label-long">6 Beratung</span><span class="nav-label-short">6 Ausbildungsberatung</span></a>
+  <a href="#karte-7"><span class="nav-label-long">7 Fachgespräche</span><span class="nav-label-short">7 Fachgespräche</span></a>
+  <a href="#karte-8"><span class="nav-label-long">8 Eigene Prompts</span><span class="nav-label-short">8 Eigene Prompts</span></a>
 </nav>
+<script>
+// Mobile: Nach Klick auf einen Link Menü wieder schließen
+document.querySelectorAll('#main-nav a').forEach(a => a.addEventListener('click', () => document.getElementById('main-nav').classList.remove('open')));
+</script>
 
 <div class="container">
 
