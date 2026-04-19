@@ -1757,16 +1757,20 @@ function downloadOfflineCopy() {
   var check = localStorage.getItem('ausb-check') || '';
   var prompts = localStorage.getItem('ausb-prompts') || '';
   function buildOffline(html) {
-    html = html.replace(/\n<!-- Eingebettete Daten \(Offline-Kopie\) -->\n[\s\S]*?<!-- \/Eingebettete Daten -->\n/, '');
+    html = html.replace(/<!-- Eingebettete Daten \(Offline-Kopie\) -->\n[\s\S]*?<!-- \/Eingebettete Daten -->\n/, '');
     html = html.replace(/ · Offline-Kopie vom [\d\.\-]+/g, '');
-    // JSON-Daten + localStorage-Seeds als <script>-Block vor schließendem </body> einbetten
-    var embedBlock = '\n<!-- Eingebettete Daten (Offline-Kopie) -->\n<script>\n';
+    // JSON-Daten + localStorage-Seeds als <script>-Block GANZ OBEN einbetten.
+    // Muss VOR dem Haupt-<script> laufen, damit window.CURRICULA_EMBEDDED
+    // und window.BERUF_PROFILE_EMBEDDED bereits gesetzt sind, wenn die
+    // Init-Logik sie abfragt. Einschub direkt nach <body>.
+    var embedBlock = '<!-- Eingebettete Daten (Offline-Kopie) -->\n<script>\n';
     if (CURRICULA) embedBlock += 'window.CURRICULA_EMBEDDED = ' + JSON.stringify(CURRICULA) + ';\n';
     if (BERUF_PROFILE) embedBlock += 'window.BERUF_PROFILE_EMBEDDED = ' + JSON.stringify(BERUF_PROFILE) + ';\n';
     if (check) embedBlock += 'try{localStorage.setItem("ausb-check", ' + JSON.stringify(check) + ');}catch(e){}\n';
     if (prompts) embedBlock += 'try{localStorage.setItem("ausb-prompts", ' + JSON.stringify(prompts) + ');}catch(e){}\n';
     embedBlock += '<\/script>\n<!-- /Eingebettete Daten -->\n';
-    html = html.replace('</body>', embedBlock + '</body>');
+    // Ersetze oeffnendes <body...> durch <body...>\n{embedBlock}
+    html = html.replace(/(<body[^>]*>)/, '$1\n' + embedBlock);
     var today = new Date().toLocaleDateString('de-DE');
     html = html.replace(/Stand: 2026-04-19<\/span>/, 'Stand: 2026-04-19 · Offline-Kopie vom ' + today + '</span>');
     var blob = new Blob([html], { type: 'text/html; charset=utf-8' });
