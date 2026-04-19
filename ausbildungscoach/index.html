@@ -2,7 +2,8 @@
 <!--
   SYNC-HINWEIS: Diese Datei existiert in zwei Repos.
   - Entwicklung: odyc-monorepo/docs/ausbildungscoach/index.html
-  - GitHub Pages: eigener Subfolder jako-odyc.github.io/ausbildungscoach/
+  - GitHub Pages (live): prompt-dash/ausbildungscoach/index.html
+    -> https://jako-odyc.github.io/prompt-dash/ausbildungscoach/
   Nach Aenderungen BEIDE Kopien committen und pushen.
 -->
 <html lang="de">
@@ -18,6 +19,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="apple-touch-icon" href="icon.svg">
+<script src="vendor/qrcode-generator.js"></script>
 <style>
   :root {
     --bg: #f0f4f8; --card: #fff; --accent: #1e3a5f; --accent-light: #2d5986;
@@ -48,6 +50,18 @@
   .copy-btn.copied { background: var(--green); color: white; }
   .download-btn { position: absolute; top: 0.5rem; right: 5.7rem; background: rgba(255,255,255,0.15); color: #ccc; border: none; padding: 0.3rem 0.7rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
   .download-btn:hover { background: rgba(255,255,255,0.25); color: white; }
+  .qr-btn { position: absolute; top: 0.5rem; right: 10.9rem; background: rgba(255,255,255,0.15); color: #ccc; border: none; padding: 0.3rem 0.7rem; border-radius: 4px; cursor: pointer; font-size: 0.8rem; transition: all 0.2s; }
+  .qr-btn:hover:not(:disabled) { background: rgba(255,255,255,0.25); color: white; }
+  .qr-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .qr-dialog { border: none; border-radius: 8px; padding: 0; max-width: 92vw; max-height: 92vh; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }
+  .qr-dialog::backdrop { background: rgba(0,0,0,0.45); }
+  .qr-dialog-inner { padding: 1.5rem; text-align: center; background: white; color: var(--accent); }
+  .qr-dialog-inner h3 { margin: 0 0 0.5rem; border: none; }
+  .qr-dialog-inner .qr-meta { color: var(--grey); font-size: 0.85rem; margin-bottom: 1rem; }
+  .qr-dialog-inner #qr-canvas { margin: 0 auto; }
+  .qr-dialog-inner .qr-hint { font-size: 0.85rem; color: var(--grey); margin-top: 1rem; max-width: 360px; margin-left: auto; margin-right: auto; line-height: 1.5; text-align: left; }
+  .qr-dialog-inner .qr-close { margin-top: 1rem; background: var(--accent); color: white; border: none; padding: 0.5rem 1.2rem; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
+  .qr-dialog-inner .qr-close:hover { background: var(--accent-light); }
 
   /* Ampel */
   .traffic { display: flex; gap: 0.5rem; margin: 0.5rem 0; flex-wrap: wrap; }
@@ -331,7 +345,7 @@
 
   <div id="u-output" style="display:none">
     <h3 style="cursor:pointer; display:flex; align-items:center; gap:0.3rem" onclick="togglePromptBox(this)" title="Klicken zum Ein-/Ausblenden">Generierter Prompt <span class="toggle-icon" style="font-size:0.8rem; color:var(--grey)">▼</span></h3>
-    <div class="prompt-box" id="u-prompt-box"><button class="download-btn" onclick="downloadPromptBox(this)">Download</button><button class="copy-btn" onclick="copyPromptBox(this)">Kopieren</button></div>
+    <div class="prompt-box" id="u-prompt-box"><button class="qr-btn" onclick="showQRDialog(this)">QR-Code</button><button class="download-btn" onclick="downloadPromptBox(this)">Download</button><button class="copy-btn" onclick="copyPromptBox(this)">Kopieren</button></div>
   </div>
 
   <details>
@@ -625,7 +639,8 @@
   <p><strong>Hinweis zur Begriffssuche:</strong> Die Lehrpläne verwenden formale Fachsprache. Alltagsbegriffe wie „Stapler" kommen nicht vor &mdash; gesucht werden sollte z.&nbsp;B. nach „Kommissionierung", „Gefahrgut", „Ladehilfsmittel" oder „Güter". Treffer lassen sich per Klick erweitern, um mehr Kontext zu sehen.</p>
   <p><strong>Kontakt:</strong> Jaroslav Kois &mdash; jaro_kois@web.de</p>
   <p><em>Kein Rechtsrat. Dieses Werkzeug ersetzt keine Sachkunde.</em></p>
-  <p style="margin-top:0.8rem"><span style="display:inline-block; background:var(--blue-light); color:var(--accent); padding:0.2rem 0.6rem; border-radius:4px; font-size:0.85rem; font-weight:600">Stand: 2026-04-18</span> — Rechtsverweise nach ArbSchG/DGUV V1. Prüfungskataloge aktuell 2. Auflage (Winter 2025/2026). BerufeNet-Daten Azubi-Kohorte 2024. Nächste Überprüfung empfohlen nach Neuordnung der Lagerberufe oder bei §-Änderung ArbSchG.</p>
+  <p><strong>Version:</strong> 1.1.0 | April 2026 — mit Anti-Halluzinations-Guards, scrollbarem Lehrplan-Volltext, Zielkompetenzen-Rahmung und Offline-Kopie. <a href="doku/#changelog">Changelog</a></p>
+  <p style="margin-top:0.8rem"><span style="display:inline-block; background:var(--blue-light); color:var(--accent); padding:0.2rem 0.6rem; border-radius:4px; font-size:0.85rem; font-weight:600">Stand: 2026-04-19</span> — Rechtsverweise nach ArbSchG/DGUV V1. Prüfungskataloge aktuell 2. Auflage (Winter 2025/2026). BerufeNet-Daten Azubi-Kohorte 2024. Nächste Überprüfung empfohlen nach Neuordnung der Lagerberufe oder bei §-Änderung ArbSchG.</p>
 
   <p style="margin-top:1rem"><button onclick="downloadOfflineCopy()" style="padding:0.4rem 0.9rem; border-radius:4px; font-size:0.9rem; cursor:pointer; background:var(--accent); color:white; border:1px solid var(--accent)">⬇ Offline-Kopie herunterladen</button> &nbsp;<span style="font-size:0.82rem; color:var(--grey)">Lädt die komplette Seite mit Ihren eigenen Einträgen als HTML-Datei auf den Computer — funktioniert danach ohne Internet.</span></p>
 
@@ -664,11 +679,113 @@
 function getPromptBoxText(btn) {
   const box = btn.parentElement;
   return Array.from(box.childNodes)
-    .filter(n => n.nodeType === 3 || (n.nodeType === 1 && !n.classList?.contains('copy-btn') && !n.classList?.contains('download-btn')))
+    .filter(n => n.nodeType === 3 || (n.nodeType === 1 && !n.classList?.contains('copy-btn') && !n.classList?.contains('download-btn') && !n.classList?.contains('qr-btn')))
     .map(n => n.textContent)
     .join('')
     .replace(/\[([^\]]+)\]/g, '[$1]');
 }
+
+// QR-Code-Limits (Version 40 Binary UTF-8):
+//   ECL M ca. 2330 Bytes, ECL L ca. 2950 Bytes (experimentell gemessen).
+//   Wir versuchen erst M, dann L als Fallback.
+const QR_MAX_BYTES = 2900;  // harter Cut-off, über ECL L Max
+
+function promptQRBytes(text) {
+  return new Blob([text]).size;
+}
+
+function qrDialog() {
+  let dlg = document.getElementById('qr-global-dialog');
+  if (!dlg) {
+    dlg = document.createElement('dialog');
+    dlg.id = 'qr-global-dialog';
+    dlg.className = 'qr-dialog';
+    dlg.innerHTML = `<div class="qr-dialog-inner">
+      <h3>Prompt als QR-Code</h3>
+      <div class="qr-meta" id="qr-meta"></div>
+      <div id="qr-canvas"></div>
+      <div class="qr-hint">So funktioniert's: <strong>System-Kamera</strong> (iPhone/Android) öffnen → QR scannen → „Text kopieren" antippen → in ChatGPT, Claude oder Perplexity einfügen. Die KI-Apps selbst haben keinen QR-Scanner.</div>
+      <button class="qr-close" onclick="document.getElementById('qr-global-dialog').close()">Schließen</button>
+    </div>`;
+    document.body.appendChild(dlg);
+    // Klick auf Backdrop schließt
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+  }
+  return dlg;
+}
+
+function showQRDialog(btn) {
+  const text = getPromptBoxText(btn);
+  const bytes = promptQRBytes(text);
+  if (bytes > QR_MAX_BYTES) {
+    alert(`Prompt zu lang für QR-Code (${bytes} Bytes, Limit ~${QR_MAX_BYTES}).\nBitte den Kopieren-Button nutzen.`);
+    return;
+  }
+  if (typeof qrcode === 'undefined') {
+    alert('QR-Code-Bibliothek nicht geladen. Bitte Seite neu laden.');
+    return;
+  }
+  const dlg = qrDialog();
+  const canvasDiv = dlg.querySelector('#qr-canvas');
+  const meta = dlg.querySelector('#qr-meta');
+  canvasDiv.innerHTML = '';
+  let usedECL = null;
+  try {
+    // UTF-8-Support aktivieren (wichtig für Umlaute!)
+    qrcode.stringToBytes = qrcode.stringToBytesFuncs['UTF-8'];
+    // Versuch 1: ECL M (robuster); bei Overflow Versuch 2: ECL L (mehr Kapazität)
+    let qr = null;
+    for (const ecl of ['M', 'L']) {
+      try {
+        const attempt = qrcode(0, ecl);
+        attempt.addData(text, 'Byte');
+        attempt.make();
+        qr = attempt;
+        usedECL = ecl;
+        break;
+      } catch (_) { /* try next ECL */ }
+    }
+    if (!qr) throw new Error('Prompt übersteigt auch ECL-L-Kapazität.');
+    const svg = qr.createSvgTag({ cellSize: 6, margin: 4, scalable: true });
+    canvasDiv.innerHTML = svg;
+    const svgEl = canvasDiv.querySelector('svg');
+    if (svgEl) {
+      svgEl.setAttribute('width', '320');
+      svgEl.setAttribute('height', '320');
+      svgEl.style.maxWidth = '85vw';
+      svgEl.style.maxHeight = '60vh';
+    }
+    meta.textContent = `${text.length} Zeichen · ${bytes} Bytes · ECL ${usedECL}`;
+  } catch (e) {
+    alert('QR-Code konnte nicht erzeugt werden: ' + (e.message || e));
+    return;
+  }
+  dlg.showModal();
+}
+window.showQRDialog = showQRDialog;
+
+// Nach der Prompt-Generierung: QR-Button anhängen, wenn Prompt klein genug
+function attachQRButton(box) {
+  // Entferne alte qr-btn falls vorhanden (beim Regenerieren)
+  const existing = box.querySelector('.qr-btn');
+  if (existing) existing.remove();
+  const qrBtn = document.createElement('button');
+  qrBtn.className = 'qr-btn';
+  qrBtn.textContent = 'QR-Code';
+  const text = Array.from(box.childNodes)
+    .filter(n => n.nodeType === 3 || (n.nodeType === 1 && !n.classList?.contains('copy-btn') && !n.classList?.contains('download-btn') && !n.classList?.contains('qr-btn')))
+    .map(n => n.textContent).join('');
+  const bytes = promptQRBytes(text);
+  if (bytes > QR_MAX_BYTES) {
+    qrBtn.disabled = true;
+    qrBtn.title = `Prompt zu lang für QR-Code (${bytes} Bytes, Limit ~${QR_MAX_BYTES}). Bitte kopieren.`;
+  } else {
+    qrBtn.addEventListener('click', () => showQRDialog(qrBtn));
+    qrBtn.title = `${bytes} Bytes — per QR übertragbar`;
+  }
+  box.appendChild(qrBtn);
+}
+window.attachQRButton = attachQRButton;
 function copyPromptBox(btn) {
   const text = getPromptBoxText(btn);
   navigator.clipboard.writeText(text).then(() => {
@@ -1012,6 +1129,36 @@ const SCHRIFT_REGELN = {
   gering: '- Symbole/Piktogramme statt Text. Anweisungen auch als mündlich/vertont denkbar. Checklisten mit Bildern. Partnerarbeit mit geübtem Kollegen empfehlen.'
 };
 
+// --- ANTI-HALLUZINATIONS-GUARDS (aus EXP-001-Empirie abgeleitet) ---
+const ANTIHALLUZ_CORE = `
+ANTI-HALLUZINATIONS-REGELN (strikt einhalten):
+- Zulässige Rechtsverweise: §5, §12, §13 ArbSchG, DGUV Vorschrift 1 §4, LWLogAusbV, KflBAusbV, BKFAusbV sowie der KMK-Rahmenlehrplan des Berufs. KEINE ANDEREN §§, KEINE DIN-/ISO-/VDI-/VDE-Normen erfinden.
+- Wenn du unsicher bist, ob eine Rechtsvorschrift existiert oder genau so zitiert wird: schreibe stattdessen "siehe einschlägige Fachliteratur" oder "bitte beim Fachverband (z.B. BGHW, DGUV) nachschlagen".
+- Keine Prozentangaben, Grenzwerte oder konkreten Zahlen erfinden, die nicht im gegebenen Kontext stehen.`;
+
+const ANTIHALLUZ_EINWEISUNG = `
+ANTI-HALLUZINATIONS-REGELN FÜR EINWEISUNGEN (strikt):
+- VERBOTEN: §12 ArbSchG, §13 ArbSchG oder DGUV-Paragrafen im Einweisungstext zitieren — dies ist KEINE Unterweisung.
+- Bei Sicherheits- oder Gefährdungsbezug stattdessen schreiben: "Dies ist eine Einweisung. Für sicherheitsrelevante Tätigkeiten ist eine formale Unterweisung nach §12 ArbSchG separat durchzuführen."
+- KEINE anderen §§, DIN-/ISO-Normen erfinden. Bei Unsicherheit: "siehe Betriebsanweisung" oder "beim Sicherheitsbeauftragten nachfragen".`;
+
+const SIEZEN_GUARD = `
+SPRACH-REGELN (Anrede, strikt):
+- Der Leser dieses Prompt-Ergebnisses ist ein erwachsener Ausbilder / eine Ausbilderin. Der Ausbilder wird durchgängig gesiezt — KEIN "du/dich/dir/deine" an den Ausbilder.
+- Wenn der Entwurf selbst an einen Azubi gerichtet ist: standardmäßig ebenfalls siezen. AUSNAHME: Bei mündlichem Sprachniveau A2 ist Duzen gegenüber dem Azubi erlaubt und oft angemessener.`;
+
+function buildLernfeldGuard(berufKey) {
+  // Max Lernfeld-Nummer je Beruf (KMK-RLP, Stand 2026)
+  const maxLF = { buero: 13, fll: 12, fl: 9, spedition: 13, bkf: 12 };
+  const n = maxLF[berufKey];
+  if (!n) return '';
+  return `
+LERNFELD-GUARD (strikt):
+- Der Beruf hat GENAU ${n} Lernfelder (LF 1 bis LF ${n}).
+- Verwende im Entwurf NUR das oben angegebene Lernfeld.
+- Erfinde KEINE anderen Lernfeld-Nummern, auch nicht für Nachfragen, Querverweise oder "Anknüpfung an LF X".`;
+}
+
 function buildUnterweisungPrompt() {
   const beruf = document.getElementById('u-beruf');
   const berufKey = beruf.value;
@@ -1125,6 +1272,12 @@ function buildUnterweisungPrompt() {
   lines.push('');
   lines.push('HINWEIS: Dieser Entwurf ist eine VORLAGE. Sachkunde, Gefährdungsbeurteilung, Durchführung und Dokumentation liegen beim sachkundigen Ausbilder.');
 
+  // Guards ans Ende (werden vom Modell zuletzt gelesen, aber gelten für den gesamten Entwurf)
+  lines.push('');
+  lines.push(ANTIHALLUZ_CORE.trim());
+  lines.push('');
+  lines.push(SIEZEN_GUARD.trim());
+
   const text = lines.join('\n');
   const out = document.getElementById('u-output');
   const box = document.getElementById('u-prompt-box');
@@ -1140,6 +1293,7 @@ function buildUnterweisungPrompt() {
   btn.textContent = 'Kopieren';
   btn.addEventListener('click', () => copyPromptBox(btn));
   box.appendChild(btn);
+  attachQRButton(box);
   out.scrollIntoView({ block: 'start', behavior: 'smooth' });
 }
 window.buildUnterweisungPrompt = buildUnterweisungPrompt;
@@ -1286,6 +1440,14 @@ function buildFachgespraechPrompt() {
   lines.push('');
   lines.push('WICHTIG: Die offiziellen IHK-AkA-Prüfungskataloge (2. Auflage, 2025/26) sind urheberrechtlich geschützt. Du kennst sie nicht im Wortlaut. Deine Fragen sind Übungsfragen im Geist der AO + RLP, keine Abbildung des Katalogs.');
 
+  // Guards
+  lines.push('');
+  lines.push(ANTIHALLUZ_CORE.trim());
+  const lfGuard = buildLernfeldGuard(berufKey);
+  if (lfGuard) { lines.push(''); lines.push(lfGuard.trim()); }
+  lines.push('');
+  lines.push(SIEZEN_GUARD.trim());
+
   const text = lines.join('\n');
   const out = document.getElementById('f-output');
   const box = document.getElementById('f-prompt-box');
@@ -1301,6 +1463,7 @@ function buildFachgespraechPrompt() {
   btn.textContent = 'Kopieren';
   btn.addEventListener('click', () => copyPromptBox(btn));
   box.appendChild(btn);
+  attachQRButton(box);
   out.scrollIntoView({ block: 'start', behavior: 'smooth' });
 }
 window.buildFachgespraechPrompt = buildFachgespraechPrompt;
@@ -1381,6 +1544,12 @@ function buildBeratungPrompt() {
   lines.push('- Wenn die Situation unvollständig beschrieben ist, stelle zuerst Rückfragen.');
   lines.push('- Berücksichtigen Sie das Zielprofil: Sprachniveau, Schulabschluss-Milieu, typische Abstraktionsebene des Ausbildungsberufs — dorthin entwickelt sich der/die Azubi, ist aber noch nicht dort.');
 
+  // Guards
+  lines.push('');
+  lines.push(ANTIHALLUZ_CORE.trim());
+  lines.push('');
+  lines.push(SIEZEN_GUARD.trim());
+
   const text = lines.join('\n');
   const out = document.getElementById('b-output');
   const box = document.getElementById('b-prompt-box');
@@ -1396,6 +1565,7 @@ function buildBeratungPrompt() {
   btn.textContent = 'Kopieren';
   btn.addEventListener('click', () => copyPromptBox(btn));
   box.appendChild(btn);
+  attachQRButton(box);
   out.scrollIntoView({ block: 'start', behavior: 'smooth' });
 }
 window.buildBeratungPrompt = buildBeratungPrompt;
@@ -1498,6 +1668,7 @@ function buildMaterialPrompt() {
   btn.textContent = 'Kopieren';
   btn.addEventListener('click', () => copyPromptBox(btn));
   box.appendChild(btn);
+  attachQRButton(box);
   out.scrollIntoView({ block: 'start', behavior: 'smooth' });
 }
 window.buildMaterialPrompt = buildMaterialPrompt;
@@ -1575,6 +1746,12 @@ function buildEinweisungPrompt() {
   lines.push('- Wenn Kontextangaben fehlen, stelle zuerst Rückfragen.');
   lines.push('- Keine personenbezogenen Daten verwenden.');
 
+  // Guards
+  lines.push('');
+  lines.push(ANTIHALLUZ_EINWEISUNG.trim());
+  lines.push('');
+  lines.push(SIEZEN_GUARD.trim());
+
   const text = lines.join('\n');
   const out = document.getElementById('e-output');
   const box = document.getElementById('e-prompt-box');
@@ -1590,6 +1767,7 @@ function buildEinweisungPrompt() {
   btn.textContent = 'Kopieren';
   btn.addEventListener('click', () => copyPromptBox(btn));
   box.appendChild(btn);
+  attachQRButton(box);
   out.scrollIntoView({ block: 'start', behavior: 'smooth' });
 }
 window.buildEinweisungPrompt = buildEinweisungPrompt;
@@ -1618,7 +1796,7 @@ function downloadOfflineCopy() {
     embedBlock += '<\/script>\n<!-- /Eingebettete Daten -->\n';
     html = html.replace('</body>', embedBlock + '</body>');
     var today = new Date().toLocaleDateString('de-DE');
-    html = html.replace(/Stand: 2026-04-18<\/span>/, 'Stand: 2026-04-18 · Offline-Kopie vom ' + today + '</span>');
+    html = html.replace(/Stand: 2026-04-19<\/span>/, 'Stand: 2026-04-19 · Offline-Kopie vom ' + today + '</span>');
     var blob = new Blob([html], { type: 'text/html; charset=utf-8' });
     var a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
