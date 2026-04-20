@@ -100,11 +100,15 @@
   .search-result { background: #fafbfc; border-left: 3px solid var(--blue-border); padding: 0.7rem 0.9rem; margin-bottom: 0.6rem; border-radius: 0 6px 6px 0; }
   .search-result .sr-head { font-size: 0.8rem; color: var(--grey); margin-bottom: 0.3rem; }
   .search-result .sr-head .badge { display: inline-block; background: var(--accent); color: white; padding: 0.05rem 0.4rem; border-radius: 3px; font-size: 0.75rem; margin-right: 0.3rem; }
-  .search-result .sr-snippet { font-size: 0.9rem; line-height: 1.5; cursor: pointer; padding: 0.3rem 0.4rem; border-radius: 4px; margin: 0.2rem -0.4rem; transition: background 0.15s; }
-  .search-result .sr-snippet:hover { background: #f0f4f8; }
-  .search-result .sr-snippet .sr-toggle { display: block; font-size: 0.78rem; color: var(--blue-border); margin-top: 0.35rem; user-select: none; }
+  .search-result .sr-snippet { font-size: 0.9rem; line-height: 1.5; padding: 0.3rem 0.4rem; border-radius: 4px; margin: 0.2rem -0.4rem; transition: background 0.15s; }
+  .search-result .sr-snippet .sr-short { display: block; cursor: pointer; }
+  .search-result .sr-snippet .sr-short:hover { background: #f0f4f8; border-radius: 4px; }
+  .search-result .sr-snippet .sr-toggle { display: block; font-size: 0.78rem; color: var(--blue-border); margin-top: 0.35rem; user-select: none; cursor: pointer; }
+  .search-result .sr-snippet .sr-toggle:hover { text-decoration: underline; }
+  .search-result .sr-snippet .sr-toggle-bottom { display: none; margin-top: 0.4rem; padding: 0.3rem 0.5rem; background: #eef3f8; border-radius: 4px; text-align: center; }
+  .search-result .sr-snippet.expanded .sr-toggle-bottom { display: block; }
   .search-result .sr-snippet.expanded { background: #f8fafc; }
-  .search-result .sr-fulltext { display: none; max-height: 420px; overflow-y: auto; background: #ffffff; border: 1px solid #c8d8e8; border-radius: 4px; padding: 0.8rem; margin-top: 0.4rem; font-size: 0.85rem; line-height: 1.55; white-space: pre-wrap; word-wrap: break-word; }
+  .search-result .sr-fulltext { display: none; max-height: 420px; overflow-y: auto; background: #ffffff; border: 1px solid #c8d8e8; border-radius: 4px; padding: 0.8rem; margin-top: 0.4rem; font-size: 0.85rem; line-height: 1.55; white-space: pre-wrap; word-wrap: break-word; user-select: text; cursor: text; }
   .search-result .sr-snippet.expanded .sr-fulltext { display: block; }
   .search-result mark { background: #ffd166; padding: 0 2px; }
   .search-result mark.active { background: #ff9f1c; outline: 2px solid #ff6b00; }
@@ -331,7 +335,7 @@ SPRACH-REGELN (Anrede, strikt):
 <h3>Pseudonymisieren in Word &mdash; drei Schritte</h3>
 <ol style="padding-left: 2.5rem; margin: 0.6rem 0">
   <li style="margin-bottom: 0.4rem"><strong>Dokument duplizieren</strong> — Original bleibt unverändert. Arbeitsdatei z.&nbsp;B. <code>beratung_AzubiA.docx</code>.</li>
-  <li><strong>Suchen-und-Ersetzen</strong> (<kbd>Strg</kbd>+<kbd>H</kbd>): Vorname → „A.", Nachname → weglassen, Firma → „Speditionsbetrieb", konkrete Orte → „Region", Geburtsdatum → „LJ 2007" oder entfernen.</li>
+  <li><strong>Suchen-und-Ersetzen</strong> (<kbd>Strg</kbd>+<kbd>H</kbd>): Vorname → „A.", Nachname → weglassen, Firma → „Speditionsbetrieb", konkrete Orte → „Region", Geburtsdatum → „Jg. 2007" oder entfernen.</li>
   <li><strong>Sichtkontrolle</strong> — ein letztes Lesen auf eindeutige Kombinationen: auch ohne Namen kann eine Beschreibung identifizierend sein, wenn mehrere selten kombinierte Merkmale zusammenkommen (z.&nbsp;B. Standort + Schicht + Eintrittsjahr). Merkmale, die einzeln nichts sagen, können zusammen eine Person eindeutig machen.</li>
 </ol>
 </section>
@@ -894,7 +898,7 @@ function runSearch() {
           &nbsp;&middot;&nbsp; ${escapeHtml(doc.quelle)}
           &nbsp;&middot;&nbsp; ${hits.length} Treffer
         </div>
-        ${hits.map((h, idx) => `<div class="sr-snippet" data-docid="${escapeHtml(doc.id)}" data-matchidx="${h.matchIdx}" data-hitidx="${idx}" onclick="toggleSnippet(this)"><span class="sr-short">${escapeHtml(h.shortSnip).replace(re, '<mark>$&</mark>')}</span><span class="sr-toggle">Im Volltext öffnen (scrollen nach oben/unten) ▾</span><div class="sr-fulltext" data-fulltext="${encodeURIComponent(fullMarked)}"></div></div>`).join('')}
+        ${hits.map((h, idx) => `<div class="sr-snippet" data-docid="${escapeHtml(doc.id)}" data-matchidx="${h.matchIdx}" data-hitidx="${idx}"><span class="sr-short" onclick="toggleSnippet(this.parentNode)">${escapeHtml(h.shortSnip).replace(re, '<mark>$&</mark>')}</span><span class="sr-toggle" onclick="toggleSnippet(this.parentNode)" role="button" tabindex="0">Im Volltext öffnen (scrollen nach oben/unten) ▾</span><div class="sr-fulltext" data-fulltext="${encodeURIComponent(fullMarked)}" onclick="event.stopPropagation()"></div><span class="sr-toggle sr-toggle-bottom" onclick="toggleSnippet(this.parentNode); this.parentNode.scrollIntoView({block:'nearest'});" role="button" tabindex="0">Volltext schließen ▴</span></div>`).join('')}
       </div>
     `);
   });
@@ -1016,6 +1020,24 @@ const LERNFELD_CACHE = {}; // berufKey -> [{nr, titel, lj, startIdx, endIdx, tex
 // Mapping auf curricula-db.json (fl und fll teilen sich RLP/ARP)
 const CURRICULA_KEY_MAP = { fl: 'fll' };
 
+// Fachlagerist hat 8 Lernfelder: LF 1-6 wie FLL, kein LF 7 (Touren planen),
+// FL LF 7 = FLL LF 8 "Güter verladen", FL LF 8 = FLL LF 9 "Güter versenden".
+// Bei 2-jähriger Ausbildung sind FL LF 7-8 im 2. LJ.
+function applyFachlageristShift(felder) {
+  const out = [];
+  for (const f of felder) {
+    if (f.nr <= 6) {
+      out.push(f);
+    } else if (f.nr === 8) {
+      out.push({ ...f, nr: 7, lj: '2' });
+    } else if (f.nr === 9) {
+      out.push({ ...f, nr: 8, lj: '2' });
+    }
+    // FLL LF 7 (Touren planen) und FLL LF 10-12 entfallen bei FL
+  }
+  return out;
+}
+
 (window.BERUF_PROFILE_EMBEDDED ? Promise.resolve(window.BERUF_PROFILE_EMBEDDED) : fetch('beruf-profile.json?v=20260418a').then(r => r.ok ? r.json() : null))
   .then(d => { BERUF_PROFILE = d; fillBerufDropdown(); })
   .catch(() => { BERUF_PROFILE = null; fillBerufDropdown(); });
@@ -1087,7 +1109,8 @@ function onBerufChange(e) {
   if (!CURRICULA) { lf.disabled = true; return; }
   const rlpDoc = CURRICULA.docs.find(d => d.beruf_key === rlpKey && (d.doktyp === 'RLP' || d.doktyp === 'ARP+RLP'));
   if (!rlpDoc) { lf.disabled = true; return; }
-  const felder = parseLernfelder(rlpDoc.text);
+  let felder = parseLernfelder(rlpDoc.text);
+  if (berufKey === 'fl') felder = applyFachlageristShift(felder);
   LERNFELD_CACHE[berufKey] = felder;
   felder.forEach(f => {
     const opt = document.createElement('option');
@@ -1148,7 +1171,7 @@ SPRACH-REGELN (Anrede, strikt):
 
 function buildLernfeldGuard(berufKey) {
   // Max Lernfeld-Nummer je Beruf (KMK-RLP, Stand 2026)
-  const maxLF = { buero: 13, fll: 12, fl: 9, spedition: 13, bkf: 12 };
+  const maxLF = { buero: 13, fll: 12, fl: 8, spedition: 13, bkf: 12 };
   const n = maxLF[berufKey];
   if (!n) return '';
   return `
@@ -1357,7 +1380,8 @@ function onBerufChangeFachgespraech(e) {
   if (!CURRICULA) { lf.disabled = true; return; }
   const rlpDoc = CURRICULA.docs.find(d => d.beruf_key === rlpKey && (d.doktyp === 'RLP' || d.doktyp === 'ARP+RLP'));
   if (!rlpDoc) { lf.disabled = true; return; }
-  const felder = parseLernfelder(rlpDoc.text);
+  let felder = parseLernfelder(rlpDoc.text);
+  if (berufKey === 'fl') felder = applyFachlageristShift(felder);
   LERNFELD_CACHE[berufKey] = felder;
   felder.forEach(f => {
     const opt = document.createElement('option');
