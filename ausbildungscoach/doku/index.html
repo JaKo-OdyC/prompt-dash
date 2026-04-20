@@ -69,9 +69,15 @@
 
   ul { padding-left: 1.2rem; margin: 0.3rem 0; }
   li { margin: 0.2rem 0; }
-  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; margin: 0.5rem 0; }
-  th, td { border: 1px solid #c8d8e8; padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; }
+  /* Tabellen: fixes Layout + Word-Wrap, damit breite Zellen den Container nicht sprengen */
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; margin: 0.5rem 0; table-layout: fixed; }
+  th, td { border: 1px solid #c8d8e8; padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; overflow-wrap: anywhere; word-break: break-word; }
   th { background: var(--blue-light); }
+  /* Generelle Schutzregel fuer lange Strings (URLs, inline-code, kbd) */
+  code, code.inline, kbd { overflow-wrap: anywhere; word-break: break-word; }
+  p, li { overflow-wrap: break-word; }
+  /* Card darf auch bei langem Inhalt nicht ueberquellen */
+  .card { overflow: hidden; }
   .ref { font-size: 0.85rem; color: var(--grey); margin-top: 2rem; border-top: 1px solid #ddd; padding-top: 0.5rem; }
   details { margin: 0.5rem 0; }
   details summary { cursor: pointer; padding: 0.4rem 0; color: var(--accent-light); font-weight: 600; }
@@ -130,32 +136,43 @@
   <li><strong>KI hat keinen Kontext zu Ihrem Betrieb.</strong> Je enger der Kontext (Ihr eigenes Material, klare Vorgaben, ein spezifischer Beruf), desto belastbarer die Antwort.</li>
 </ul>
 
-<h3>Drei Stufen des Promptings</h3>
+<h3>Der Dreisprung — wie der Coach arbeitet</h3>
+<p>Die App zeigt in Karte 1 live, wie sich die Qualität zwischen drei Prompt-Stufen verändert. Hier das Muster im Überblick:</p>
 <table>
-<thead><tr><th>Stufe</th><th>Beispiel</th><th>Stärke</th><th>Schwäche</th></tr></thead>
+<thead><tr><th>Stufe</th><th>Form</th><th>Was gewonnen wird</th><th>Was fehlt</th></tr></thead>
 <tbody>
-<tr><td><strong>1. Frei</strong></td><td>„Erklär mir FIFO"</td><td>Brainstorming, Exploration</td><td>unpräzise, nicht reproduzierbar</td></tr>
-<tr><td><strong>2. Systematisch</strong></td><td>„Du bist Ausbilder für … Erstelle eine Unterweisung zu … für Lehrjahr … Niveau …"</td><td>reproduzierbar, strukturiert</td><td>KI rät bei Lücken</td></tr>
-<tr><td><strong>3. Maschinenoptimiert</strong></td><td>Mega-Prompt mit 13 Parametern, Validierungsregeln, Rückfragen-Auftrag</td><td>maximale Qualität, klare Regeln</td><td>kaum kreativer Raum, Aufwand</td></tr>
+<tr><td><strong>S1 — naiv</strong></td><td>Ein Satz ohne Kontext</td><td>schnell, niedrigschwellig; 2026 überraschend brauchbar</td><td>duzt/siezt inkonsistent, kein Berufsbezug, kein Lehrplan</td></tr>
+<tr><td><strong>S2 — strukturiert</strong></td><td>Zielgruppe, Zweck, Dauer, Inhaltsstichpunkte als eigener Prompt</td><td>besser gegliedert, didaktisch sortiert</td><td>erfindet Paragraphen, mischt Fachbegriffe, rät bei fehlendem Kontext</td></tr>
+<tr><td><strong>S3 — mit Coach</strong></td><td>Prompt automatisch generiert aus den App-Feldern, mit Rechtsrahmen, Berufsprofil, Anti-Halluzinations-Guards, Siezen-Guard</td><td>konsistenter Ton, lehrplantreu, keine erfundenen §§, fragt bei Lücken nach statt zu raten</td><td>nicht mehr frei erfinden — aber das ist Absicht</td></tr>
 </tbody>
 </table>
-<p>Die App arbeitet auf Stufe 2 — systematische Prompts mit Platzhaltern und Rahmen. Wenn Sie tiefer gehen möchten, siehe <a href="#cowork">Cowork-Profile</a>.</p>
+<p>Die App generiert in den Karten 4–7 automatisch S3-Prompts. Sie klicken die Parameter, der Coach baut den Prompt. S1 und S2 sind nur in Karte 1 zum Vergleich abgedruckt — nicht als Werkzeug gedacht.</p>
 
-<h3>Bausteine eines systematischen Prompts</h3>
+<h3>Was die Anti-Halluzinations-Guards tun</h3>
+<p>Aus 270 Testläufen mit drei KIs (GPT-5, Claude Sonnet&nbsp;4, DeepSeek) wurde empirisch ermittelt, welche Fehler unter fachlichem Druck wiederkehren. Daraus sind vier Guards entstanden, die am Ende jedes Coach-Prompts stehen:</p>
+<ul>
+  <li><strong>Paragraphen-Whitelist</strong> — zulässig sind nur §§ 5, 12, 13 ArbSchG, DGUV V1 §4, die amtlichen Ausbildungsverordnungen und KMK-Rahmenlehrpläne. Alles andere muss die KI weglassen oder als „siehe Fachliteratur" markieren.</li>
+  <li><strong>Siezen-Guard</strong> — durchgängiges Siezen gegenüber dem Ausbilder und (Standard) auch gegenüber Azubis. Ausnahme: A2-Niveau erlaubt Duzen.</li>
+  <li><strong>Lernfeld-Guard</strong> — die Lernfeld-Nummer muss im erlaubten Bereich des jeweiligen Berufs liegen (1–13 Büro, 1–9 Fachlagerist etc.). Keine erfundenen Nummern.</li>
+  <li><strong>Anti-§12-im-Einweisungs-Text</strong> — rechtliche Textblöcke gehören in die Unterweisungs-<em>dokumentation</em>, nicht in den vorgelesenen Unterweisungs-<em>text</em>. Die KI wird explizit angewiesen, die §§ nicht wortwörtlich zu übernehmen.</li>
+</ul>
+<p>Messergebnis: Halluzinationsrate pro 1000 Zeichen von 0,02 auf 0,01 halbiert, Duzen-Rate von 47&nbsp;% auf 9&nbsp;% gesunken. Details im <a href="#changelog">Changelog v1.1.0</a>.</p>
+
+<h3>Bausteine eines Coach-Prompts</h3>
 <ol>
-  <li><strong>Rolle/Perspektive</strong> — „Du bist Ausbilder für Fachlageristen …"</li>
-  <li><strong>Aufgabe</strong> — „Erstelle eine Unterweisung zur Folienwickelmaschine …"</li>
-  <li><strong>Zielgruppe</strong> — „Azubi im 2. Lehrjahr, Sprachniveau B1"</li>
-  <li><strong>Kontext &amp; Zusatzmaterial</strong> — „Berücksichtige diese Betriebsanleitung …"</li>
-  <li><strong>Format</strong> — „Gliederung in 4-Schritt-Methode + Quiz"</li>
-  <li><strong>Beispiele / Stilvorgaben</strong> — „Nimm diese Formulierung als Maßstab …"</li>
+  <li><strong>Rolle/Perspektive</strong> — „Du bist erfahrener Ausbilder …"</li>
+  <li><strong>Rechtsrahmen</strong> — §§ 12, 13 ArbSchG, DGUV V1 §4 (nur als Orientierung, nicht zum Wörtlich-Übernehmen)</li>
+  <li><strong>Zielprofil des Berufs</strong> — BerufeNet-Auszug, Schulabschluss-Statistik, typische Didaktik-Zugänge</li>
+  <li><strong>Kontext</strong> — Beruf, Lehrjahr, Tätigkeit, betriebliche Besonderheiten</li>
+  <li><strong>Sprache und Zugänglichkeit</strong> — mündliches Niveau (A2/B1/B2/C1) + Schriftsprache (geübt/unsicher/sehr unsicher)</li>
+  <li><strong>Anforderungen an den Entwurf</strong> — Struktur, Verständnisfragen, Rückfragen bei Kontextlücken</li>
+  <li><strong>Guards</strong> — die vier oben beschriebenen Schutzregeln</li>
 </ol>
 
-<h3>Rückfragen und Selbstprüfung einbauen</h3>
-<p>KI fragt von sich aus nicht nach, wenn etwas unklar ist — sie rät. Mit zwei zusätzlichen Zeilen am Prompt-Ende ändern Sie das:</p>
-<div class="prompt-box">Wenn im Prompt Unklarheiten sind, stelle Rückfragen, bevor du generierst.
-Prüfe vor Ausgabe, ob alle Punkte erfüllt sind. Wenn nicht → verbessere.</div>
-<p>Das ist der Kern von Stufe 3 — aber schon auf Stufe 2 nutzbar.</p>
+<h3>Rückfragen und Selbstprüfung</h3>
+<p>KI fragt von sich aus selten nach, wenn etwas unklar ist — sie rät. Der Coach-Prompt enthält am Ende explizit:</p>
+<div class="prompt-box">Wenn Kontextangaben fehlen, stelle Rückfragen, bevor du generierst — rate nicht.</div>
+<p>Dieser Befehl wirkt unterschiedlich stark je Modell: DeepSeek fragt sehr konsequent nach (z.&nbsp;B. nach Messermodell, PSA-Level, Gruppengröße), ChatGPT legt tendenziell direkt los. Zweite KI als Kontrollinstanz befragen bleibt die sicherste Strategie.</p>
 
 <h3>Zustandsprompt und Container-Modus</h3>
 <p>Zwei weiterentwickelte Prompt-Formen, die in der App in mehreren Karten optional angeboten werden:</p>
