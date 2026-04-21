@@ -1817,6 +1817,10 @@ function downloadOfflineCopy() {
     embedBlock += '<\/script>\n<!-- /Eingebettete Daten -->\n';
     // Ersetze oeffnendes <body...> durch <body...>\n{embedBlock}
     html = html.replace(/(<body[^>]*>)/, '$1\n' + embedBlock);
+    // Relative Links, die unter file:// nicht funktionieren, auf Online-URL umschreiben
+    var ONLINE_BASE = 'https://jako-odyc.github.io/prompt-dash/ausbildungscoach/';
+    html = html.replace(/href="doku\//g, 'href="' + ONLINE_BASE + 'doku/');
+    html = html.replace(/href="\.\.\/"/g, 'href="https://jako-odyc.github.io/prompt-dash/"');
     var today = new Date().toLocaleDateString('de-DE');
     html = html.replace(/Stand: 2026-04-19<\/span>/, 'Stand: 2026-04-19 · Offline-Kopie vom ' + today + '</span>');
     var blob = new Blob([html], { type: 'text/html; charset=utf-8' });
