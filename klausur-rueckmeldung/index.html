@@ -552,16 +552,6 @@
 
   </div>
 
-  <!-- SAVE-BAR (nur wenn eine Excel aktiv ist) -->
-  <div class="save-bar" id="saveBar" style="display:none">
-    <span class="small">Aktive Datei: <b id="saveBarName">—</b> · Schülerin oder Schüler <b id="saveBarStu">—</b> <span class="info" data-help="save-bar">i</span></span>
-    <button class="btn accent sm" id="saveBtn" onclick="saveCurrentStudentToExcel()">⤵ In Excel speichern</button>
-    <button class="btn ghost sm" id="downloadAllBtn" onclick="downloadActiveWorkbook()">XLSX exportieren</button>
-    <span class="small" id="saveStatus" title="Daten werden automatisch im Browser-Speicher gehalten">—</span>
-    <button class="btn ghost sm" onclick="confirmClearLocalData()" title="Browser-Speicher dieser Anwendung leeren — Excel-Datei bleibt unberührt">🗑 Lokal löschen</button>
-    <span class="small" id="saveHint"></span>
-  </div>
-
   <div class="grid" style="margin-top:22px">
     <!-- Kopfdaten -->
     <section class="card" id="kopfdaten" style="grid-column:1/-1">
@@ -698,6 +688,16 @@
     </div>
     <div class="out-paper" id="out"></div>
   </section>
+
+  <!-- SAVE-BAR (nur wenn eine Excel aktiv ist) — am Workflow-Ende -->
+  <div class="save-bar" id="saveBar" style="display:none;margin-top:22px">
+    <span class="small">Aktive Datei: <b id="saveBarName">—</b> · Schülerin oder Schüler <b id="saveBarStu">—</b> <span class="info" data-help="save-bar">i</span></span>
+    <button class="btn accent sm" id="saveBtn" onclick="saveCurrentStudentToExcel()">⤵ In Excel speichern</button>
+    <button class="btn ghost sm" id="downloadAllBtn" onclick="downloadActiveWorkbook()">XLSX exportieren</button>
+    <span class="small" id="saveStatus" title="Daten werden automatisch im Browser-Speicher gehalten">—</span>
+    <button class="btn ghost sm" onclick="confirmClearLocalData()" title="Browser-Speicher dieser Anwendung leeren — Excel-Datei bleibt unberührt">🗑 Lokal löschen</button>
+    <span class="small" id="saveHint"></span>
+  </div>
 
   <div class="foot">
     <b>Notenpunkt-Tabelle (KMK):</b> 15 ≥ 95 % · 14 ≥ 90 % · 13 ≥ 85 % · 12 ≥ 80 % · 11 ≥ 75 % · 10 ≥ 70 % · 9 ≥ 65 % · 8 ≥ 60 % · 7 ≥ 55 % · 6 ≥ 50 % · 5 ≥ 45 % · 4 ≥ 40 % · 3 ≥ 33 % · 2 ≥ 27 % · 1 ≥ 20 % · 0 &lt; 20 %.<br>
@@ -1661,8 +1661,6 @@ function drawTasks(){
       <div class="task-actions">
         <button class="btn accent sm" data-prompt="${t.id}" title="Prompt ins Clipboard kopieren — in Claude.ai/ChatGPT einfügen">⎘ Prompt kopieren</button>
         <span class="info" data-help="prompt-kopieren">i</span>
-        <button class="btn sm" data-paste="${t.id}" title="Antwort aus Clipboard in das Rückmeldetext-Feld einfügen">↓ Antwort einfügen</button>
-        <span class="info" data-help="antwort-einfuegen">i</span>
         <button class="btn ghost sm api-only" data-gen="${t.id}" title="Direkt-Anfrage an die API (nur wenn API-Modus aktiv)" style="display:none">✦ Rückmeldung erzeugen</button>
       </div>
       <p class="status" id="st-${t.id}"></p>
@@ -3613,7 +3611,7 @@ const HELP_TEXTS = {
          2. Schülerin oder Schüler auswählen → Items mit Punkten füllen<br>
          3. Stichpunkte schreiben + Fehler anklicken<br>
          4. „Prompt kopieren" → in Claude.ai/ChatGPT einfügen → Antwort kopieren<br>
-         5. „Antwort einfügen" zurück ins Tool<br>
+         5. Antwort direkt ins Rückmeldetext-Feld der Aufgabe einfügen<br>
          6. Rückmeldung kopieren und in Word/Mail einfügen</p>
       <p>Alle Eingaben werden <b>automatisch im Browser-Speicher</b> gehalten — Tab schließen ist okay, beim Wiederöffnen ist alles da.</p>`
   },
@@ -3728,7 +3726,7 @@ const HELP_TEXTS = {
       2. In Claude.ai / ChatGPT / Gemini wechseln<br>
       3. Strg+V einfügen, Antwort abwarten<br>
       4. Antwort kopieren<br>
-      5. „↓ Antwort einfügen" hier im Tool</p>`
+      5. Antwort direkt ins Rückmeldetext-Feld einfügen</p>`
   },
   'antwort-einfuegen': {
     title: 'Antwort einfügen',
@@ -3738,7 +3736,7 @@ const HELP_TEXTS = {
   'api-mode': {
     title: 'API direkt aufrufen',
     body: `<p>Wenn aktiv: das Tool ruft die Anthropic-API direkt auf (statt nur den Prompt zu kopieren). Funktioniert nur im claude.ai-Kontext — nicht auf eigenständigen Deployments (Github Pages, lokale HTML-Datei).</p>
-      <p>Default ist <b>aus</b>. Der Standardweg ist „Prompt kopieren" → externes KI-Tool → „Antwort einfügen". Das funktioniert überall und kostet keine API-Gebühren.</p>`
+      <p>Default ist <b>aus</b>. Der Standardweg ist „Prompt kopieren" → externes KI-Tool → Antwort direkt ins Rückmeldetext-Feld einfügen. Das funktioniert überall und kostet keine API-Gebühren.</p>`
   },
   'review-prompt': {
     title: 'Prompt vor dem Absenden anzeigen',
