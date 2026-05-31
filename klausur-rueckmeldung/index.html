@@ -2039,6 +2039,7 @@ async function genMuster(id, btn){
   var gp=genMusterPrompt(t, i+1);
   var apiOn=document.getElementById('optApiMode') && document.getElementById('optApiMode').checked;
   if(apiOn){
+    if((t.musterloesung||'').trim() && !confirm('Es ist bereits eine Musterlösung / ein Erwartungshorizont hinterlegt.\n\nSoll der KI-ENTWURF sie ersetzen?\nAbbrechen = vorhandene Fassung behalten.')){ if(st){ st.className='status'; st.textContent='Abgebrochen — vorhandene Fassung behalten.'; } return; }
     btn.disabled=true; var old=btn.textContent; btn.textContent='… erzeuge';
     if(st){ st.className='status'; st.textContent='KI erzeugt Entwurf …'; }
     try{
