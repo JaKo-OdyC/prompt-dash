@@ -539,6 +539,10 @@
           <label>API-Key <span class="info" data-help="apikey">i</span> <span class="small" style="text-transform:none;letter-spacing:0">— bleibt nur lokal im Browser</span></label>
           <input type="password" id="apiKey" placeholder="Key vom Anbieter (sk-… o. Ä.)" oninput="saveApiSettings()" autocomplete="off">
         </div>
+        <div style="margin-top:8px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+          <button type="button" class="btn ghost sm" onclick="testApiConnection(this)">Verbindung testen</button>
+          <span class="status" id="apiTestStatus" style="margin:0"></span>
+        </div>
       </div>
     </section>
 
@@ -1942,6 +1946,17 @@ function saveApiSettings(){
   try{ localStorage.setItem('klausur-apikey-'+p, (document.getElementById('apiKey')||{}).value||'');
        localStorage.setItem('klausur-apimodel-'+p, (document.getElementById('apiModel')||{}).value||''); }catch(e){}
 }
+async function testApiConnection(btn){
+  const st=document.getElementById('apiTestStatus');
+  btn.disabled=true; const old=btn.textContent; btn.textContent='… teste';
+  if(st){ st.className='status'; st.textContent='Verbindung wird getestet …'; }
+  try{
+    const txt = await callProvider('Du bist ein Verbindungstest. Antworte nur mit: OK', 'Test');
+    if(st){ st.className='status ok'; st.textContent='✓ Verbindung OK — Antwort: '+txt.slice(0,40); }
+  }catch(e){
+    if(st){ st.className='status err'; st.textContent='✗ Fehlgeschlagen: '+e.message; }
+  }finally{ btn.disabled=false; btn.textContent=old; }
+}
 async function callProvider(sys, usr){
   const prov=document.getElementById('apiProvider') ? document.getElementById('apiProvider').value : 'anthropic';
   const cfg=PROVIDER_DEFAULTS[prov]||PROVIDER_DEFAULTS.anthropic;
@@ -2392,9 +2407,10 @@ function fillPicker(){
   updateNavButtons();
 }
 function onPickStudent(){
+  const _target = parseInt(document.getElementById('picker').value);  /* Bug-Fix: Auswahl ZUERST merken */
   saveDraftForCurrentStudent();      // alten Stand sichern
   saveCurrentStudentToWorkbook();    // Items in Workbook-State schreiben
-  currentStudentIdx = parseInt(document.getElementById('picker').value);
+  currentStudentIdx = isNaN(_target) ? currentStudentIdx : _target;
   updateNavButtons();
   loadCurrentStudent();              // neuen Stand laden
   persistDebounced();
@@ -3546,6 +3562,7 @@ document.addEventListener('click', e=>{
   const el = e.target.closest('.info[data-help]');
   if(!el) return;
   e.stopPropagation();
+  e.preventDefault();   /* Bug-Fix: i-Button im <label> darf die Checkbox nicht toggeln */
   if(_activePopover && _activePopover.target === el){
     closeHelp(); return;
   }
@@ -3570,6 +3587,14 @@ function resetAll(){
   document.getElementById('vorschlag').value='';
   document.getElementById('sprache').selectedIndex=2;
   { const _na=document.getElementById('optNachteil'); if(_na) _na.checked=false; }
+  { const _fi=document.getElementById('xlsxFile'); if(_fi) _fi.value=''; }   /* Bug-Fix: Datei-Auswahl + Excel-Zustand zuruecksetzen */
+  activeWB=null; activeSheetName=null; activeMeta=null; activeStudents=[]; currentStudentIdx=-1; activeFilename=null;
+  studentDrafts={};
+  { const _pw=document.getElementById('pickerWrap'); if(_pw) _pw.style.display='none'; }
+  { const _pk=document.getElementById('picker'); if(_pk) _pk.innerHTML=''; }
+  { const _im=document.getElementById('importMeta'); if(_im) _im.textContent=''; }
+  { const _ov=document.getElementById('overviewCard'); if(_ov) _ov.style.display='none'; }
+  if(typeof updateSaveBar==='function') updateSaveBar();
   tasks=[]; uid=0;
   schemaLoadDefault();
   onFqInput();
