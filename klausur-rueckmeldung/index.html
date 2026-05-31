@@ -1,0 +1,3649 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Klausur-Rückmeldung</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Klausur-RM">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1e3a5f">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231e3a5f'/%3E%3Ctext x='32' y='43' font-size='30' text-anchor='middle' fill='white' font-family='sans-serif' font-weight='bold'%3EKR%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Klausur-R%C3%BCckmeldung%22%2C%22short_name%22%3A%22Klausur-RM%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f0f4f8%22%2C%22theme_color%22%3A%22%231e3a5f%22%7D">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"
+        onerror="document.documentElement.dataset.xlsxFail='1'"></script>
+<script>
+  // Fallback: wenn cdnjs nicht geladen hat, jsdelivr versuchen
+  if(typeof XLSX === 'undefined'){
+    var s = document.createElement('script');
+    s.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
+    s.onerror = function(){ document.documentElement.dataset.xlsxFail='1'; };
+    document.head.appendChild(s);
+  }
+</script>
+<style>
+  :root{
+    /* Familien-Palette (Ausbildungscoach / Prompt-Dash) */
+    --bg:#f0f4f8; --card:#fff; --accent:#1e3a5f; --accent-light:#2d5986;
+    --green:#2d6a4f; --yellow:#b5830b; --red:#9b2226; --grey:#666;
+    --blue-light:#e8f0fe; --blue-border:#4a90d9;
+    /* Legacy-Aliase: retargetiert auf die Familien-Palette, damit Inline-Styles
+       (var(--ink-soft) etc.) + bestehende Komponenten weiter greifen. */
+    --paper:#ffffff; --paper-2:#eef3f8; --ink:#1e3a5f; --ink-soft:#5a6b7d;
+    --line:#cdd8e4; --line-soft:#e4ebf2; --accent-soft:#2d5986;
+    --gold:#b5830b; --ok:#2d6a4f; --warn:#b5830b; --bad:#9b2226;
+    --shadow:0 1px 4px rgba(0,0,0,.08); --r:8px;
+    --mono:'Consolas','Courier New',monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--accent);
+    font-family:'Segoe UI',system-ui,-apple-system,sans-serif;
+    font-size:16px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ===== Sticky Nav (Familie) ===== */
+  .nav{background:var(--accent);color:#fff;padding:.5rem 1rem;position:sticky;top:0;z-index:100;
+    display:flex;flex-wrap:wrap;gap:.3rem;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.15)}
+  .nav a{color:rgba(255,255,255,.85);text-decoration:none;font-size:.8rem;padding:.25rem .5rem;
+    border-radius:3px;white-space:nowrap}
+  .nav a:hover{background:rgba(255,255,255,.15);color:#fff}
+  .nav .nav-title{font-weight:700;font-size:.9rem;color:#fff;margin-right:.5rem}
+  .nav-toggle{display:none;background:none;border:0;color:#fff;font-size:1.2rem;cursor:pointer;
+    padding:.25rem .5rem;margin-left:auto}
+  @media(max-width:680px){
+    .nav{padding:.4rem .6rem;gap:.15rem;flex-wrap:nowrap;overflow:hidden}
+    .nav .nav-title{font-size:.85rem;margin-right:.3rem}
+    .nav-toggle{display:inline-block}
+    .nav a{display:none;font-size:.9rem;padding:.5rem .75rem;border-radius:4px;width:100%}
+    .nav.open{flex-wrap:wrap;overflow:visible;padding-bottom:.6rem}
+    .nav.open a{display:block}
+    .nav.open .nav-title{width:100%;margin-bottom:.3rem}
+    .nav.open .nav-toggle{position:absolute;right:.5rem;top:.35rem}
+  }
+
+  .wrap{max-width:1180px;margin:0 auto;padding:28px 26px 90px}
+  header.top{display:flex;align-items:flex-end;justify-content:space-between;
+    gap:24px;border-bottom:2px solid var(--accent);padding-bottom:16px;flex-wrap:wrap}
+  h1{font-weight:700;font-size:1.9rem;letter-spacing:-.01em;margin:0;line-height:1.1;color:var(--accent)}
+  .sub{font-size:.95rem;color:var(--grey);margin-top:8px;max-width:680px;line-height:1.55}
+  .kbd{font-weight:700;font-size:.72rem;color:var(--accent-light);
+    text-transform:uppercase;letter-spacing:.12em}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:22px}
+  @media(max-width:900px){.grid{grid-template-columns:1fr}}
+
+  .card{background:var(--card);border:1px solid #e1e8f0;border-radius:var(--r);
+    box-shadow:var(--shadow);padding:20px 20px 22px;position:relative;scroll-margin-top:64px}
+  .card.import{background:#fbfdff;border:1px dashed var(--blue-border)}
+  .card.setup{background:#f7fbf8;border:1px dashed #9cc3a8}
+  .card h2{font-weight:700;font-size:1.15rem;margin:0 0 4px;
+    display:flex;align-items:center;gap:10px;color:var(--accent)}
+  .card h2 .n{font-size:.8rem;color:#fff;background:var(--accent);
+    width:1.7rem;height:1.7rem;border-radius:50%;display:grid;place-items:center;
+    font-weight:700;flex:0 0 auto}
+  .card h2 .n.alt{background:var(--blue-border)}
+  .card h2 .n.alt2{background:var(--green)}
+  .card h2 .opt{font-weight:400;font-size:.8rem;color:var(--grey);
+    font-style:italic;letter-spacing:0;text-transform:none;margin-left:auto}
+  .hint{font-size:.82rem;color:var(--grey);margin:2px 0 16px;line-height:1.5}
+  label{display:block;font-size:.72rem;font-weight:700;letter-spacing:.03em;
+    text-transform:uppercase;color:var(--accent-light);margin:0 0 5px}
+  .field{margin-bottom:15px}
+  .row{display:flex;gap:13px;flex-wrap:wrap}
+  .row>.field{flex:1;min-width:120px}
+  input[type=text],input[type=number],select,textarea{
+    width:100%;font-family:'Segoe UI',system-ui,sans-serif;font-size:.95rem;color:var(--accent);
+    background:#fff;border:1px solid var(--line);border-radius:6px;
+    padding:9px 11px;outline:none;transition:border-color .15s,box-shadow .15s}
+  textarea{resize:vertical;line-height:1.55}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(30,58,95,.12)}
+  input[type=file]{font-family:'Segoe UI',system-ui,sans-serif;font-size:.88rem;background:#fff;
+    border:1px solid var(--line);border-radius:6px;padding:7px 9px;cursor:pointer}
+  input[type=file]::file-selector-button{
+    font-weight:600;font-size:.82rem;
+    background:var(--accent);color:#fff;border:none;border-radius:5px;
+    padding:6px 12px;margin-right:11px;cursor:pointer}
+  input[type=file]::file-selector-button:hover{background:var(--accent-light)}
+  select{appearance:none;-webkit-appearance:none;cursor:pointer;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%231e3a5f' stroke-width='1.6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 12px center;padding-right:32px}
+  .btn{font-family:'Segoe UI',system-ui,sans-serif;font-weight:600;font-size:.88rem;cursor:pointer;
+    border:1px solid var(--accent);background:var(--accent);color:#fff;
+    padding:9px 16px;border-radius:6px;transition:transform .08s,background .15s;
+    display:inline-flex;align-items:center;gap:8px}
+  .btn:hover{background:var(--accent-light)}
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{background:#fff;color:var(--accent);border-color:var(--line)}
+  .btn.ghost:hover{background:var(--blue-light);border-color:var(--blue-border)}
+  .btn.accent{background:var(--accent);border-color:var(--accent)}
+  .btn.accent:hover{background:var(--accent-light)}
+  .btn.gold{background:var(--yellow);border-color:var(--yellow);color:#fff}
+  .btn.gold:hover{filter:brightness(1.08)}
+  .btn.sm{font-size:.8rem;padding:6px 11px}
+  .btn:disabled{opacity:.5;cursor:not-allowed}
+  .task{border:1px solid #e1e8f0;border-left:4px solid var(--accent);
+    border-radius:8px;background:#fff;padding:17px 18px;margin-bottom:16px;
+    box-shadow:var(--shadow);animation:rise .25s ease}
+  @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .task-head{display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:12px;flex-wrap:wrap;gap:10px}
+  .task-head h3{font-weight:700;font-size:1.05rem;margin:0;color:var(--accent)}
+  .task-head .be-sum{font-weight:700;font-size:.88rem;
+    color:var(--accent);padding:3px 11px;background:var(--blue-light);border-radius:12px}
+  .x{border:none;background:none;color:var(--red);cursor:pointer;font-size:.82rem;
+    font-weight:600;padding:4px 6px;border-radius:5px}
+  .x:hover{background:#f8d7da}
+  .gen-out{margin-top:11px}
+  .gen-out textarea{min-height:120px;background:#fafcff;border-style:dashed}
+  .status{font-size:.8rem;font-style:italic;color:var(--grey);margin:8px 0 0;min-height:18px}
+  .status.err{color:var(--red);font-style:normal;font-weight:600}
+  .status.ok{color:var(--green);font-weight:600}
+  .calc{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-end}
+  .calc .field{flex:0 0 130px}
+  .readout{flex:1;min-width:230px;background:var(--blue-light);border:1px solid #cfe0f5;
+    border-radius:8px;padding:13px 15px;font-size:.95rem;color:var(--accent)}
+  .readout b{font-weight:700}
+  .pill{display:inline-block;font-weight:700;font-size:.8rem;
+    padding:3px 10px;border-radius:999px;margin-left:4px}
+  .pill.k0{background:#d8f3dc;color:var(--green)}
+  .pill.k1{background:#fff3cd;color:#6b4e02}
+  .pill.k2{background:#f8d7da;color:var(--red)}
+  .full{grid-column:1/-1}
+  .out-paper{background:#fff;border:1px solid var(--line);border-radius:8px;
+    padding:26px 30px;font-size:.97rem;line-height:1.72;white-space:pre-wrap;
+    min-height:120px;color:var(--accent)}
+  .out-paper strong{font-weight:700;color:var(--accent)}
+  .out-paper .ph{color:var(--blue-border);font-style:italic}
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 14px;align-items:center}
+  .addbtn{width:100%;border:1.5px dashed var(--blue-border);background:transparent;
+    color:var(--accent);font-weight:600;font-size:.9rem;
+    padding:13px;border-radius:8px;cursor:pointer;transition:.15s}
+  .addbtn:hover{background:var(--blue-light);border-color:var(--accent)}
+  .addbtn.sm{padding:7px;font-size:.8rem}
+  .foot{margin-top:34px;font-size:.78rem;color:var(--grey);line-height:1.7;
+    background:var(--blue-light);border:1px solid #cfe0f5;border-radius:8px;padding:14px 16px}
+  .foot code{background:#fff;border:1px solid #cfe0f5;padding:1px 6px;border-radius:4px;font-family:var(--mono)}
+  .foot b{color:var(--accent)}
+  .small{font-size:.75rem;color:var(--grey)}
+  code{font-family:var(--mono);font-size:.85em;background:#eef3f8;border:1px solid #dde6ef;
+    padding:.5px 5px;border-radius:4px;color:var(--accent-light)}
+  .info-box{background:var(--blue-light);border:1px solid #b3cce6;border-radius:6px;padding:.8rem;margin:.5rem 0;font-size:.9rem}
+  .warn-box{background:#fff3cd;border:1px solid var(--yellow);border-radius:6px;padding:.8rem;margin:.5rem 0;font-size:.9rem}
+
+  /* Import + Setup */
+  .import-row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end;margin-bottom:6px}
+  .import-row>.field{flex:1;min-width:200px;margin-bottom:0}
+  .import-meta{font-size:.8rem;color:var(--grey);margin-top:8px;min-height:16px}
+  .import-meta b{font-weight:700;color:var(--accent)}
+  .nav-arrows{display:inline-flex;gap:4px;margin-left:6px}
+  .nav-arrows button{width:30px;height:30px;display:grid;place-items:center;
+    border:1px solid var(--line);background:#fff;border-radius:6px;cursor:pointer;
+    font-size:.95rem;color:var(--accent)}
+  .nav-arrows button:hover{background:var(--blue-light)}
+  .nav-arrows button:disabled{opacity:.35;cursor:not-allowed}
+  .opts{display:flex;gap:16px;flex-wrap:wrap;font-size:.82rem;color:var(--grey);
+    margin-top:10px;padding-top:10px;border-top:1px dashed var(--line-soft)}
+  .opts label{font-size:.82rem;font-weight:400;text-transform:none;letter-spacing:0;
+    color:var(--grey);margin:0;display:flex;align-items:center;gap:6px;cursor:pointer}
+  .opts input[type=checkbox]{accent-color:var(--accent)}
+
+  /* Items (Bewertungsteile pro Aufgabe) */
+  .items-list{display:flex;flex-direction:column;gap:6px;margin:4px 0 12px}
+  .item-row{display:grid;grid-template-columns:1fr 80px 14px 80px 50px 28px;gap:8px;
+    align-items:center;padding:5px 8px;background:var(--paper-2);
+    border:1px solid var(--line-soft);border-radius:7px}
+  .item-row-schema{grid-template-columns:1fr 80px 28px}
+  .item-row input{padding:5px 9px;font-size:.88rem}
+  .item-row input[type=number]{text-align:right;font-weight:700}
+  .item-row input[readonly]{background:#e7eef6;color:var(--grey);cursor:not-allowed}
+  .item-row .slash{font-weight:700;color:var(--grey);text-align:center}
+  .item-row .x-mini{border:none;background:transparent;color:var(--red);
+    font-weight:700;font-size:.88rem;cursor:pointer;padding:4px;border-radius:4px;line-height:1}
+  .item-row .x-mini:hover{background:#f8d7da}
+  .item-row .x-mini:disabled{opacity:.25;cursor:not-allowed}
+
+  /* Setup-Aufgaben-Builder */
+  .schema-task{border:1px dashed var(--line);background:#fbfdff;border-radius:7px;
+    padding:11px 12px;margin-bottom:9px}
+  .schema-task-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .schema-task-head h4{font-weight:700;font-size:.9rem;margin:0;color:var(--accent)}
+  .task-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+
+  .src-badge{display:inline-block;font-weight:700;font-size:.68rem;
+    color:#fff;background:var(--yellow);padding:2px 7px;border-radius:10px;
+    margin-left:8px;text-transform:uppercase;letter-spacing:.04em}
+  .src-badge.green{color:#fff;background:var(--green)}
+
+  .save-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;
+    padding:11px 14px;background:var(--blue-light);border:1px solid var(--blue-border);
+    border-radius:8px;margin-top:12px}
+  .save-bar .small{color:var(--accent-light)}
+
+  /* Uebersichts-Tabelle */
+  .overview-scroll{overflow-x:auto;max-width:100%;border:1px solid var(--line);
+    border-radius:7px;background:#fff}
+  .overview-table{border-collapse:collapse;font-size:.8rem;font-family:'Segoe UI',system-ui,sans-serif;
+    width:100%;min-width:600px}
+  .overview-table th, .overview-table td{
+    padding:5px 9px;border-bottom:1px solid var(--line-soft);
+    border-right:1px solid var(--line-soft);text-align:right;
+    white-space:nowrap;line-height:1.4}
+  .overview-table th{background:var(--paper-2);font-weight:700;
+    font-size:.72rem;color:var(--accent);position:sticky;top:0;z-index:2;
+    text-transform:none;letter-spacing:0}
+  .overview-table th.left, .overview-table td.left{text-align:left;font-weight:600}
+  .overview-table th.aufg-head{background:#dde9f6;color:var(--accent)}
+  .overview-table td.aufg-sum{background:#eef4fb;font-weight:700;color:var(--accent)}
+  .overview-table td.total{background:var(--blue-light);font-weight:700;color:var(--accent)}
+  .overview-table td.np{background:#dde9f6;font-weight:700;color:var(--accent);font-size:.88rem}
+  .overview-table tr.current{background:#fff6e6}
+  .overview-table tr.current td.left{color:var(--accent)}
+  .overview-table .draft-mark{display:inline-block;width:6px;height:6px;border-radius:50%;
+    background:var(--accent);margin-left:5px;vertical-align:middle}
+  .overview-table .empty{color:#bcc7d3}
+
+  /* Aufklappbare Musterloesung */
+  details.muster-details{margin:6px 0 14px;border:1px dashed var(--line);
+    border-radius:7px;background:#f7fafd;padding:0}
+  details.muster-details summary{cursor:pointer;padding:8px 12px;
+    font-weight:600;font-size:.85rem;color:var(--accent);
+    list-style:revert;outline:none;user-select:none}
+  details.muster-details summary:hover{background:var(--blue-light)}
+  details.muster-details[open] summary{border-bottom:1px dashed var(--line);background:var(--blue-light)}
+  details.muster-details textarea{display:block;width:calc(100% - 24px);
+    margin:10px 12px 12px;border:1px solid var(--line);border-radius:5px;
+    padding:8px 10px;background:#fff;font-family:'Segoe UI',system-ui,sans-serif;font-size:.88rem;
+    line-height:1.5;resize:vertical}
+  details.muster-details summary .small{font-weight:400;color:var(--grey);font-style:italic;margin-left:6px}
+
+  /* Fehlerlisten-Details (Amber-Subsystem, in-family) */
+  details.fehlerlisten-details{margin:6px 0 14px;border:1px dashed #e0c074;
+    border-radius:7px;background:#fffaf0;padding:0}
+  details.fehlerlisten-details summary{cursor:pointer;padding:8px 12px;
+    font-weight:600;font-size:.85rem;color:#8a6209;user-select:none;outline:none}
+  details.fehlerlisten-details summary:hover{background:#fdf3df}
+  details.fehlerlisten-details[open] summary{border-bottom:1px dashed #e0c074;background:#fdf3df}
+  details.fehlerlisten-details summary .small{font-weight:400;color:#a07d2e;font-style:italic;margin-left:6px}
+  .fehlerlisten-body{padding:10px 12px 12px}
+  .fehler-block{margin-bottom:10px;padding-bottom:8px;border-bottom:1px dotted #ecd9a8}
+  .fehler-block:last-of-type{border-bottom:none;margin-bottom:6px}
+  .fehler-block h5{font-weight:700;font-size:.8rem;margin:0 0 6px;color:#8a6209;
+    text-transform:none;letter-spacing:0}
+  .fehler-pills{display:flex;flex-wrap:wrap;gap:5px}
+  .fehler-pill{font-family:'Segoe UI',system-ui,sans-serif;font-size:.8rem;line-height:1.3;
+    background:#fff;border:1px solid #e3cf94;color:#6b4e0a;
+    padding:4px 9px;border-radius:14px;cursor:pointer;
+    transition:background .15s, border-color .15s, transform .05s}
+  .fehler-pill:hover{background:#fdf3df}
+  .fehler-pill:active{transform:translateY(1px)}
+  .fehler-pill.active{background:#8a6209;color:#fff;border-color:#8a6209}
+  .fehler-pill.active:hover{background:#6f4e07}
+  .fehler-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;
+    padding-top:10px;border-top:1px dashed #ecd9a8}
+
+  /* Fehler-Editor-Modal */
+  .fehler-editor-tabs{display:flex;gap:4px;margin-bottom:14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+  .fehler-editor-tab{font-weight:600;font-size:.8rem;
+    padding:7px 12px;background:transparent;border:none;border-bottom:2px solid transparent;
+    cursor:pointer;color:var(--grey);margin-bottom:-1px}
+  .fehler-editor-tab:hover{color:var(--accent)}
+  .fehler-editor-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+  .fehler-editor-body textarea{width:100%;font-family:'Segoe UI',system-ui,sans-serif;font-size:.88rem;
+    line-height:1.55;min-height:280px;padding:10px 12px;border:1px solid var(--line);
+    border-radius:6px;background:#fff;resize:vertical;color:var(--accent)}
+  .fehler-editor-hint{font-size:.78rem;color:var(--grey);font-style:italic;margin:6px 0 0}
+
+  /* Noten-Pills (1-6 mit Tendenz) — semantische Skala gut->schwach */
+  .gp{display:inline-block;font-weight:700;font-size:.72rem;
+    padding:1px 7px;border-radius:10px;margin-left:5px;line-height:1.5;letter-spacing:-.02em;
+    min-width:24px;text-align:center}
+  .gp-1{background:#d4e8d4;color:#1f4d1f}
+  .gp-2{background:#e0ebc8;color:#3d5520}
+  .gp-3{background:#f4e8c6;color:#735518}
+  .gp-4{background:#f4d8b6;color:#7b4514}
+  .gp-5{background:#f0c8c0;color:#7b2a20}
+  .gp-6{background:#d8a8a0;color:#5c1a14}
+  .gp-x{background:var(--line-soft);color:var(--grey)}
+  .item-row .gp{font-size:.66rem;padding:1px 6px;min-width:20px}
+  .overview-table .gp{margin-left:3px;font-size:.69rem;padding:1px 5px}
+
+  /* Sammlungs-Liste */
+  .collection-row{display:flex;align-items:center;justify-content:space-between;
+    padding:8px 12px;border:1px solid var(--line-soft);border-radius:6px;
+    background:#f7fafd;margin-bottom:5px;font-size:.88rem}
+  .collection-row .meta{font-weight:700;color:var(--accent)}
+  .collection-row .stats{color:var(--grey);font-size:.82rem;margin-left:12px}
+  .collection-row .x-mini{border:none;background:transparent;color:var(--red);
+    font-weight:700;font-size:.88rem;cursor:pointer;padding:4px 8px;border-radius:4px}
+  .collection-row .x-mini:hover{background:#f8d7da}
+  .collection-empty{font-size:.82rem;font-style:italic;color:var(--grey);padding:8px 0}
+
+  /* Modale */
+  .modal-backdrop{position:fixed;inset:0;background:rgba(20,30,50,.55);
+    z-index:1000;display:grid;place-items:center;padding:20px;
+    backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+    animation:fadein .15s ease}
+  @keyframes fadein{from{opacity:0}to{opacity:1}}
+  .modal{background:#fff;border:1px solid var(--line);border-radius:12px;
+    max-width:880px;width:100%;max-height:90vh;display:flex;flex-direction:column;
+    padding:22px 24px;box-shadow:0 20px 60px rgba(0,0,0,.35);animation:rise .2s ease}
+  .modal h3{font-weight:700;font-size:1.25rem;margin:0 0 6px;color:var(--accent)}
+  .modal-hint{font-size:.82rem;color:var(--grey);font-style:italic;margin:0 0 14px}
+  .modal-hint b{font-weight:700;color:var(--accent);font-style:normal}
+  .modal label{margin-top:8px}
+  .modal textarea{width:100%;font-family:var(--mono);font-size:.82rem;
+    line-height:1.5;background:#fff;border:1px solid var(--line);border-radius:6px;
+    padding:10px 12px;resize:vertical;color:var(--accent)}
+  /* Prompt-Editor wie Familie: dunkle Prompt-Box */
+  #promptSys,#promptUsr{background:#1e3a5f;color:#e0e8f0;border-color:#2d5986}
+  #promptSys{min-height:180px;flex:0 0 auto}
+  #promptUsr{min-height:140px;flex:1 1 auto}
+  .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+
+  /* Mobile-Feinschliff */
+  @media(max-width:600px){
+    body{font-size:15px}
+    .wrap{padding:18px 14px 70px}
+    .out-paper{padding:18px 16px}
+    h1{font-size:1.5rem}
+    .modal{padding:16px 16px}
+  }
+
+  /* Info-Marker (klickbar) — Familie */
+  .info{display:inline-flex;align-items:center;justify-content:center;
+    width:16px;height:16px;border-radius:50%;border:1px solid var(--blue-border);
+    color:var(--accent);background:var(--blue-light);
+    font-family:'Segoe UI',system-ui,sans-serif;font-weight:700;font-size:11px;
+    cursor:pointer;margin-left:6px;line-height:1;user-select:none;
+    transition:background .12s,transform .05s;vertical-align:middle}
+  .info:hover{background:#d6e6fb}
+  .info:active{transform:translateY(1px)}
+  .info.open{background:var(--accent);color:#fff;border-color:var(--accent)}
+  label .info{margin-left:5px}
+  h2 .info{margin-left:9px;width:18px;height:18px;font-size:12px}
+
+  /* Help-Popover — Familie */
+  .help-popover{position:absolute;z-index:1200;max-width:380px;
+    background:#fff;border:1px solid var(--accent);border-radius:8px;
+    box-shadow:0 6px 24px rgba(20,30,50,.18);padding:12px 14px;
+    font-family:'Segoe UI',system-ui,sans-serif;font-size:13.5px;line-height:1.55;
+    color:var(--accent);animation:popin .12s ease}
+  @keyframes popin{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:none}}
+  .help-popover h4{font-weight:700;font-size:14px;margin:0 0 6px;color:var(--accent)}
+  .help-popover code{font-family:var(--mono);background:var(--blue-light);
+    padding:1px 5px;border-radius:3px;font-size:12.5px;color:var(--accent-light)}
+  .help-popover .arrow{position:absolute;top:-7px;left:14px;
+    width:12px;height:12px;background:#fff;border-left:1px solid var(--accent);
+    border-top:1px solid var(--accent);transform:rotate(45deg)}
+  .help-popover .close{position:absolute;top:6px;right:8px;
+    background:none;border:none;color:var(--grey);cursor:pointer;
+    font-size:14px;font-weight:700;padding:2px 6px;border-radius:4px}
+  .help-popover .close:hover{background:var(--blue-light);color:var(--accent)}
+
+  /* Fuss: Hinweise + Haftung + QR */
+  .ref{margin-top:22px;font-size:.82rem;color:var(--grey);line-height:1.65;
+    background:#fff;border:1px solid #e1e8f0;border-radius:8px;padding:18px 20px;box-shadow:var(--shadow)}
+  .ref h3{font-size:1rem;color:var(--accent);margin:0 0 8px}
+  .ref p{margin:.5rem 0}
+  .ref b{color:var(--accent)}
+  .ref a{color:var(--accent-light)}
+  .ref .disclaimer{background:var(--blue-light);border:1px solid #cfe0f5;border-radius:6px;padding:10px 14px;margin:.6rem 0}
+  .ref .disclaimer p{margin:.35rem 0}
+  .ref .qr-row{display:flex;gap:1.5rem;align-items:flex-start;flex-wrap:wrap;margin-top:1rem}
+  .ref .qr-box{flex-shrink:0;text-align:center}
+  .ref .qr-box svg{border:1px solid var(--line);border-radius:6px;padding:6px;background:#fff;width:150px;height:150px}
+  .ref .qr-cap{font-size:.72rem;color:var(--grey);margin:.3rem 0 0}
+  .ref .app-install{flex:1;min-width:220px}
+  .ref .app-install ol{margin:.2rem 0 .6rem 1.2rem;padding:0}
+  .ref .app-install li{margin:.1rem 0}
+  .ref .stand{display:inline-block;background:var(--blue-light);color:var(--accent);
+    padding:.15rem .55rem;border-radius:4px;font-size:.78rem;font-weight:600}
+
+</style>
+</head>
+<body>
+<nav class="nav" id="mainNav">
+  <span class="nav-title">📝 Klausur-Rückmeldung</span>
+  <a href="#setup">Anlegen</a>
+  <a href="#import">Laden</a>
+  <a href="#kopfdaten">Kopfdaten</a>
+  <a href="#aufgaben">Aufgaben</a>
+  <a href="#sprachpruefung">Sprache</a>
+  <a href="#noten">Noten</a>
+  <a href="#overviewCard">Übersicht</a>
+  <a href="#rueckmeldetext">Rückmeldung</a>
+  <button class="nav-toggle" onclick="toggleNav()" aria-label="Menü öffnen">☰</button>
+</nav>
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="kbd">Klausurrückmeldung · Sek II / Gymnasium · Politik &amp; Wirtschaft</div>
+      <h1>Klausur-Rückmeldung <span class="info" data-help="workflow" title="So funktioniert das Tool">i</span></h1>
+      <p class="sub">Pro Aufgabe bis zu 4 benennbare Bewertungsteile mit Maximalpunkten — z. B. Einleitung / Sprache / Stringenz / Inhalt. Werte fließen in eine Excel — entweder in eine bestehende oder in eine vom Tool generierte Datei. Rückmeldetext wird als direkte Schüler-Rückmeldung erzeugt (kein Gutachtenstil); „Aufgabe N" und Punktangaben sind fett.</p>
+    </div>
+    <button class="btn ghost sm" id="resetBtn" onclick="resetAll()">Zurücksetzen</button>
+  </header>
+
+  <!-- DUO: Setup neue Klausur + Bestehende laden -->
+  <div class="grid" style="margin-top:22px">
+
+    <!-- Neue Klausur einrichten -->
+    <section class="card setup" id="setup">
+      <h2><span class="n alt2">+</span>Neue Klausur anlegen <span class="opt">erzeugt Excel</span> <span class="info" data-help="neue-klausur">i</span></h2>
+      <p class="hint">Schülerinnen und Schüler mit vollem Namen eintragen — die Excel kürzt automatisch via Formel auf Format „Bac., C." (Spalten <code>Vorname</code> / <code>Nachname</code>). Volle Namen bleiben in <code>Vorname_voll</code> / <code>Nachname_voll</code> erhalten.</p>
+
+      <div class="field">
+        <label>Titel der Klausur (für Dateiname)</label>
+        <input type="text" id="setupTitel" placeholder="z. B. PoWi-Q2-Klausur-2-2026" value="">
+      </div>
+
+      <div class="row">
+        <div class="field" style="flex:2">
+          <label>Fach</label>
+          <input type="text" id="setupFach" placeholder="z. B. Politik &amp; Wirtschaft">
+        </div>
+        <div class="field" style="flex:0 0 110px">
+          <label title="z. B. E1, E2, Q1, Q2, Q3, Q4">Stufe</label>
+          <input type="text" id="setupStufe" placeholder="Q2" value="Q2">
+        </div>
+        <div class="field" style="flex:1">
+          <label>Datum</label>
+          <input type="text" id="setupDatum" placeholder="TT.MM.JJJJ">
+        </div>
+      </div>
+      <p class="small" style="margin:-8px 0 12px;font-style:italic;color:var(--ink-soft)">Dateiname wird: <code id="filenamePreview">pw_q2_2026_Klausur.xlsx</code></p>
+
+      <div class="field">
+        <label>Schülerinnen und Schüler — eine pro Zeile (Format „Nachname, Vorname")</label>
+        <textarea id="setupStudents" rows="6" placeholder="Bacher, Carla&#10;Müller, Anna&#10;Schmidt, Tim&#10;…"></textarea>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:6px">
+          <span class="small" style="margin-right:6px">Schnell-Fülle anonym: <span class="info" data-help="schueler-anonym">i</span></span>
+          <input type="number" id="anonCount" min="1" max="60" placeholder="24" style="width:70px;padding:5px 8px;font-size:14px">
+          <button class="btn ghost sm" onclick="fillAnonymous()">Aaa, A. · Aab, B. · …</button>
+        </div>
+        <p class="small" style="margin:5px 0 0">Sortiert alphabetisch nach Nachname. Excel-Formeln <code>=GROSS2(LINKS(B2;3))&amp;"."</code> und <code>=GROSS(LINKS(A2;1))&amp;"."</code> erzeugen die Kürzel automatisch.</p>
+      </div>
+
+      <div class="field">
+        <label>Aufgaben-Schema</label>
+        <div id="schemaList"></div>
+        <button class="addbtn sm" onclick="schemaAddTask()">+ Aufgabe hinzufügen</button>
+      </div>
+
+      <div class="task-actions">
+        <button class="btn ghost sm" onclick="schemaLoadDefault()">Vorlage „Q2-Klausur PoWi (100 BE)"</button>
+        <button class="btn ghost sm" onclick="schemaToTasks()">↓ In Aufgaben übernehmen</button>
+        <button class="btn accent" onclick="generateAndLoadNewExcel()">Excel erzeugen &amp; aktivieren</button>
+      </div>
+      <p class="status" id="setupStatus"></p>
+    </section>
+
+    <!-- Bestehende Klausur laden -->
+    <section class="card import" id="import">
+      <h2><span class="n alt">⤴</span>Bestehende Klausur laden <span class="opt">XLSX-Datei</span> <span class="info" data-help="bestehende-klausur">i</span></h2>
+      <p class="hint">Datei mit Schema <code>{N} {Kriterium}</code> (z.&nbsp;B. <code>1 Einleitung</code>) und optionalen Spalten <code>Aufg N</code>, <code>FQ</code>, <code>Gesamt</code>. FQ-Formel <code>=Fehler×100/Wörter</code> wird zurückgerechnet.</p>
+
+      <div class="import-row">
+        <div class="field" style="flex:0 0 100%">
+          <label>XLSX-Datei</label>
+          <input type="file" id="xlsxFile" accept=".xlsx,.xls" onchange="handleFile(event)">
+        </div>
+      </div>
+
+      <div id="pickerWrap" style="display:none">
+        <div class="row" style="margin-bottom:0">
+          <div class="field" style="flex:1">
+            <label>Schülerin oder Schüler <span class="nav-arrows">
+              <button id="prevStu" onclick="navStudent(-1)" title="vorherige">‹</button>
+              <button id="nextStu" onclick="navStudent(1)" title="nächste">›</button>
+            </span></label>
+            <select id="picker" onchange="onPickStudent()"></select>
+          </div>
+          <div class="field" style="flex:0 0 auto;margin-bottom:0;align-self:flex-end">
+            <button class="btn gold sm" id="loadBtn" onclick="loadCurrentStudent()" disabled>In Maske laden</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="import-meta" id="importMeta"></div>
+
+      <div class="opts">
+        <label><input type="checkbox" id="optClearOnLoad" checked> Beim Schülerwechsel Stichpunkte&nbsp;&amp;&nbsp;Texte zurücksetzen <span class="info" data-help="clear-on-load">i</span></label>
+        <label><input type="checkbox" id="optCritInPrompt" checked> Items in KI-Prompt einbeziehen <span class="info" data-help="crit-prompt">i</span></label>
+        <label><input type="checkbox" id="optReviewPrompt"> Prompt vor dem Absenden anzeigen &amp; editieren <span class="info" data-help="review-prompt">i</span></label>
+        <label title="Wenn aus: nur Copy/Paste — Prompt kopieren, Antwort aus externem KI-Tool einfügen. Wenn an: direkter API-Call (nur im claude.ai-Kontext oder mit gültigem Setup)."><input type="checkbox" id="optApiMode"> API direkt aufrufen <span class="small">(fortgeschritten)</span> <span class="info" data-help="api-mode">i</span></label>
+        <label><input type="checkbox" id="optEmpfehlung"> Weiterentwicklungs-Empfehlung anhängen <span class="info" data-help="empfehlung">i</span></label>
+      </div>
+      <div class="api-only" id="apiSettings" style="display:none;margin-top:10px;padding:10px 12px;background:var(--blue-light);border:1px solid #cfe0f5;border-radius:6px">
+        <div class="row" style="gap:10px;margin:0">
+          <div class="field" style="flex:1;min-width:150px;margin:0">
+            <label>KI-Anbieter <span class="info" data-help="provider">i</span></label>
+            <select id="apiProvider" onchange="onProviderChange()">
+              <option value="anthropic">Anthropic (Claude)</option>
+              <option value="openai">OpenAI (GPT)</option>
+              <option value="gemini">Google Gemini</option>
+              <option value="ollama">Ollama (lokal)</option>
+            </select>
+          </div>
+          <div class="field" style="flex:0 0 180px;min-width:120px;margin:0">
+            <label>Modell (optional)</label>
+            <input type="text" id="apiModel" placeholder="Standard" oninput="saveApiSettings()" autocomplete="off">
+          </div>
+        </div>
+        <div class="field" id="apiKeyWrap" style="margin:8px 0 0">
+          <label>API-Key <span class="info" data-help="apikey">i</span> <span class="small" style="text-transform:none;letter-spacing:0">— bleibt nur lokal im Browser</span></label>
+          <input type="password" id="apiKey" placeholder="Key vom Anbieter (sk-… o. Ä.)" oninput="saveApiSettings()" autocomplete="off">
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- SAVE-BAR (nur wenn eine Excel aktiv ist) -->
+  <div class="save-bar" id="saveBar" style="display:none">
+    <span class="small">Aktive Datei: <b id="saveBarName">—</b> · Schülerin oder Schüler <b id="saveBarStu">—</b> <span class="info" data-help="save-bar">i</span></span>
+    <button class="btn accent sm" id="saveBtn" onclick="saveCurrentStudentToExcel()">⤵ In Excel speichern</button>
+    <button class="btn ghost sm" id="downloadAllBtn" onclick="downloadActiveWorkbook()">XLSX exportieren</button>
+    <span class="small" id="saveStatus" title="Daten werden automatisch im Browser-Speicher gehalten">—</span>
+    <button class="btn ghost sm" onclick="confirmClearLocalData()" title="Browser-Speicher dieser Anwendung leeren — Excel-Datei bleibt unberührt">🗑 Lokal löschen</button>
+    <span class="small" id="saveHint"></span>
+  </div>
+
+  <div class="grid" style="margin-top:22px">
+    <!-- Kopfdaten -->
+    <section class="card" id="kopfdaten">
+      <h2><span class="n">1</span>Kopfdaten</h2>
+      <p class="hint">Anrede + Anredeform steuern den KI-Ton (du / Sie / sachlich).</p>
+      <div class="row">
+        <div class="field" style="flex:0 0 110px">
+          <label>Anrede</label>
+          <select id="anrede" onchange="render()">
+            <option>Frau</option><option>Herr</option>
+          </select>
+        </div>
+        <div class="field" style="flex:2">
+          <label>Name</label>
+          <input type="text" id="name" placeholder="Nachname-Kürzel" oninput="render()">
+        </div>
+      </div>
+      <div class="row">
+        <div class="field" style="flex:1">
+          <label>Anredeform im Text <span class="info" data-help="anredeform">i</span></label>
+          <select id="anredeform" onchange="render()">
+            <option value="du">du (Gymnasium, vertraut)</option>
+            <option value="Sie" selected>Sie (formell)</option>
+            <option value="sachlich">unpersönlich / sachlich</option>
+          </select>
+        </div>
+        <div class="field" style="flex:0 0 130px">
+          <label>Vorschlag</label>
+          <select id="vorschlag" onchange="render()">
+            <option value="">— (keiner)</option>
+            <option>A</option><option>B</option><option>C</option><option>D</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label title="Steuert die sprachliche Komplexität des erzeugten Rückmeldetexts">Sprachstufe der KI-Rückmeldung <span class="info" data-help="sprachstufe">i</span></label>
+        <select id="sprachstufe" onchange="render()"></select>
+        <p class="small" id="sprachstufeHint" style="margin:4px 0 0;font-style:italic;color:var(--ink-soft)">—</p>
+      </div>
+      <div class="field">
+        <label>Titel der Klausur</label>
+        <input type="text" id="titel" placeholder="z. B. Wirtschaftspolitische Steuerung" oninput="render()">
+      </div>
+      <div class="row">
+        <div class="field" style="flex:2">
+          <label>Fach</label>
+          <input type="text" id="fach" placeholder="z. B. Politik &amp; Wirtschaft" oninput="render()">
+        </div>
+        <div class="field" style="flex:1">
+          <label>Datum</label>
+          <input type="text" id="datum" placeholder="TT.MM.JJJJ" oninput="render()">
+        </div>
+      </div>
+    </section>
+
+    <!-- Sprache + Sprachrichtigkeit -->
+    <section class="card" id="sprachpruefung">
+      <h2><span class="n">3</span>Sprache &amp; Sprachrichtigkeit <span class="info" data-help="fq">i</span></h2>
+      <p class="hint">FQ aus Fehler/Wörter (Formel-Konvention <code>=Fehler*100/Wörter</code>) oder direkt eingeben.</p>
+      <div class="field">
+        <label>Ausdruck und Sprache der Arbeit sind …</label>
+        <select id="sprache" onchange="render()">
+          <option>stets klar, fachsprachlich präzise und sprachlich normgerecht</option>
+          <option>weitgehend klar, fachsprachlich angemessen und überwiegend normgerecht</option>
+          <option selected>durchgängig verständlich, nicht immer fachlich adäquat und meistens normgerecht</option>
+          <option>verständlich, fachsprachlich teilweise ungenau und nur eingeschränkt normgerecht</option>
+          <option>über weite Strecken unpräzise, fachsprachlich unzureichend und nur teilweise normgerecht</option>
+        </select>
+      </div>
+      <div class="calc">
+        <div class="field"><label>Fehler</label>
+          <input type="number" id="fehler" min="0" placeholder="0" step="0.5" oninput="onFqInput()"></div>
+        <div class="field"><label>Wörter</label>
+          <input type="number" id="woerter" min="1" placeholder="0" step="1" oninput="onFqInput()"></div>
+        <div class="field"><label>… oder FQ direkt</label>
+          <input type="number" id="fqDirect" min="0" placeholder="—" step="any" oninput="onFqInput()"></div>
+        <div class="readout" id="fqReadout">Fehlerquotient: <b>—</b></div>
+      </div>
+      <label style="display:flex;align-items:flex-start;gap:8px;margin-top:12px;padding:10px 12px;background:var(--blue-light);border:1px solid #cfe0f5;border-radius:6px;font-size:.88rem;cursor:pointer;color:var(--accent);text-transform:none;letter-spacing:0;font-weight:400">
+        <input type="checkbox" id="optNachteil" onchange="onNachteilChange()" style="width:auto;margin-top:3px;accent-color:var(--accent);cursor:pointer">
+        <span><b>LRS / Notenschutz</b> (Nachteilsausgleich) — Fehlerquotient ausweisen, aber <b>nicht</b> in die Note einrechnen <span class="info" data-help="nachteil">i</span></span>
+      </label>
+    </section>
+  </div>
+
+  <!-- Aufgaben -->
+  <section class="card full" style="margin-top:22px" id="aufgaben">
+    <h2><span class="n">2</span>Aufgaben &amp; Bewertungsteile</h2>
+    <p class="hint">Pro Aufgabe bis zu 4 Bewertungsteile (Name, erreichte Punkte, Maximum). Summe = BE pro Aufgabe. Bei aktiver Excel sind Item-Namen aus den Spalten gebunden (Werte/Max editierbar).</p>
+    <div id="tasks"></div>
+    <button class="addbtn" onclick="addTask()">+ Aufgabe hinzufügen</button>
+  </section>
+
+  <!-- Notenpunkte -->
+  <section class="card full" style="margin-top:22px" id="noten">
+    <h2><span class="n">4</span>Notenpunkte (optional)</h2>
+    <p class="hint">Summe BE und mögliche Gesamt-BE → Anteil, Notenpunkte, Note. FQ-Abzug wird verrechnet.</p>
+    <div class="calc">
+      <div class="field"><label>Summe BE</label><input type="text" id="sumBE" readonly style="background:var(--paper-2)"></div>
+      <div class="field"><label>mögliche BE gesamt</label><input type="number" id="maxBE" min="1" placeholder="z. B. 100" step="0.5" oninput="render()"></div>
+      <div class="readout" id="npReadout">Anteil: <b>—</b></div>
+    </div>
+  </section>
+
+  <!-- Übersichts-Tabelle (alle Schülerinnen und Schüler × Items) -->
+  <section class="card full" id="overviewCard" style="margin-top:22px;display:none">
+    <h2><span class="n" style="background:#5C7BA8">▦</span>Übersicht aller Bewertungen <span class="opt">live</span> <span class="info" data-help="overview-table">i</span></h2>
+    <p class="hint">Aktueller Stand aller Schülerinnen und Schüler. Daten werden automatisch im Browser gespeichert — beim Schüler-Wechsel und bei Eingaben. Schreibgeschützt, Eingabe oben in den Item-Feldern.</p>
+    <div class="overview-scroll">
+      <table class="overview-table" id="overviewTable"></table>
+    </div>
+  </section>
+
+  <!-- Ausgabe -->
+  <section class="card full" style="margin-top:22px" id="rueckmeldetext">
+    <h2><span class="n">5</span>Rückmeldetext</h2>
+    <div class="toolbar">
+      <button class="btn accent" onclick="copyOut()">Rückmeldung kopieren (mit Fettdruck)</button>
+      <button class="btn ghost" onclick="copyPlainOut()">Als Markdown kopieren</button>
+      <button class="btn ghost api-only" id="genAllBtn" onclick="generateAll()" style="display:none">✦ Alle Aufgaben erzeugen</button>
+      <button class="btn ghost" onclick="copyAllPrompts()">⎘ Alle Stichpunkte als Prompt kopieren</button>
+      <span class="small" id="copyHint"></span>
+    </div>
+    <div class="out-paper" id="out"></div>
+  </section>
+
+  <div class="foot">
+    <b>Notenpunkt-Tabelle (KMK):</b> 15 ≥ 95 % · 14 ≥ 90 % · 13 ≥ 85 % · 12 ≥ 80 % · 11 ≥ 75 % · 10 ≥ 70 % · 9 ≥ 65 % · 8 ≥ 60 % · 7 ≥ 55 % · 6 ≥ 50 % · 5 ≥ 45 % · 4 ≥ 40 % · 3 ≥ 33 % · 2 ≥ 27 % · 1 ≥ 20 % · 0 &lt; 20 %.<br>
+    <b>FQ-Abzug:</b> <code>FQ &lt; 3 → kein Abzug</code> · <code>3 ≤ FQ &lt; 6 → 1 NP</code> · <code>FQ ≥ 6 → 2 NP</code>.<br>
+    <b>Excel-Schreiben:</b> Tool ändert nur Items-Werte, FQ-Zelle, _voll-Namen und (falls leer) Notenpunkte. Formel-Zellen (Gesamt, Aufg&nbsp;N, Vorname/Nachname-Kürzungsformel, vorhandene NP-Formeln) bleiben unberührt.<br>
+    <b>Neu erzeugte Excel:</b> Spalten <code>Vorname</code> / <code>Nachname</code> enthalten Formeln <code>=GROSS(LINKS(A2;1))&amp;"."</code> bzw. <code>=GROSS2(LINKS(B2;3))&amp;"."</code> — Kürzel werden automatisch aus den <code>_voll</code>-Spalten berechnet, beim Hinzufügen einer Zeile in Excel: Formel-Zellen aus der Zeile darüber nach unten ziehen.
+  </div>
+  <div class="ref">
+    <h3>Hinweise &amp; Haftungsausschluss</h3>
+    <div class="disclaimer">
+      <p><b>Datenschutz:</b> Alle Eingaben bleiben lokal in deinem Browser (localStorage). Sie verlassen das Gerät nur, wenn du aktiv einen Prompt in einen externen KI-Dienst kopierst oder sendest. Empfehlung: Schülerdaten pseudonymisieren (Kürzel statt Klarnamen); bei Cloud-KI den Schul- und Landesdatenschutz beachten — der „Nur Prompt"-Modus bzw. ein lokales Modell ist datenschutzfreundlicher.</p>
+      <p><b>KI-Texte sind Entwürfe:</b> Erzeugte Rückmeldungen müssen fachlich und pädagogisch geprüft und verantwortet werden. Keine Gewähr für Korrektheit oder Angemessenheit.</p>
+      <p><b>Notenberechnung ohne Gewähr:</b> Notenpunkte und Fehlerquotient sind Hilfswerte nach KMK-Schema, kein amtliches Ergebnis. Maßgeblich sind die Bewertung der Lehrkraft und die geltende Prüfungsordnung.</p>
+    </div>
+    <p><b>Kontakt:</b> Jaroslav Kois — jaro_kois@web.de · <em>Kein amtliches Dokument. Ohne Gewähr.</em></p>
+    <p><b>Version:</b> 20 — KI-agnostisch (Prompt-Modus als Default, optionaler API-Schalter), Informationsleisten (i), Familien-Design. &nbsp;<span class="stand">Stand: 2026-05-31</span></p>
+    <div class="qr-row">
+      <div class="qr-box">
+        <svg viewBox="0 0 37 37" xmlns="http://www.w3.org/2000/svg"><rect width="37" height="37" fill="#fff"/><path d="M2,2h1v1h-1zM3,2h1v1h-1zM4,2h1v1h-1zM5,2h1v1h-1zM6,2h1v1h-1zM7,2h1v1h-1zM8,2h1v1h-1zM11,2h1v1h-1zM13,2h1v1h-1zM20,2h1v1h-1zM23,2h1v1h-1zM24,2h1v1h-1zM28,2h1v1h-1zM29,2h1v1h-1zM30,2h1v1h-1zM31,2h1v1h-1zM32,2h1v1h-1zM33,2h1v1h-1zM34,2h1v1h-1zM2,3h1v1h-1zM8,3h1v1h-1zM10,3h1v1h-1zM14,3h1v1h-1zM15,3h1v1h-1zM16,3h1v1h-1zM19,3h1v1h-1zM20,3h1v1h-1zM23,3h1v1h-1zM28,3h1v1h-1zM34,3h1v1h-1zM2,4h1v1h-1zM4,4h1v1h-1zM5,4h1v1h-1zM6,4h1v1h-1zM8,4h1v1h-1zM10,4h1v1h-1zM12,4h1v1h-1zM16,4h1v1h-1zM17,4h1v1h-1zM22,4h1v1h-1zM23,4h1v1h-1zM24,4h1v1h-1zM28,4h1v1h-1zM30,4h1v1h-1zM31,4h1v1h-1zM32,4h1v1h-1zM34,4h1v1h-1zM2,5h1v1h-1zM4,5h1v1h-1zM5,5h1v1h-1zM6,5h1v1h-1zM8,5h1v1h-1zM10,5h1v1h-1zM11,5h1v1h-1zM16,5h1v1h-1zM18,5h1v1h-1zM19,5h1v1h-1zM22,5h1v1h-1zM23,5h1v1h-1zM25,5h1v1h-1zM28,5h1v1h-1zM30,5h1v1h-1zM31,5h1v1h-1zM32,5h1v1h-1zM34,5h1v1h-1zM2,6h1v1h-1zM4,6h1v1h-1zM5,6h1v1h-1zM6,6h1v1h-1zM8,6h1v1h-1zM11,6h1v1h-1zM12,6h1v1h-1zM19,6h1v1h-1zM20,6h1v1h-1zM21,6h1v1h-1zM22,6h1v1h-1zM24,6h1v1h-1zM25,6h1v1h-1zM28,6h1v1h-1zM30,6h1v1h-1zM31,6h1v1h-1zM32,6h1v1h-1zM34,6h1v1h-1zM2,7h1v1h-1zM8,7h1v1h-1zM12,7h1v1h-1zM14,7h1v1h-1zM15,7h1v1h-1zM18,7h1v1h-1zM20,7h1v1h-1zM22,7h1v1h-1zM23,7h1v1h-1zM24,7h1v1h-1zM28,7h1v1h-1zM34,7h1v1h-1zM2,8h1v1h-1zM3,8h1v1h-1zM4,8h1v1h-1zM5,8h1v1h-1zM6,8h1v1h-1zM7,8h1v1h-1zM8,8h1v1h-1zM10,8h1v1h-1zM12,8h1v1h-1zM14,8h1v1h-1zM16,8h1v1h-1zM18,8h1v1h-1zM20,8h1v1h-1zM22,8h1v1h-1zM24,8h1v1h-1zM26,8h1v1h-1zM28,8h1v1h-1zM29,8h1v1h-1zM30,8h1v1h-1zM31,8h1v1h-1zM32,8h1v1h-1zM33,8h1v1h-1zM34,8h1v1h-1zM10,9h1v1h-1zM11,9h1v1h-1zM13,9h1v1h-1zM17,9h1v1h-1zM18,9h1v1h-1zM20,9h1v1h-1zM21,9h1v1h-1zM24,9h1v1h-1zM2,10h1v1h-1zM8,10h1v1h-1zM10,10h1v1h-1zM11,10h1v1h-1zM12,10h1v1h-1zM13,10h1v1h-1zM15,10h1v1h-1zM16,10h1v1h-1zM17,10h1v1h-1zM18,10h1v1h-1zM19,10h1v1h-1zM22,10h1v1h-1zM24,10h1v1h-1zM26,10h1v1h-1zM27,10h1v1h-1zM28,10h1v1h-1zM31,10h1v1h-1zM32,10h1v1h-1zM33,10h1v1h-1zM4,11h1v1h-1zM5,11h1v1h-1zM11,11h1v1h-1zM14,11h1v1h-1zM15,11h1v1h-1zM16,11h1v1h-1zM17,11h1v1h-1zM19,11h1v1h-1zM21,11h1v1h-1zM24,11h1v1h-1zM25,11h1v1h-1zM26,11h1v1h-1zM30,11h1v1h-1zM31,11h1v1h-1zM32,11h1v1h-1zM33,11h1v1h-1zM2,12h1v1h-1zM3,12h1v1h-1zM4,12h1v1h-1zM5,12h1v1h-1zM8,12h1v1h-1zM12,12h1v1h-1zM13,12h1v1h-1zM14,12h1v1h-1zM15,12h1v1h-1zM16,12h1v1h-1zM17,12h1v1h-1zM18,12h1v1h-1zM22,12h1v1h-1zM23,12h1v1h-1zM24,12h1v1h-1zM28,12h1v1h-1zM30,12h1v1h-1zM32,12h1v1h-1zM33,12h1v1h-1zM3,13h1v1h-1zM5,13h1v1h-1zM7,13h1v1h-1zM11,13h1v1h-1zM13,13h1v1h-1zM14,13h1v1h-1zM15,13h1v1h-1zM17,13h1v1h-1zM18,13h1v1h-1zM24,13h1v1h-1zM25,13h1v1h-1zM29,13h1v1h-1zM30,13h1v1h-1zM31,13h1v1h-1zM32,13h1v1h-1zM4,14h1v1h-1zM6,14h1v1h-1zM7,14h1v1h-1zM8,14h1v1h-1zM9,14h1v1h-1zM10,14h1v1h-1zM12,14h1v1h-1zM13,14h1v1h-1zM15,14h1v1h-1zM18,14h1v1h-1zM22,14h1v1h-1zM27,14h1v1h-1zM28,14h1v1h-1zM29,14h1v1h-1zM33,14h1v1h-1zM34,14h1v1h-1zM2,15h1v1h-1zM4,15h1v1h-1zM6,15h1v1h-1zM9,15h1v1h-1zM11,15h1v1h-1zM17,15h1v1h-1zM18,15h1v1h-1zM20,15h1v1h-1zM21,15h1v1h-1zM22,15h1v1h-1zM24,15h1v1h-1zM25,15h1v1h-1zM28,15h1v1h-1zM29,15h1v1h-1zM31,15h1v1h-1zM32,15h1v1h-1zM33,15h1v1h-1zM34,15h1v1h-1zM2,16h1v1h-1zM4,16h1v1h-1zM5,16h1v1h-1zM6,16h1v1h-1zM8,16h1v1h-1zM9,16h1v1h-1zM11,16h1v1h-1zM12,16h1v1h-1zM13,16h1v1h-1zM17,16h1v1h-1zM22,16h1v1h-1zM23,16h1v1h-1zM24,16h1v1h-1zM27,16h1v1h-1zM28,16h1v1h-1zM30,16h1v1h-1zM32,16h1v1h-1zM33,16h1v1h-1zM2,17h1v1h-1zM3,17h1v1h-1zM5,17h1v1h-1zM6,17h1v1h-1zM7,17h1v1h-1zM10,17h1v1h-1zM12,17h1v1h-1zM13,17h1v1h-1zM15,17h1v1h-1zM17,17h1v1h-1zM24,17h1v1h-1zM26,17h1v1h-1zM27,17h1v1h-1zM30,17h1v1h-1zM32,17h1v1h-1zM34,17h1v1h-1zM3,18h1v1h-1zM4,18h1v1h-1zM6,18h1v1h-1zM7,18h1v1h-1zM8,18h1v1h-1zM9,18h1v1h-1zM10,18h1v1h-1zM12,18h1v1h-1zM16,18h1v1h-1zM19,18h1v1h-1zM24,18h1v1h-1zM26,18h1v1h-1zM27,18h1v1h-1zM29,18h1v1h-1zM30,18h1v1h-1zM34,18h1v1h-1zM4,19h1v1h-1zM9,19h1v1h-1zM10,19h1v1h-1zM11,19h1v1h-1zM12,19h1v1h-1zM13,19h1v1h-1zM15,19h1v1h-1zM16,19h1v1h-1zM17,19h1v1h-1zM20,19h1v1h-1zM21,19h1v1h-1zM22,19h1v1h-1zM24,19h1v1h-1zM25,19h1v1h-1zM28,19h1v1h-1zM31,19h1v1h-1zM32,19h1v1h-1zM33,19h1v1h-1zM34,19h1v1h-1zM3,20h1v1h-1zM4,20h1v1h-1zM5,20h1v1h-1zM7,20h1v1h-1zM8,20h1v1h-1zM12,20h1v1h-1zM13,20h1v1h-1zM15,20h1v1h-1zM17,20h1v1h-1zM19,20h1v1h-1zM21,20h1v1h-1zM24,20h1v1h-1zM25,20h1v1h-1zM29,20h1v1h-1zM31,20h1v1h-1zM32,20h1v1h-1zM34,20h1v1h-1zM4,21h1v1h-1zM5,21h1v1h-1zM6,21h1v1h-1zM10,21h1v1h-1zM13,21h1v1h-1zM15,21h1v1h-1zM16,21h1v1h-1zM17,21h1v1h-1zM18,21h1v1h-1zM21,21h1v1h-1zM22,21h1v1h-1zM25,21h1v1h-1zM26,21h1v1h-1zM27,21h1v1h-1zM28,21h1v1h-1zM30,21h1v1h-1zM31,21h1v1h-1zM32,21h1v1h-1zM33,21h1v1h-1zM2,22h1v1h-1zM4,22h1v1h-1zM7,22h1v1h-1zM8,22h1v1h-1zM9,22h1v1h-1zM10,22h1v1h-1zM11,22h1v1h-1zM12,22h1v1h-1zM13,22h1v1h-1zM14,22h1v1h-1zM19,22h1v1h-1zM25,22h1v1h-1zM26,22h1v1h-1zM27,22h1v1h-1zM30,22h1v1h-1zM31,22h1v1h-1zM33,22h1v1h-1zM34,22h1v1h-1zM2,23h1v1h-1zM4,23h1v1h-1zM5,23h1v1h-1zM7,23h1v1h-1zM9,23h1v1h-1zM12,23h1v1h-1zM15,23h1v1h-1zM16,23h1v1h-1zM17,23h1v1h-1zM20,23h1v1h-1zM21,23h1v1h-1zM23,23h1v1h-1zM24,23h1v1h-1zM25,23h1v1h-1zM29,23h1v1h-1zM30,23h1v1h-1zM31,23h1v1h-1zM2,24h1v1h-1zM4,24h1v1h-1zM5,24h1v1h-1zM8,24h1v1h-1zM9,24h1v1h-1zM10,24h1v1h-1zM11,24h1v1h-1zM12,24h1v1h-1zM14,24h1v1h-1zM17,24h1v1h-1zM18,24h1v1h-1zM19,24h1v1h-1zM20,24h1v1h-1zM22,24h1v1h-1zM23,24h1v1h-1zM26,24h1v1h-1zM28,24h1v1h-1zM31,24h1v1h-1zM32,24h1v1h-1zM33,24h1v1h-1zM2,25h1v1h-1zM5,25h1v1h-1zM10,25h1v1h-1zM14,25h1v1h-1zM15,25h1v1h-1zM18,25h1v1h-1zM20,25h1v1h-1zM22,25h1v1h-1zM24,25h1v1h-1zM28,25h1v1h-1zM31,25h1v1h-1zM32,25h1v1h-1zM33,25h1v1h-1zM2,26h1v1h-1zM3,26h1v1h-1zM4,26h1v1h-1zM6,26h1v1h-1zM7,26h1v1h-1zM8,26h1v1h-1zM9,26h1v1h-1zM11,26h1v1h-1zM14,26h1v1h-1zM17,26h1v1h-1zM18,26h1v1h-1zM20,26h1v1h-1zM21,26h1v1h-1zM22,26h1v1h-1zM26,26h1v1h-1zM27,26h1v1h-1zM28,26h1v1h-1zM29,26h1v1h-1zM30,26h1v1h-1zM31,26h1v1h-1zM10,27h1v1h-1zM12,27h1v1h-1zM13,27h1v1h-1zM14,27h1v1h-1zM16,27h1v1h-1zM17,27h1v1h-1zM18,27h1v1h-1zM19,27h1v1h-1zM20,27h1v1h-1zM21,27h1v1h-1zM22,27h1v1h-1zM23,27h1v1h-1zM26,27h1v1h-1zM30,27h1v1h-1zM32,27h1v1h-1zM34,27h1v1h-1zM2,28h1v1h-1zM3,28h1v1h-1zM4,28h1v1h-1zM5,28h1v1h-1zM6,28h1v1h-1zM7,28h1v1h-1zM8,28h1v1h-1zM11,28h1v1h-1zM12,28h1v1h-1zM14,28h1v1h-1zM17,28h1v1h-1zM18,28h1v1h-1zM23,28h1v1h-1zM24,28h1v1h-1zM25,28h1v1h-1zM26,28h1v1h-1zM28,28h1v1h-1zM30,28h1v1h-1zM32,28h1v1h-1zM33,28h1v1h-1zM2,29h1v1h-1zM8,29h1v1h-1zM11,29h1v1h-1zM14,29h1v1h-1zM18,29h1v1h-1zM20,29h1v1h-1zM21,29h1v1h-1zM25,29h1v1h-1zM26,29h1v1h-1zM30,29h1v1h-1zM31,29h1v1h-1zM32,29h1v1h-1zM33,29h1v1h-1zM2,30h1v1h-1zM4,30h1v1h-1zM5,30h1v1h-1zM6,30h1v1h-1zM8,30h1v1h-1zM11,30h1v1h-1zM13,30h1v1h-1zM15,30h1v1h-1zM16,30h1v1h-1zM18,30h1v1h-1zM19,30h1v1h-1zM21,30h1v1h-1zM22,30h1v1h-1zM24,30h1v1h-1zM26,30h1v1h-1zM27,30h1v1h-1zM28,30h1v1h-1zM29,30h1v1h-1zM30,30h1v1h-1zM31,30h1v1h-1zM33,30h1v1h-1zM34,30h1v1h-1zM2,31h1v1h-1zM4,31h1v1h-1zM5,31h1v1h-1zM6,31h1v1h-1zM8,31h1v1h-1zM12,31h1v1h-1zM13,31h1v1h-1zM16,31h1v1h-1zM17,31h1v1h-1zM18,31h1v1h-1zM19,31h1v1h-1zM20,31h1v1h-1zM21,31h1v1h-1zM22,31h1v1h-1zM24,31h1v1h-1zM25,31h1v1h-1zM26,31h1v1h-1zM27,31h1v1h-1zM29,31h1v1h-1zM30,31h1v1h-1zM31,31h1v1h-1zM32,31h1v1h-1zM33,31h1v1h-1zM34,31h1v1h-1zM2,32h1v1h-1zM4,32h1v1h-1zM5,32h1v1h-1zM6,32h1v1h-1zM8,32h1v1h-1zM11,32h1v1h-1zM12,32h1v1h-1zM15,32h1v1h-1zM17,32h1v1h-1zM18,32h1v1h-1zM21,32h1v1h-1zM22,32h1v1h-1zM24,32h1v1h-1zM25,32h1v1h-1zM26,32h1v1h-1zM27,32h1v1h-1zM29,32h1v1h-1zM30,32h1v1h-1zM31,32h1v1h-1zM32,32h1v1h-1zM33,32h1v1h-1zM34,32h1v1h-1zM2,33h1v1h-1zM8,33h1v1h-1zM12,33h1v1h-1zM14,33h1v1h-1zM16,33h1v1h-1zM18,33h1v1h-1zM20,33h1v1h-1zM21,33h1v1h-1zM24,33h1v1h-1zM28,33h1v1h-1zM29,33h1v1h-1zM30,33h1v1h-1zM31,33h1v1h-1zM32,33h1v1h-1zM2,34h1v1h-1zM3,34h1v1h-1zM4,34h1v1h-1zM5,34h1v1h-1zM6,34h1v1h-1zM7,34h1v1h-1zM8,34h1v1h-1zM10,34h1v1h-1zM12,34h1v1h-1zM15,34h1v1h-1zM16,34h1v1h-1zM17,34h1v1h-1zM19,34h1v1h-1zM25,34h1v1h-1zM26,34h1v1h-1zM27,34h1v1h-1zM28,34h1v1h-1zM29,34h1v1h-1zM33,34h1v1h-1z" fill="#1e3a5f"/></svg>
+        <p class="qr-cap">Auf dem Smartphone öffnen:<br>jako-odyc.github.io/<br>prompt-dash/klausur-rueckmeldung/</p>
+      </div>
+      <div class="app-install">
+        <p style="font-weight:600;margin:0 0 .4rem">Als App-Symbol speichern:</p>
+        <p style="margin:.2rem 0"><b>iPhone / iPad (Safari):</b></p>
+        <ol>
+          <li>Seite in Safari öffnen (QR-Code scannen)</li>
+          <li>Teilen-Symbol antippen (Quadrat mit Pfeil)</li>
+          <li>„Zum Home-Bildschirm" wählen, „Hinzufügen"</li>
+        </ol>
+        <p style="margin:.2rem 0"><b>Android (Chrome):</b></p>
+        <ol>
+          <li>Drei-Punkte-Menü rechts oben</li>
+          <li>„Zum Startbildschirm hinzufügen"</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Prompt-Review-Modal -->
+<div id="promptModal" class="modal-backdrop" style="display:none" onclick="if(event.target===this)cancelPromptReview()">
+  <div class="modal">
+    <h3>Prompt vor dem Absenden</h3>
+    <p class="modal-hint" id="promptModalHint">Aufgabe <b>—</b> · ggf. anpassen oder direkt abschicken. Änderungen gelten nur für diesen Sendevorgang.</p>
+    <label>System-Prompt</label>
+    <textarea id="promptSys" spellcheck="false"></textarea>
+    <label>User-Message</label>
+    <textarea id="promptUsr" spellcheck="false"></textarea>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="cancelPromptReview()">Abbrechen</button>
+      <button class="btn ghost" onclick="resetPromptToOriginal()">Original wiederherstellen</button>
+      <button class="btn accent" onclick="confirmPromptReview()">Absenden →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Fehlerlisten-Editor-Modal -->
+<div id="fehlerEditorModal" class="modal-backdrop" style="display:none" onclick="if(event.target===this)closeFehlerEditor()">
+  <div class="modal">
+    <h3>Fehlerlisten bearbeiten</h3>
+    <p class="modal-hint">Eine Zeile pro Fehler. Die Listen gelten für die aktuelle Klausur und werden im Browser-Speicher behalten. „Defaults wiederherstellen" überschreibt die aktuelle Liste.</p>
+    <div class="fehler-editor-tabs" id="fehlerEditorTabs"></div>
+    <div class="fehler-editor-body">
+      <textarea id="fehlerEditorTextarea" spellcheck="false"></textarea>
+      <p class="fehler-editor-hint" id="fehlerEditorHint">—</p>
+    </div>
+    <div class="modal-actions">
+      <button class="btn ghost" onclick="closeFehlerEditor()">Abbrechen</button>
+      <button class="btn ghost" onclick="resetFehlerCategory()">Defaults wiederherstellen (nur diese Kategorie)</button>
+      <button class="btn accent" onclick="saveFehlerEditor()">Speichern</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ============================ KONSTANTEN ============================ */
+const NIVEAU = [
+  {lab:"sehr gut  ·  13–15 NP", tone:"sehr würdigend, kleine Schwächen knapp benannt"},
+  {lab:"gut  ·  10–12 NP", tone:"überwiegend würdigend, einzelne Mängel klar benannt"},
+  {lab:"befriedigend  ·  7–9 NP", tone:"ausgewogen, Stärken und Schwächen gleichgewichtet"},
+  {lab:"ausreichend  ·  5–6 NP", tone:"deutlich kritisch mit Anerkennung des Bewältigten"},
+  {lab:"schwach ausreichend  ·  4 NP", tone:"kritisch, defizitorientiert, knapp gewürdigt"},
+  {lab:"mangelhaft (Grundkenntnisse vorhanden)  ·  1–3 NP", tone:"überwiegend kritisch, konstruktiv-aufbauend"},
+  {lab:"ungenügend  ·  0 NP", tone:"durchgängig kritisch, Mängel klar benennen, ohne abzuwerten"}
+];
+
+const NP_TABLE = [
+  {np:15,p:95,note:"sehr gut",t:"1+"},{np:14,p:90,note:"sehr gut",t:"1"},{np:13,p:85,note:"sehr gut",t:"1−"},
+  {np:12,p:80,note:"gut",t:"2+"},{np:11,p:75,note:"gut",t:"2"},{np:10,p:70,note:"gut",t:"2−"},
+  {np:9,p:65,note:"befriedigend",t:"3+"},{np:8,p:60,note:"befriedigend",t:"3"},{np:7,p:55,note:"befriedigend",t:"3−"},
+  {np:6,p:50,note:"ausreichend",t:"4+"},{np:5,p:45,note:"ausreichend",t:"4"},
+  {np:4,p:40,note:"schwach ausreichend",t:"4−"},
+  {np:3,p:33,note:"mangelhaft",t:"5+"},{np:2,p:27,note:"mangelhaft",t:"5"},{np:1,p:20,note:"mangelhaft",t:"5−"},
+  {np:0,p:0,note:"ungenügend",t:"6"}
+];
+
+/* NP → NIVEAU-Index (0=sehr gut … 6=ungenügend) */
+function npToNiveauIdx(np){
+  if(np>=13) return 0; if(np>=10) return 1; if(np>=7) return 2;
+  if(np>=5)  return 3; if(np>=4)  return 4; if(np>=1) return 5;
+  return 6;
+}
+
+/* Sprachstufen-Dropdown initialisieren */
+function initSprachstufeDropdown(){
+  const sel = document.getElementById('sprachstufe');
+  if(!sel) return;
+  sel.innerHTML = SPRACHSTUFEN.map((s,i)=>
+    `<option value="${esc(s.id)}" ${i===0?'selected':''}>${esc(s.label)}</option>`
+  ).join('');
+}
+function getSprachstufe(){
+  const id = getVal('sprachstufe');
+  return SPRACHSTUFEN.find(s=>s.id===id) || SPRACHSTUFEN[0];
+}
+function updateSprachstufeHint(){
+  const el = document.getElementById('sprachstufeHint');
+  if(el){ el.textContent = getSprachstufe().desc; }
+}
+
+/* Fach → kurzes Kürzel für Dateinamen */
+function fachToKurz(fach){
+  if(!fach) return 'fach';
+  const f = fach.toLowerCase().trim();
+  /* gängige Hessen-Fächer */
+  if(/politik.*wirtschaft|pw\b|powi/.test(f)) return 'pw';
+  if(/^geschichte\b|^gesch\b/.test(f))         return 'gesch';
+  if(/^deutsch\b/.test(f))                      return 'd';
+  if(/^englisch\b/.test(f))                     return 'e';
+  if(/^französisch\b|^franz/.test(f))           return 'f';
+  if(/^mathematik\b|^mathe\b/.test(f))          return 'm';
+  if(/^biologie\b|^bio\b/.test(f))              return 'bio';
+  if(/^chemie\b/.test(f))                       return 'ch';
+  if(/^physik\b/.test(f))                       return 'ph';
+  if(/^erdkunde\b|^geographie\b|^geo\b/.test(f)) return 'ek';
+  if(/^religion\b|\bevangelisch\b|\bkatholisch\b/.test(f)) return 'rel';
+  if(/^ethik\b/.test(f))                        return 'eth';
+  if(/^philosophie\b/.test(f))                  return 'phil';
+  if(/^kunst\b/.test(f))                        return 'ku';
+  if(/^musik\b/.test(f))                        return 'mu';
+  if(/^sport\b/.test(f))                        return 'sp';
+  if(/^informatik\b|^info\b/.test(f))           return 'inf';
+  /* sonst: erste beiden Buchstaben als Notlösung */
+  return f.replace(/[^a-zäöü]/g,'').slice(0,3) || 'fach';
+}
+/* Datum (TT.MM.JJJJ oder JJJJ-MM-TT) → Jahr; sonst aktuelles Jahr */
+function datumToJahr(datum){
+  if(datum){
+    const m1 = datum.match(/(\d{4})/);
+    if(m1) return m1[1];
+  }
+  return String(new Date().getFullYear());
+}
+
+/* Vorschau des Dateinamens live aktualisieren (im Setup-Bereich) */
+function updateFilenamePreview(){
+  const el = document.getElementById('filenamePreview');
+  if(!el) return;
+  const fach   = (getVal('setupFach')   || getVal('fach') || '').trim();
+  const titel  = (getVal('setupTitel')  || getVal('titel') || 'Klausur').trim();
+  const stufe  = (getVal('setupStufe')  || 'Q2').trim().toLowerCase().replace(/\s+/g,'');
+  const datum  = (getVal('setupDatum')  || getVal('datum') || '').trim();
+  const fachKurz = fachToKurz(fach);
+  const jahr   = datumToJahr(datum);
+  const safeTitel = titel.replace(/[^\wÄÖÜäöüß\.\- ]+/g,'_').replace(/\s+/g,'-');
+  el.textContent = `${fachKurz}_${stufe}_${jahr}_${safeTitel}.xlsx`;
+}
+
+/* Gibt für einen Prozent-Anteil die Note zurück.
+   Zwei Modi:
+   - mit FQ-Abzug (für Gesamt): np wird um FQ-Abzug reduziert
+   - ohne (für Items/Aufgaben innerhalb): roh aus NP_TABLE */
+function gradeForPercent(pct, fqAbzug){
+  if(!isFinite(pct) || pct<0) return null;
+  const baseRow = NP_TABLE.find(r=>pct>=r.p) || NP_TABLE[NP_TABLE.length-1];
+  const np = Math.max(0, baseRow.np - (fqAbzug||0));
+  const row = NP_TABLE.find(r=>r.np===np) || baseRow;
+  return {
+    np: np,
+    baseNp: baseRow.np,
+    note: row.note,
+    tendenz: row.t,
+    niveauIdx: npToNiveauIdx(np)
+  };
+}
+
+/* Kurzlabel z.B. "3+" oder "5" — für inline-Anzeige */
+function gradeLabel(g){
+  if(!g) return '—';
+  return g.tendenz;
+}
+/* Pill-CSS-Klasse je nach Notenbereich */
+function gradePillClass(g){
+  if(!g) return 'gp-x';
+  if(g.np>=13) return 'gp-1';
+  if(g.np>=10) return 'gp-2';
+  if(g.np>=7)  return 'gp-3';
+  if(g.np>=5)  return 'gp-4';
+  if(g.np>=1)  return 'gp-5';
+  return 'gp-6';
+}
+
+const DEFAULT_SCHEMA = [
+  {name:"Aufgabe 1", items:[
+    {name:"Einleitung", max:3},
+    {name:"Sprache",    max:4},
+    {name:"Stringenz",  max:3},
+    {name:"Inhalt",     max:20}
+  ]},
+  {name:"Aufgabe 2", items:[
+    {name:"Sprache",   max:5},
+    {name:"Stringenz", max:5},
+    {name:"Inhalt",    max:30}
+  ]},
+  {name:"Aufgabe 3", items:[
+    {name:"Sprache",   max:5},
+    {name:"Stringenz", max:5},
+    {name:"Inhalt",    max:20}
+  ]}
+];
+
+const MAX_ITEMS_PER_TASK = 4;
+
+/* Sprachstufen für die KI-Rückmeldung. Anzeige im UI = GER-Stufe; im Prompt landet
+   die ausformulierte Beschreibung mit konkreten Vorgaben. */
+/* Default-Fehlerlisten pro Kriterium. Editierbar in den Einstellungen.
+   Schlüssel ist der kleingeschriebene Item-Name (Matching mit Kriteriums-Spalten). */
+const FEHLER_DEFAULTS = {
+  einleitung: [
+    "klare Einleitung fehlt",
+    "Textsorte des Materials nicht benannt",
+    "Autor:in nicht eingeordnet",
+    "Erscheinungsort/Quelle nicht genannt",
+    "Erscheinungsdatum fehlt",
+    "Adressat:in/Zielgruppe nicht thematisiert",
+    "Thema des Textes nur sehr allgemein formuliert",
+    "Bezug zur Aufgabenstellung nicht hergestellt",
+    "Einleitung zu lang, in den Hauptteil verschoben",
+    "wertende Aussagen bereits in der Einleitung"
+  ],
+  sprache: [
+    "Fehler im Satzbau (Sb)",
+    "Fehler im Ausdruck (A)",
+    "Rechtschreibfehler (R)",
+    "Zeichensetzungsfehler (Z)",
+    "Grammatikfehler (G)",
+    "Wortwahl ungenau (Wf)",
+    "Wortwiederholungen (Wdh)",
+    "Fachbegriffe fehlen oder werden falsch verwendet",
+    "umgangssprachliche Wendungen",
+    "unklare Formulierungen / Bezüge unklar"
+  ],
+  stringenz: [
+    "Distanzierung vom Text nicht gelungen",
+    "Distanz nur teilweise gewahrt (Mischung aus Wiedergabe und Bewertung)",
+    "Konjunktiv I nicht durchgehend verwendet",
+    "Argumentationsschritte nicht erkennbar",
+    "logische Sprünge zwischen den Absätzen",
+    "keine erkennbare Gliederung (Einleitung – Hauptteil – Schluss)",
+    "Wiederholungen statt Weiterführung der Argumentation",
+    "Schluss greift die Einleitung nicht auf",
+    "roter Faden fehlt",
+    "Aufgabenstellung gerät aus dem Blick"
+  ],
+  inhalt: [
+    "wesentliche Inhalte fehlen",
+    "Inhalte oberflächlich, zu wenig konkret",
+    "Beispiele fehlen oder unpassend",
+    "zentrale Fachbegriffe nicht eingeführt/erklärt",
+    "Materialbezug fehlt (keine Belege aus dem Text)",
+    "eigene Beurteilung bleibt zu zurückhaltend / fehlt",
+    "Argumente nicht differenziert (nur Pro- oder Kontra-Seite)",
+    "Inhalte falsch wiedergegeben",
+    "kein Bezug zu Unterrichtsinhalten / zum Kurshalbjahr-Thema",
+    "Schlussfolgerung trägt die Argumentation nicht"
+  ],
+  "inhalt (zusammenfassung)": [
+    "wesentliche Kernaussagen des Textes fehlen",
+    "eigene Wertung oder Meinung eingeflossen (Zusammenfassung muss sachlich-neutral bleiben)",
+    "zu nah am Wortlaut, kaum eigene Formulierung (Paraphrase fehlt)",
+    "wörtliche Übernahmen ohne Kennzeichnung",
+    "unwichtige Einzelheiten statt der zentralen Gedanken",
+    "Inhalte falsch oder verzerrt wiedergegeben",
+    "Gedankengang/Aufbau des Textes nicht nachvollziehbar geordnet",
+    "nicht durchgängig im Präsens / Tempus uneinheitlich",
+    "zu ausführlich, nicht auf das Wesentliche verdichtet",
+    "indirekte Rede (Konjunktiv I) nicht verwendet, wo nötig"
+  ],
+  weiterentwicklung: [
+    "[einfach] Schreibe kürzere Sätze — ein Gedanke pro Satz.",
+    "[einfach] Lies deinen Text am Ende einmal leise mit, um Flüchtigkeitsfehler zu finden.",
+    "[einfach] Beginne jeden Absatz mit einem klaren Kernsatz.",
+    "[niedrigschwellig] Verbinde Sätze mit Verknüpfungswörtern (zunächst, außerdem, folglich, dagegen).",
+    "[niedrigschwellig] Belege jede Aussage mit einem konkreten Beispiel oder einer Textstelle.",
+    "[mittel] Trenne klar zwischen sachlicher Wiedergabe und eigener, begründeter Beurteilung.",
+    "[mittel] Baue eine erkennbare Gliederung: Einleitung – Hauptteil – Schluss.",
+    "[mittel] Setze Fachbegriffe gezielt ein und erkläre sie beim ersten Auftreten kurz.",
+    "[anspruchsvoll] Wäge mehrere Perspektiven (Pro und Kontra) ab, bevor du dich festlegst.",
+    "[anspruchsvoll] Verknüpfe deine Argumentation mit Unterrichtsinhalten/Theorien des Kurshalbjahres.",
+    "[anspruchsvoll] Formuliere variantenreich; vermeide Wortwiederholungen durch passende Synonyme.",
+    "[anspruchsvoll] Schreibe einen Schluss, der die Einleitung aufgreift und ein begründetes Fazit zieht."
+  ]
+};
+
+const SPRACHSTUFEN = [
+  {id:'B2-default', label:'Standard (B2 Oberstufe)',
+   desc:'Normaler oberstufengerechter Stil. Fachsprache wo passend, klare Satzbauten, keine künstliche Vereinfachung.'},
+  {id:'A1', label:'A1 (sehr einfach)',
+   desc:'Sehr einfache Sprache. Kurze Hauptsätze, maximal 8–10 Wörter pro Satz. Nur Grundwortschatz, keine Fremdwörter, keine Fachbegriffe. Statt zusammengesetzter Wörter umschreiben („Wirtschaftspolitik" → „was der Staat mit der Wirtschaft macht"). Aktive Verben. Pro Aufgabe maximal 4 Sätze.'},
+  {id:'A2', label:'A2 (einfach)',
+   desc:'Einfache Sprache. Kurze Sätze, 10–12 Wörter im Schnitt. Wenige Fremdwörter, wenn doch, dann sofort erklärt. Wenige zusammengesetzte Wörter. Konkrete Beispiele statt Abstraktion. Pro Aufgabe 4–6 Sätze.'},
+  {id:'B1', label:'B1 (mittel)',
+   desc:'Mittelschwere Sprache. Hauptsätze mit gelegentlichen Nebensätzen, 12–15 Wörter im Schnitt. Häufige Fachbegriffe werden verwendet, aber mit Bezug zum Konkreten verbunden. Keine verschachtelten Konstruktionen. Pro Aufgabe 5–7 Sätze.'},
+  {id:'B2', label:'B2 (oberstufengerecht)',
+   desc:'Oberstufengerechte Sprache. Satzgefüge mit ein bis zwei Nebensätzen erlaubt, 15–20 Wörter im Schnitt. Fachsprache der politischen Bildung wird angewendet. Pro Aufgabe 5–8 Sätze.'},
+  {id:'C1', label:'C1 (anspruchsvoll)',
+   desc:'Anspruchsvolle akademische Sprache. Komplexere Satzgefüge, abstrahierende Begriffe, präzise Fachsprache. Auch konjunktivische Wendungen erlaubt. Pro Aufgabe 6–9 Sätze.'},
+  {id:'C2', label:'C2 (wissenschaftlich)',
+   desc:'Wissenschaftliche Sprache. Differenzierte Argumentationsgänge, präzise Fachterminologie, abstrahierende Satzkonstruktionen. Theoretische Einordnung möglich. Pro Aufgabe 7–10 Sätze.'}
+];
+
+/* Fehlerzeichen-Legende (#9): Standard-Korrekturkürzel. */
+const FEHLERZEICHEN = {Sb:'Satzbau', A:'Ausdruck', R:'Rechtschreibung', Z:'Zeichensetzung', G:'Grammatik', Wf:'Wortwahl/Wortform', Wdh:'Wortwiederholung'};
+function legendeBlock(text){
+  const used=[];
+  for(const k in FEHLERZEICHEN){ if(text.indexOf('('+k+')')>=0) used.push(k); }
+  if(!used.length) return '';
+  return 'Fehlerzeichen: '+used.map(k=>k+' = '+FEHLERZEICHEN[k]).join(' · ');
+}
+
+/* ============================ STATE ============================ */
+let tasks=[]; let uid=0;
+let schema = JSON.parse(JSON.stringify(DEFAULT_SCHEMA)); /* setup-builder state */
+
+/* aktive Excel-Daten (entweder aus File-Load oder neu generiert) */
+let activeWB = null;       /* SheetJS-Workbook */
+let activeSheetName = null;
+let activeMeta = null;     /* {criterionCols, taskSubtotalCols, ...} */
+let activeStudents = [];   /* Array von Studenten-Objekten */
+let currentStudentIdx = -1;
+let activeFilename = null; /* für Download */
+
+/* Pro Schülerin/Schüler gespeicherte UI-Eingaben (Stichpunkte, Texte, Niveau, FQ),
+   die nicht direkt im Workbook leben. Index = rowIdx der Schülerin/des Schülers. */
+let studentDrafts = {};
+
+/* Klausur-weite Metadaten: Aufgabenstellungen + Musterlösungen pro Task-Index.
+   Sind nicht schüler-spezifisch und werden separat persistiert. */
+let klausurMeta = {
+  aufgabenstellungen: [],
+  musterloesungen: [],
+  musterloesungOffen: [],
+  /* Fehlerlisten pro Kriterium (lowercase-Name → Array von Strings).
+     Beim Start als Kopie von FEHLER_DEFAULTS gefüllt. */
+  fehlerlisten: JSON.parse(JSON.stringify(FEHLER_DEFAULTS))
+};
+
+/* Überträgt klausurMeta-Felder in tasks[] (nach Schema-Aufbau oder Schüler-Load).
+   Nicht aufzurufen vor drawTasks() — dazwischen, da drawTasks die Werte rendert. */
+function applyKlausurMetaToTasks(){
+  tasks.forEach((t, i)=>{
+    if(klausurMeta.aufgabenstellungen[i] != null) t.aufgabenstellung = klausurMeta.aufgabenstellungen[i];
+    if(klausurMeta.musterloesungen[i] != null)    t.musterloesung    = klausurMeta.musterloesungen[i];
+    if(klausurMeta.musterloesungOffen[i] != null) t.musterloesungOffen = klausurMeta.musterloesungOffen[i];
+  });
+}
+
+/* Für eine Aufgabe das Fehlerlisten-HTML bauen — pro Item (Einleitung, Sprache, …)
+   eine Sub-Box mit anklickbaren Items aus klausurMeta.fehlerlisten[itemName]. */
+function buildFehlerlistenHTML(t){
+  const lists = klausurMeta.fehlerlisten || {};
+  const blocks = t.items.map(it=>{
+    const nm = String(it.name||'').trim();
+    if(!nm) return '';
+    const key = nm.toLowerCase();
+    const arr = lists[key];
+    if(!arr || !arr.length){
+      return `<div class="fehler-block">
+        <h5>${esc(nm)} <span class="small">— keine Default-Liste</span></h5>
+        <p class="small" style="margin:0;color:var(--ink-soft)">Über „Listen bearbeiten" eine Liste für „${esc(nm)}" anlegen.</p>
+      </div>`;
+    }
+    const pills = arr.map((txt,i)=>
+      `<button class="fehler-pill" type="button" data-fehler-text="${esc(txt)}" data-task-id="${t.id}">${esc(txt)}</button>`
+    ).join('');
+    return `<div class="fehler-block">
+      <h5>${esc(nm)}</h5>
+      <div class="fehler-pills">${pills}</div>
+    </div>`;
+  }).filter(Boolean).join('');
+  if(!blocks){
+    return `<p class="small" style="margin:8px 0;color:var(--ink-soft)">Keine Bewertungsteile mit Namen — zuerst oben Item-Namen vergeben.</p>`;
+  }
+  return blocks;
+}
+
+/* Übernimmt alle aktiven Fehler-Pills einer Aufgabe ins Stichpunkte-Feld.
+   Markierte Pills werden danach wieder deaktiviert (für die nächste Person). */
+function fehlerUebernehmen(taskId){
+  const t = tasks.find(x=>x.id===taskId);
+  if(!t) return;
+  const taskEl = document.querySelector(`.task [data-fehler-uebernehmen="${taskId}"]`)?.closest('.task');
+  if(!taskEl) return;
+  /* Pills sind nach Item gruppiert. Wir sammeln pro Item die aktiven Pills,
+     damit die Stichpunkte schön gruppiert eingefügt werden. */
+  const blocks = taskEl.querySelectorAll('.fehler-block');
+  const newLines = [];
+  blocks.forEach(block=>{
+    const itemName = block.querySelector('h5')?.firstChild?.textContent?.trim() || '';
+    const active = Array.from(block.querySelectorAll('.fehler-pill.active'));
+    if(!active.length) return;
+    /* Optional: Item-Name als Header? Wir machen das schlicht — direkt die Fehler-Texte,
+       so wie Jaro sie auch von Hand schreiben würde (siehe Mazzucato-Backup). */
+    active.forEach(a=> newLines.push(a.dataset.fehlerText));
+  });
+  if(!newLines.length){
+    setHint('st-'+taskId, 'Keine Fehler angeklickt.', 'err');
+    return;
+  }
+  const ta = document.querySelector(`textarea[data-k="stich"][data-id="${taskId}"]`);
+  if(!ta) return;
+  const existing = ta.value.trim();
+  const newBlock = newLines.map(l=>'– '+l).join('\n');
+  ta.value = existing ? existing + '\n' + newBlock : newBlock;
+  t.stich = ta.value;
+  /* Pills deaktivieren */
+  taskEl.querySelectorAll('.fehler-pill.active').forEach(p=> p.classList.remove('active'));
+  render();
+  setHint('st-'+taskId, `${newLines.length} ${newLines.length===1?'Fehler':'Fehler'} übernommen.`, 'ok');
+}
+
+/* Auto-Save Debouncer */
+let _saveTimer = null;
+const STORAGE_KEY = 'klausur-rueckmeldung-v14';
+
+/* ============================ PERSISTENZ ============================ */
+/* Workbook → Base64 für localStorage */
+function wbToBase64(wb){
+  try{
+    const arr = XLSX.write(wb, {bookType:'xlsx', type:'array', cellStyles:true});
+    let bin = '';
+    const bytes = new Uint8Array(arr);
+    /* Chunk-weise, um Stack-Overflow bei String.fromCharCode zu vermeiden */
+    const chunk = 8192;
+    for(let i=0; i<bytes.length; i+=chunk){
+      bin += String.fromCharCode.apply(null, bytes.subarray(i, i+chunk));
+    }
+    return btoa(bin);
+  }catch(e){ console.warn('wbToBase64 failed:', e); return null; }
+}
+function base64ToWB(b64){
+  try{
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for(let i=0; i<bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return XLSX.read(bytes, {type:'array', cellFormula:true, cellStyles:true});
+  }catch(e){ console.warn('base64ToWB failed:', e); return null; }
+}
+
+function persistState(){
+  if(typeof XLSX === 'undefined') return;
+  try{
+    const payload = {
+      version: 1,
+      ts: Date.now(),
+      activeFilename: activeFilename,
+      currentStudentIdx: currentStudentIdx,
+      studentDrafts: studentDrafts,
+      klausurMeta: klausurMeta,
+      schema: schema,
+      headerFields: {
+        anrede:      getVal('anrede'),
+        anredeform:  getVal('anredeform'),
+        vorschlag:   getVal('vorschlag'),
+        titel:       getVal('titel'),
+        fach:        getVal('fach'),
+        datum:       getVal('datum'),
+        sprache:     getVal('sprache'),
+        sprachstufe: getVal('sprachstufe'),
+        maxBE:       getVal('maxBE'),
+        optClearOnLoad:   document.getElementById('optClearOnLoad').checked,
+        optCritInPrompt:  document.getElementById('optCritInPrompt').checked,
+        optReviewPrompt:  document.getElementById('optReviewPrompt').checked,
+        optApiMode:       document.getElementById('optApiMode').checked,
+        optEmpfehlung:    document.getElementById('optEmpfehlung') ? document.getElementById('optEmpfehlung').checked : false
+      },
+      wbB64: activeWB ? wbToBase64(activeWB) : null
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    updateSaveStatus();
+  }catch(e){
+    console.warn('persistState failed:', e);
+    /* localStorage voll? Wir versuchen kein Recovery, geben nur Warnung. */
+    const el = document.getElementById('saveStatus');
+    if(el){ el.textContent = '⚠ Browser-Speicher fast voll'; el.style.color = '#9A5B12'; }
+  }
+}
+function getVal(id){ const el = document.getElementById(id); return el ? el.value : ''; }
+function setVal(id, v){ const el = document.getElementById(id); if(el) v!=null && (el.value = v); }
+
+function persistDebounced(){
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(persistState, 800);
+}
+
+function loadPersistedState(){
+  if(typeof XLSX === 'undefined') return false;
+  let raw;
+  try{ raw = localStorage.getItem(STORAGE_KEY); }
+  catch(e){ return false; }
+  if(!raw) return false;
+  let p;
+  try{ p = JSON.parse(raw); } catch(e){ return false; }
+  if(!p || p.version !== 1) return false;
+
+  /* Schema & Header-Felder wiederherstellen */
+  if(p.schema && Array.isArray(p.schema) && p.schema.length){
+    schema = p.schema;
+    drawSchema();
+  }
+  if(p.headerFields){
+    Object.entries(p.headerFields).forEach(([k,v])=>{
+      if(typeof v === 'boolean'){
+        const el = document.getElementById(k); if(el) el.checked = v;
+      } else { setVal(k, v); }
+    });
+  }
+  studentDrafts = p.studentDrafts || {};
+  if(p.klausurMeta){
+    /* Fehlerlisten zusammenführen: gespeicherte Werte haben Vorrang,
+       fehlende Kriterien werden aus den Defaults gefüllt. */
+    const savedFL = p.klausurMeta.fehlerlisten || {};
+    const mergedFL = JSON.parse(JSON.stringify(FEHLER_DEFAULTS));
+    Object.keys(savedFL).forEach(k=>{
+      if(Array.isArray(savedFL[k])) mergedFL[k] = savedFL[k];
+    });
+    klausurMeta = {
+      aufgabenstellungen: p.klausurMeta.aufgabenstellungen || [],
+      musterloesungen:    p.klausurMeta.musterloesungen    || [],
+      musterloesungOffen: p.klausurMeta.musterloesungOffen || [],
+      fehlerlisten: mergedFL
+    };
+  }
+
+  /* Workbook wiederherstellen, falls vorhanden */
+  if(p.wbB64){
+    const wb = base64ToWB(p.wbB64);
+    if(wb){
+      try{
+        const data = readWorkbookData(wb);
+        activateWorkbook(data, p.activeFilename || 'Klausur.xlsx', /*fromPersist=*/true);
+        if(p.currentStudentIdx >= 0 && p.currentStudentIdx < activeStudents.length){
+          currentStudentIdx = p.currentStudentIdx;
+          document.getElementById('picker').value = String(currentStudentIdx);
+          loadCurrentStudent(/*fromPersist=*/true);
+        }
+        return true;
+      }catch(e){ console.warn('Workbook restore failed:', e); }
+    }
+  }
+  return true;
+}
+
+function clearPersistedState(){
+  try{ localStorage.removeItem(STORAGE_KEY); }catch(e){}
+}
+
+function updateSaveStatus(){
+  const el = document.getElementById('saveStatus');
+  if(!el) return;
+  const now = new Date();
+  const hh = String(now.getHours()).padStart(2,'0');
+  const mm = String(now.getMinutes()).padStart(2,'0');
+  const ss = String(now.getSeconds()).padStart(2,'0');
+  el.textContent = `lokal gespeichert ${hh}:${mm}:${ss}`;
+  el.style.color = '';
+}
+
+/* ============================ HELPERS ============================ */
+function esc(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function de(x,d){ if(!isFinite(x))return '—'; return x.toFixed(d).replace('.',','); }
+function deNum(x){
+  if(x==null||x==='') return '';
+  const n = parseFloat(x);
+  if(!isFinite(n)) return '';
+  return (Math.round(n*100)/100).toString().replace('.',',');
+}
+function numOrNull(v){
+  if(v==null||v==='') return null;
+  const n = parseFloat(v);
+  return isFinite(n) ? n : null;
+}
+function person(){
+  const fem=document.getElementById('anrede').value==='Frau';
+  return {fem, who:fem?'die Schülerin':'der Schüler',
+          anrede:document.getElementById('anrede').value,
+          form:document.getElementById('anredeform').value};
+}
+
+/* Name auf "Bac., C." Form bringen.
+   Eingabe: "Bacher, Carla" oder "Bac., C." oder "Bacher Carla" — alle zulässig. */
+function shortName(input){
+  if(!input) return {nachname:'', vorname:''};
+  const s = String(input).trim();
+  if(!s) return {nachname:'', vorname:''};
+  /* Komma als Hauptdelimiter */
+  let n='', v='';
+  if(s.includes(',')){
+    const parts = s.split(',', 2);
+    n = parts[0].trim();
+    v = (parts[1]||'').trim();
+  } else {
+    /* Leerzeichen-Fallback: erstes Wort = Nachname */
+    const m = s.match(/^(\S+)\s+(\S.*)$/);
+    if(m){ n=m[1]; v=m[2]; }
+    else { n=s; v=''; }
+  }
+  /* Nachname auf 3 Buchstaben kürzen, mit Punkt */
+  let nShort = n.replace(/\.$/,'').slice(0,3);
+  if(nShort.length){ nShort = nShort.charAt(0).toUpperCase() + nShort.slice(1).toLowerCase() + '.'; }
+  /* Vorname auf 1 Buchstabe */
+  let vShort = '';
+  if(v){
+    vShort = v.replace(/\.$/,'').charAt(0).toUpperCase() + '.';
+  }
+  return {nachname:nShort, vorname:vShort};
+}
+
+function parseStudentLines(text){
+  return String(text||'').split(/\r?\n/)
+    .map(l=>l.trim()).filter(Boolean)
+    .map(line=>{
+      const s = String(line).trim();
+      let nFull='', vFull='';
+      if(s.includes(',')){
+        const parts = s.split(',', 2);
+        nFull = parts[0].trim();
+        vFull = (parts[1]||'').trim();
+      } else {
+        const m = s.match(/^(\S+)\s+(\S.*)$/);
+        if(m){ nFull=m[1]; vFull=m[2]; }
+        else { nFull=s; vFull=''; }
+      }
+      const sh = shortName(s);
+      return {
+        nachnameVoll: nFull, vornameVoll: vFull,
+        nachname: sh.nachname, vorname: sh.vorname
+      };
+    })
+    .filter(s=>s.nachnameVoll || s.nachname)
+    .sort((a,b)=>{
+      const aN = a.nachnameVoll||a.nachname, bN = b.nachnameVoll||b.nachname;
+      const c = aN.localeCompare(bN, 'de');
+      if(c!==0) return c;
+      const aV = a.vornameVoll||a.vorname,  bV = b.vornameVoll||b.vorname;
+      return aV.localeCompare(bV, 'de');
+    });
+}
+
+/* ============================ ITEMS (Bewertungsteile) ============================ */
+/* Datenmodell: task.items = [{name, max, score, locked:bool}]
+   `locked` heißt: Name nicht editierbar (Bindung an Excel-Spalte).
+   `score` als String (Eingabefeld); konvertiert für Berechnungen. */
+
+function taskBE(t){
+  return t.items.reduce((a,it)=>{
+    const v = parseFloat(it.score);
+    return a + (isFinite(v) && v>=0 ? v : 0);
+  }, 0);
+}
+function taskBeMax(t){
+  return t.items.reduce((a,it)=>{
+    const v = parseFloat(it.max);
+    return a + (isFinite(v) && v>=0 ? v : 0);
+  }, 0);
+}
+function taskAnyScore(t){
+  return t.items.some(it=>{
+    const v = parseFloat(it.score);
+    return isFinite(v) && v>=0;
+  });
+}
+
+/* Setzt task.niveau automatisch passend zur rechnerischen Note der Aufgabe.
+   Wird bei jeder Score-/Max-Eingabe aufgerufen. */
+function syncNiveauForTask(t){
+  if(!taskAnyScore(t)) return;
+  const be = taskBE(t), bm = taskBeMax(t);
+  if(!(bm>0)) return;
+  const g = gradeForPercent(be/bm*100);
+  if(g) t.niveau = g.niveauIdx;
+}
+
+function addTask(){
+  const id=++uid;
+  tasks.push({id, niveau:2, items:[{name:'', max:'', score:'', locked:false}],
+              stich:'', text:'', aufgabenstellung:'', musterloesung:'',
+              musterloesungOffen:false});
+  drawTasks();
+}
+function delTask(id){
+  if(tasks.length<=1) return;
+  tasks = tasks.filter(t=>t.id!==id);
+  drawTasks();
+}
+function addItem(taskId){
+  const t = tasks.find(x=>x.id===taskId);
+  if(!t || t.items.length>=MAX_ITEMS_PER_TASK) return;
+  t.items.push({name:'', max:'', score:'', locked:false});
+  drawTasks();
+}
+function delItem(taskId, idx){
+  const t = tasks.find(x=>x.id===taskId);
+  if(!t || t.items.length<=1) return;
+  t.items.splice(idx,1);
+  drawTasks();
+}
+
+function setTaskCount(n){
+  while(tasks.length<n){ addTask(); }
+  while(tasks.length>n){ tasks.pop(); }
+  drawTasks();
+}
+
+/* ============================ FQ ============================ */
+function isNachteilActive(){ const el=document.getElementById('optNachteil'); return !!(el && el.checked); }
+function onNachteilChange(){
+  if(currentStudentIdx>=0 && activeStudents[currentStudentIdx]){
+    activeStudents[currentStudentIdx].nachteil = isNachteilActive();
+    saveDraftForCurrentStudent();
+  }
+  render();
+}
+function fqInfo(){
+  const fd=parseFloat(document.getElementById('fqDirect').value);
+  const f =parseFloat(document.getElementById('fehler').value);
+  const w =parseFloat(document.getElementById('woerter').value);
+  let fq, source, fObj=null, wObj=null;
+  if(isFinite(fd) && fd>=0){
+    fq = fd; source = 'direct';
+  } else if(isFinite(f) && f>=0 && isFinite(w) && w>0){
+    fq = f/w*100; source = 'fw'; fObj=f; wObj=w;
+  } else { return null; }
+  const na = isNachteilActive();
+  let abzug=0, txt="kein Notenpunktabzug";
+  if(na){ txt="Notenschutz (LRS): Fehlerquotient nicht eingerechnet"; }
+  else if(fq>=6){abzug=2;txt="zwei Notenpunkte Abzug";}
+  else if(fq>=3){abzug=1;txt="ein Notenpunkt Abzug";}
+  return {f:fObj, w:wObj, fq, abzug, txt, source, nachteil:na};
+}
+function onFqInput(){
+  const fd = document.getElementById('fqDirect').value;
+  const hasDirect = fd!=='' && parseFloat(fd)>=0;
+  document.getElementById('fehler').style.opacity  = hasDirect ? '.5' : '1';
+  document.getElementById('woerter').style.opacity = hasDirect ? '.5' : '1';
+  render();
+}
+
+/* ============================ TASK UI ============================ */
+function drawTasks(){
+  const host=document.getElementById('tasks'); host.innerHTML='';
+  tasks.forEach((t,i)=>{
+    const n=i+1;
+    const be   = taskBE(t);
+    const beMx = taskBeMax(t);
+    const beTxt = (taskAnyScore(t) || beMx>0)
+      ? deNum(be) + (beMx>0 ? ' / '+deNum(beMx) : '') + ' BE'
+      : '—';
+
+    const itemsHTML = t.items.map((it,idx)=>{
+      const lockBadge = it.locked ? ' <span class="src-badge green">geb.</span>' : '';
+      /* Note pro Item: nur wenn beide Werte da und max>0 */
+      const sVal = parseFloat(it.score), mVal = parseFloat(it.max);
+      let pill = '<span class="gp gp-x" title="Note pro Item, sobald Score und Max gesetzt">—</span>';
+      if(isFinite(sVal) && sVal>=0 && isFinite(mVal) && mVal>0){
+        const g = gradeForPercent(sVal/mVal*100);
+        if(g) pill = `<span class="gp ${gradePillClass(g)}" title="${esc(g.note)} · ${g.np} NP">${esc(g.tendenz)}</span>`;
+      }
+      return `<div class="item-row">
+        <input type="text" data-k="iname" data-id="${t.id}" data-idx="${idx}" placeholder="z.B. Inhalt"
+               value="${esc(it.name)}" ${it.locked?'readonly':''}>
+        <input type="number" data-k="iscore" data-id="${t.id}" data-idx="${idx}" placeholder="0"
+               step="0.5" min="0" value="${esc(it.score)}">
+        <span class="slash">/</span>
+        <input type="number" data-k="imax" data-id="${t.id}" data-idx="${idx}" placeholder="max"
+               step="0.5" min="0" value="${esc(it.max)}">
+        ${pill}
+        <button class="x-mini" data-act="delitem" data-id="${t.id}" data-idx="${idx}"
+                ${t.items.length<=1?'disabled':''} title="Bewertungsteil entfernen">✕</button>
+      </div>`;
+    }).join('');
+
+    const canAdd = t.items.length < MAX_ITEMS_PER_TASK;
+
+    /* Note pro Aufgabe */
+    let taskPill = '';
+    if(taskAnyScore(t) && beMx>0){
+      const g = gradeForPercent(be/beMx*100);
+      if(g) taskPill = `<span class="gp ${gradePillClass(g)}" title="${esc(g.note)} · ${g.np} NP">${esc(g.tendenz)}</span>`;
+    }
+
+    const el=document.createElement('div'); el.className='task';
+    el.innerHTML=`
+      <div class="task-head">
+        <h3>Aufgabe ${n}</h3>
+        <span class="be-sum">${beTxt}${taskPill}</span>
+        <select data-k="niveau" data-id="${t.id}" style="flex:0 0 280px;min-width:200px" title="Niveau (Notenbereich) — wird automatisch aus den Punkten synchronisiert">
+          ${NIVEAU.map((nv,ni)=>`<option value="${ni}" ${t.niveau===ni?'selected':''}>${esc(nv.lab)}</option>`).join('')}
+        </select>
+        <span class="info" data-help="niveau">i</span>
+        <button class="x" data-act="deltask" data-id="${t.id}" ${tasks.length<=1?'style="visibility:hidden"':''}>✕ Aufgabe</button>
+      </div>
+      <label style="margin-top:6px">Bewertungsteile (bis ${MAX_ITEMS_PER_TASK}) <span class="info" data-help="item-row">i</span></label>
+      <div class="items-list">${itemsHTML}</div>
+      ${canAdd ? `<button class="addbtn sm" data-act="additem" data-id="${t.id}">+ Bewertungsteil</button>` : ''}
+      <div class="field" style="margin-top:14px">
+        <label>Aufgabenstellung <span class="info" data-help="aufgabenstellung">i</span></label>
+        <textarea data-k="aufgabenstellung" data-id="${t.id}" rows="2" placeholder="Wortlaut der Aufgabe — bleibt klausur-weit, unabhängig von der Schülerin oder dem Schüler.">${esc(t.aufgabenstellung||'')}</textarea>
+      </div>
+      <details class="muster-details" ${t.musterloesungOffen?'open':''}>
+        <summary data-k="muster-toggle" data-id="${t.id}">Musterlösung / Erwartungshorizont <span class="small">(aufklappen zum Bearbeiten)</span> <span class="info" data-help="musterloesung">i</span></summary>
+        <textarea data-k="musterloesung" data-id="${t.id}" rows="4" placeholder="Erwartete Inhalte / Lösungsskizze. Wird optional an die KI weitergegeben.">${esc(t.musterloesung||'')}</textarea>
+      </details>
+      <details class="fehlerlisten-details">
+        <summary>Typische Fehler anklicken <span class="small">(je Bewertungsteil)</span> <span class="info" data-help="fehlerliste">i</span></summary>
+        <div class="fehlerlisten-body">
+          ${buildFehlerlistenHTML(t)}
+          <div class="fehler-actions">
+            <button class="btn sm" data-fehler-uebernehmen="${t.id}">↓ Markierte übernehmen in Stichpunkte</button>
+            <button class="btn ghost sm" onclick="openFehlerEditor()">Listen bearbeiten</button>
+          </div>
+        </div>
+      </details>
+      <div class="field" style="margin-top:14px">
+        <label>Stichpunkte zur Rückmeldung <span class="info" data-help="stichpunkte">i</span></label>
+        <textarea data-k="stich" data-id="${t.id}" placeholder="– zentrale wirtschaftspolitische Konzepte korrekt benannt&#10;– Bezug zum Material am Ende nicht konsequent durchgeführt&#10;– eigene Beurteilung bleibt zu zurückhaltend">${esc(t.stich)}</textarea>
+      </div>
+      <div class="task-actions">
+        <button class="btn accent sm" data-prompt="${t.id}" title="Prompt ins Clipboard kopieren — in Claude.ai/ChatGPT einfügen">⎘ Prompt kopieren</button>
+        <span class="info" data-help="prompt-kopieren">i</span>
+        <button class="btn sm" data-paste="${t.id}" title="Antwort aus Clipboard in das Rückmeldetext-Feld einfügen">↓ Antwort einfügen</button>
+        <span class="info" data-help="antwort-einfuegen">i</span>
+        <button class="btn ghost sm api-only" data-gen="${t.id}" title="Direkt-Anfrage an die API (nur wenn API-Modus aktiv)" style="display:none">✦ Rückmeldung erzeugen</button>
+      </div>
+      <p class="status" id="st-${t.id}"></p>
+      <div class="gen-out">
+        <label>Erzeugter Rückmeldetext (frei editierbar)</label>
+        <textarea data-k="text" data-id="${t.id}" placeholder="Wird hier nach dem Erzeugen eingefügt — oder direkt selbst schreiben.">${esc(t.text)}</textarea>
+      </div>`;
+    host.appendChild(el);
+  });
+
+  /* Event-Bindings */
+  host.querySelectorAll('[data-k]').forEach(inp=>{
+    const evt = inp.tagName==='SELECT' ? 'change' : 'input';
+    inp.addEventListener(evt, e=>{
+      const id  = +e.target.dataset.id;
+      const k   = e.target.dataset.k;
+      const idx = e.target.dataset.idx!=null ? +e.target.dataset.idx : null;
+      const t = tasks.find(x=>x.id===id);
+      if(!t) return;
+      if(k==='niveau') t.niveau = +e.target.value;
+      else if(k==='stich') t.stich = e.target.value;
+      else if(k==='text')  t.text  = e.target.value;
+      else if(k==='aufgabenstellung'){
+        t.aufgabenstellung = e.target.value;
+        const taskIdx = tasks.findIndex(x=>x.id===id);
+        if(taskIdx>=0) klausurMeta.aufgabenstellungen[taskIdx] = e.target.value;
+      }
+      else if(k==='musterloesung'){
+        t.musterloesung = e.target.value;
+        const taskIdx = tasks.findIndex(x=>x.id===id);
+        if(taskIdx>=0) klausurMeta.musterloesungen[taskIdx] = e.target.value;
+      }
+      else if(k==='iname'  && idx!=null) t.items[idx].name  = e.target.value;
+      else if(k==='iscore' && idx!=null) t.items[idx].score = e.target.value;
+      else if(k==='imax'   && idx!=null) t.items[idx].max   = e.target.value;
+      /* sanftes Re-Render: für Score/Max BE-Summe, Aufgaben-Pill,
+         Item-Pill und Niveau-Auswahl live aktualisieren */
+      if(k==='iscore' || k==='imax'){
+        syncNiveauForTask(t);
+        const taskEl = e.target.closest('.task');
+        if(taskEl){
+          /* BE-Summe + Aufgaben-Pill neu rendern */
+          const be = taskBE(t), bm = taskBeMax(t);
+          const beTxt = (taskAnyScore(t) || bm>0)
+              ? deNum(be) + (bm>0 ? ' / '+deNum(bm) : '') + ' BE' : '—';
+          let taskPill = '';
+          if(taskAnyScore(t) && bm>0){
+            const g = gradeForPercent(be/bm*100);
+            if(g) taskPill = `<span class="gp ${gradePillClass(g)}" title="${esc(g.note)} · ${g.np} NP">${esc(g.tendenz)}</span>`;
+          }
+          const sp = taskEl.querySelector('.be-sum');
+          if(sp) sp.innerHTML = beTxt + taskPill;
+          /* Niveau-Dropdown auf neuen Stand setzen */
+          const sel = taskEl.querySelector('select[data-k="niveau"]');
+          if(sel) sel.value = String(t.niveau);
+          /* Item-Pill der betroffenen Reihe neu rendern */
+          if(idx!=null){
+            const itEl = taskEl.querySelectorAll('.item-row')[idx];
+            if(itEl){
+              const sVal = parseFloat(t.items[idx].score), mVal = parseFloat(t.items[idx].max);
+              let pillHtml = '<span class="gp gp-x" title="Note pro Item, sobald Score und Max gesetzt">—</span>';
+              if(isFinite(sVal) && sVal>=0 && isFinite(mVal) && mVal>0){
+                const g = gradeForPercent(sVal/mVal*100);
+                if(g) pillHtml = `<span class="gp ${gradePillClass(g)}" title="${esc(g.note)} · ${g.np} NP">${esc(g.tendenz)}</span>`;
+              }
+              const oldPill = itEl.querySelector('.gp');
+              if(oldPill) oldPill.outerHTML = pillHtml;
+            }
+          }
+        }
+      }
+      render();
+    });
+  });
+  host.querySelectorAll('[data-act]').forEach(b=>{
+    b.addEventListener('click', e=>{
+      const act = b.dataset.act;
+      const id  = +b.dataset.id;
+      const idx = b.dataset.idx!=null ? +b.dataset.idx : null;
+      if(act==='deltask') delTask(id);
+      else if(act==='additem') addItem(id);
+      else if(act==='delitem') delItem(id, idx);
+    });
+  });
+  host.querySelectorAll('[data-gen]').forEach(b=>b.onclick=()=>generate(+b.dataset.gen,b));
+  host.querySelectorAll('[data-prompt]').forEach(b=>b.onclick=()=>copyPrompt(+b.dataset.prompt));
+  host.querySelectorAll('[data-paste]').forEach(b=>b.onclick=()=>pasteAnswerForTask(+b.dataset.paste));
+  /* Musterlösungs-Details: Auf/Zu-Zustand merken */
+  host.querySelectorAll('details.muster-details').forEach(d=>{
+    d.addEventListener('toggle', ()=>{
+      const summary = d.querySelector('summary[data-k="muster-toggle"]');
+      if(!summary) return;
+      const id = +summary.dataset.id;
+      const t = tasks.find(x=>x.id===id);
+      if(t){
+        t.musterloesungOffen = d.open;
+        const taskIdx = tasks.findIndex(x=>x.id===id);
+        if(taskIdx>=0) klausurMeta.musterloesungOffen[taskIdx] = d.open;
+        persistDebounced();
+      }
+    });
+  });
+  /* Fehler-Pills: Klick toggelt .active */
+  host.querySelectorAll('.fehler-pill').forEach(p=>{
+    p.addEventListener('click', ()=> p.classList.toggle('active'));
+  });
+  /* Fehler-Übernehmen-Buttons */
+  host.querySelectorAll('[data-fehler-uebernehmen]').forEach(b=>{
+    b.addEventListener('click', ()=> fehlerUebernehmen(+b.dataset.fehlerUebernehmen));
+  });
+  render();
+  updateApiModeUI();
+}
+
+/* ============================ RENDER ============================ */
+function render(){
+  /* FQ-Readout */
+  const fq=fqInfo(); const fqR=document.getElementById('fqReadout');
+  if(fq){
+    let label = `Fehlerquotient: <b>${de(fq.fq,1)}</b>`;
+    if(fq.source==='direct') label += ' <span class="src-badge">direkt</span>';
+    fqR.innerHTML = label + ` &nbsp;→&nbsp; <span class="pill k${fq.abzug}">${fq.txt}</span>`;
+  } else {
+    const _fe=document.getElementById('fehler').value.trim();
+    const _wo=document.getElementById('woerter').value.trim();
+    const _fd=document.getElementById('fqDirect').value.trim();
+    let _w='';
+    if(parseFloat(_fe)<0 || parseFloat(_fd)<0)      _w='⚠ Negative Eingabe — FQ ignoriert';
+    else if(_fe!=='' && !(parseFloat(_wo)>0))        _w='⚠ Wörter fehlen oder 0 — FQ nicht berechnet';
+    else if(_wo!=='' && !(parseFloat(_fe)>=0))       _w='⚠ Fehlerzahl fehlt — FQ nicht berechnet';
+    fqR.innerHTML='Fehlerquotient: <b>—</b>'+(_w?` <span class="pill k1">${_w}</span>`:'');
+  }
+
+  /* BE-Summe + NP */
+  let sum=0, have=false;
+  tasks.forEach(t=>{ if(taskAnyScore(t)){ sum+=taskBE(t); have=true; } });
+  document.getElementById('sumBE').value = have ? deNum(sum) : '';
+
+  /* mögliche BE: aus task.beMax-Summe vorschlagen, falls maxBE leer */
+  const maxFromTasks = tasks.reduce((a,t)=>a+taskBeMax(t), 0);
+  const maxBEFieldVal = document.getElementById('maxBE').value;
+  let maxBE = parseFloat(maxBEFieldVal);
+  if(!(maxBE>0) && maxFromTasks>0){
+    document.getElementById('maxBE').value = maxFromTasks;
+    maxBE = maxFromTasks;
+  }
+
+  const npR=document.getElementById('npReadout');
+  if(have && maxBE>0){
+    const pct=sum/maxBE*100;
+    const row=NP_TABLE.find(r=>pct>=r.p)||NP_TABLE[NP_TABLE.length-1];
+    const ab=fq?fq.abzug:0;
+    const endNp=Math.max(0,row.np-ab);
+    const endRow=NP_TABLE.find(r=>r.np===endNp);
+    npR.innerHTML=`Anteil: <b>${de(pct,1)} %</b> → <b>${row.np} NP</b> (${row.note}, ${row.t})`+
+      (ab? ` − ${ab} NP (FQ) = <span class="pill k${ab}">${endNp} NP · ${endRow.note} · ${endRow.t}</span>`
+         : (fq && fq.nachteil ? ` <span class="pill k0">Notenschutz: FQ nicht eingerechnet</span>`
+            : ` <span class="pill k0">kein FQ-Abzug</span>`))
+      + (pct>100 ? ` <span class="pill k1">⚠ Summe BE über mögliche BE</span>` : '');
+  } else if(have && !(maxBE>0)){
+    npR.innerHTML='Anteil: <b>—</b> <span class="pill k1">⚠ Mögliche BE fehlt oder 0 — keine Note</span>';
+  } else { npR.innerHTML='Anteil: <b>—</b> <span class="small">(Items füllen & mögliche BE eintragen)</span>'; }
+
+  document.getElementById('out').innerHTML = buildHTML();
+  updateSaveBar();
+  updateSprachstufeHint();
+  renderOverviewTable();
+  persistDebounced();
+}
+
+/* ============================ OUTPUT-BAU ============================ */
+function headerHTML(){
+  const p=person();
+  const name=document.getElementById('name').value.trim()||'<span class="ph">[Name]</span>';
+  const titel=document.getElementById('titel').value.trim();
+  const vs=document.getElementById('vorschlag').value;
+  let line1 = 'Rückmeldung zur Klausur';
+  if(titel) line1 += ' \u201E'+esc(titel)+'\u201C';
+  if(vs)    line1 += ' · Vorschlag '+esc(vs);
+  const line2 = esc(p.anrede)+' '+name;
+  return line1+'\n'+line2;
+}
+function taskBlockHTML(t,n){
+  const be = taskAnyScore(t)
+    ? '<strong>'+deNum(taskBE(t))+' BE</strong>'
+    : '<span class="ph">[BE]</span>';
+  const head = '<strong>Aufgabe '+n+'</strong> — '+be;
+  const body = t.text.trim() ? esc(t.text.trim())
+    : '<span class="ph">[Rückmeldetext Aufgabe '+n+' – Stichpunkte eintragen und erzeugen]</span>';
+  return head+'\n'+body;
+}
+function spracheBlockHTML(){
+  let out = 'Ausdruck und Sprache der Arbeit sind '+esc(document.getElementById('sprache').value)+'.';
+  const fq=fqInfo();
+  if(fq){
+    if(fq.source==='fw'){
+      out += '\n'+deNum(fq.f)+' Fehler bei '+deNum(fq.w)+' Wörtern ergeben einen Fehlerquotienten von '+de(fq.fq,1)+' — '+fq.txt+'.';
+    } else {
+      out += '\nDer Fehlerquotient beträgt '+de(fq.fq,1)+' — '+fq.txt+'.';
+    }
+  } else { out += '\n<span class="ph">[FQ angeben]</span>'; }
+  return out;
+}
+function totalBlockHTML(){
+  let sum=0, have=false;
+  tasks.forEach(t=>{ if(taskAnyScore(t)){ sum+=taskBE(t); have=true; } });
+  const maxBE=parseFloat(document.getElementById('maxBE').value);
+  if(!(have && maxBE>0)) return '';
+  const pct=sum/maxBE*100;
+  const row=NP_TABLE.find(r=>pct>=r.p)||NP_TABLE[NP_TABLE.length-1];
+  const fq=fqInfo(); const ab=fq?fq.abzug:0;
+  const endNp=Math.max(0,row.np-ab);
+  const endRow=NP_TABLE.find(r=>r.np===endNp);
+  let line = 'Gesamt: <strong>'+deNum(sum)+' von '+deNum(maxBE)+' BE</strong> = '+de(pct,1)+' %';
+  if(ab>0){ line += ' → '+row.np+' NP − '+ab+' NP (FQ) = <strong>'+endNp+' NP</strong> ('+esc(endRow.note)+', Note '+esc(endRow.t)+')'; }
+  else    { line += ' → <strong>'+endNp+' NP</strong> ('+esc(endRow.note)+', Note '+esc(endRow.t)+')'; }
+  return line;
+}
+function buildHTML(){
+  let html = headerHTML()+'\n\n';
+  tasks.forEach((t,i)=> html += taskBlockHTML(t,i+1)+'\n\n');
+  html += spracheBlockHTML();
+  const total = totalBlockHTML();
+  if(total) html += '\n\n'+total;
+  const _leg = legendeBlock(html);
+  if(_leg) html += '\n\n'+_leg;
+  return html;
+}
+function buildMarkdown(){
+  let s = buildHTML();
+  s = s.replace(/<strong>([\s\S]*?)<\/strong>/g, '**$1**');
+  s = s.replace(/<span class="ph">([\s\S]*?)<\/span>/g, '$1');
+  s = s.replace(/<span class="src-badge[^"]*">([\s\S]*?)<\/span>/g, '');
+  s = s.replace(/&nbsp;/g,' ').replace(/&amp;/g,'&').replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"');
+  return s;
+}
+function buildPlain(){ return buildMarkdown(); }
+function buildClipHTML(){
+  let s = buildHTML();
+  s = s.replace(/<span class="ph">([\s\S]*?)<\/span>/g, '<em style="color:#888">$1</em>');
+  s = s.replace(/<span class="src-badge[^"]*">[\s\S]*?<\/span>/g, '');
+  s = s.replace(/\n/g, '<br>');
+  return '<div style="font-family:Georgia,serif;font-size:11pt;line-height:1.6;color:#000">'+s+'</div>';
+}
+
+/* ============================ KI-PROMPT & GENERATION ============================ */
+function promptFor(t,n){
+  const p=person();
+  const name=document.getElementById('name').value.trim();
+  const nv=NIVEAU[t.niveau];
+  let anredeRegel;
+  if(p.form==='du'){
+    anredeRegel = `direkte Anrede mit „du" (klein); Possessiv „dein/deine".`;
+  } else if(p.form==='Sie'){
+    anredeRegel = `direkte Anrede mit „Sie" (groß); Possessiv „Ihr/Ihre".`;
+  } else {
+    anredeRegel = `unpersönlich/sachlich, ohne direkte Anrede. Vermeide „du", „Sie", „die Schülerin", „der Schüler".`;
+  }
+
+  const fach = (document.getElementById('fach').value||'').trim() || 'Politik und Wirtschaft';
+  const stufe = getSprachstufe();
+  /* Standard-Stufe (B2-default) verhält sich wie bisher — keine extra Sprach-Regel */
+  const sprachblock = stufe.id === 'B2-default'
+    ? ''
+    : `\n\nSPRACHSTUFE: ${stufe.label}. ${stufe.desc}\nDieser Sprach-Vorgabe folge strikt — sie ist wichtiger als andere Stil-Wünsche.`;
+
+  const sys = `Du bist ein erfahrener Gymnasiallehrer für ${fach} und schreibst eine knappe, konstruktive Rückmeldung zu einer Aufgabe einer Klausur. Der Text geht direkt an ${p.who}.
+
+GRUNDREGEL (wichtigste Regel): Du formulierst AUSSCHLIESSLICH die unten gegebenen Stichpunkte des Korrektors aus — du bist Umformulierer, nicht Autor. Füge KEINE Inhalte, Fakten, Beispiele, Begründungen, Fachbegriffe, Zahlen, Daten, Gesetze, Quellen oder Zitate hinzu, die nicht ausdrücklich in den Stichpunkten oder der Aufgabenstellung stehen — auch nicht, wenn sie fachlich plausibel wären. Benenne nur die Stärken, Schwächen und Erwartungen, die in den Stichpunkten stehen; erfinde keine zusätzlichen.
+
+WENN KEINE STICHPUNKTE vorliegen: Gib KEINEN Rückmeldetext aus, sondern ausschließlich diesen einen Satz: [Keine Stichpunkte — bitte ergänzen].
+
+AUFGABE: Wandle die stichpunktartigen Notizen in EINEN zusammenhängenden Rückmeldetext (Fließtext) um. Die LÄNGE richtet sich nach den Notizen: so viele Sätze, wie die Stichpunkte tragen (Richtwert bis ca. 7) — lieber kürzer als Fülltext. Erzeuge KEINE zusätzlichen Sätze nur, um eine bestimmte Länge zu erreichen.
+
+STIL:
+- KEIN Gutachten-Stil. Schreibe also NICHT „Die Leistungen entsprechen den Anforderungen …", NICHT „${esc(p.anrede)} ${esc(name||'[Name]')} zeigt, dass …".
+- Direkter, konstruktiver Rückmelde-Ton (gelungen / nicht gelungen / Erwartung) — aber NUR zu den Punkten, die in den Stichpunkten genannt sind.
+- Anredeform: ${anredeRegel}
+- Aussagen aus der Vorlage im normalen Indikativ wiedergeben — KEIN Konjunktiv I.
+- Fachsprachlich formulieren, aber nur mit Begriffen, die durch die Stichpunkte gedeckt sind; führe keine zusätzliche Fachsprache ein.
+- Unklare oder unvollständige Stichpunkte vorsichtig und knapp wiedergeben; im Zweifel weglassen statt ergänzen.
+- Nicht behaupten, was die Person konkret geschrieben oder gemeint habe, sofern es nicht in den Stichpunkten steht.
+- Standardisierte Korrektur-Kürzel in Klammern aus den Stichpunkten (z. B. (Sb), (A), (R), (Z), (G), (Wf), (Wdh)) darfst du als kurze Marker hinter der betreffenden Stelle übernehmen — erfinde KEINE neuen Kürzel.
+- KEIN Bewertungssatz, KEIN BE-Satz, KEIN Notensatz am Ende.
+- KEINE Überschrift „Aufgabe N" am Anfang.
+- KEIN Markdown, KEINE Aufzählungszeichen.
+- Tonfall am Leistungsniveau ausrichten — nur über die Formulierung, nicht über erfundene Stärken oder Schwächen: ${nv.tone}.${sprachblock}`;
+
+  let critBlock = '';
+  const useCrit = document.getElementById('optCritInPrompt').checked;
+  if(useCrit && t.items && t.items.some(it=>it.score!=='' && it.name)){
+    const lines = t.items.filter(it=>it.name).map(it=>{
+      const s = parseFloat(it.score);
+      const m = parseFloat(it.max);
+      const sTxt = isFinite(s) ? deNum(s) : '—';
+      const mTxt = isFinite(m) && m>0 ? ' / '+deNum(m) : '';
+      const pct  = (isFinite(s)&&isFinite(m)&&m>0) ? ' ('+Math.round(s/m*100)+' %)' : '';
+      return `- ${it.name}: ${sTxt}${mTxt} BE${pct}`;
+    }).join('\n');
+    critBlock = `\n\nBewertungs-Profil (NUR Tonkalibrierung — Einzelnoten/Prozentwerte NICHT im Text zitieren):
+${lines}`;
+  }
+
+  /* Aufgabenstellung und (falls vorhanden) Musterlösung als Kontext für die KI */
+  let aufgabeBlock = '';
+  if((t.aufgabenstellung||'').trim()){
+    aufgabeBlock = `\n\nAufgabenstellung (Wortlaut):\n${t.aufgabenstellung.trim()}`;
+  }
+  let musterBlock = '';
+  if((t.musterloesung||'').trim()){
+    musterBlock = `\n\nMusterlösung / Erwartungshorizont (NUR interner Bezugspunkt für dich — NICHT zitieren, NICHT als Schülerleistung darstellen und NICHT als zusätzliche Inhalte in den Text übernehmen):\n${t.musterloesung.trim()}`;
+  }
+
+  let empfBlock = '';
+  const optE = document.getElementById('optEmpfehlung');
+  if(optE && optE.checked){
+    const liste = (klausurMeta.fehlerlisten && klausurMeta.fehlerlisten['weiterentwicklung']) || [];
+    if(liste.length){
+      empfBlock = `\n\nWeiterentwicklungs-Empfehlungen (Vorgabeliste, nach Niveau gestaffelt). Waehle HOECHSTENS EINE, die zur in dieser Aufgabe gezeigten Leistung passt, und formuliere sie konkret auf den Fall bezogen als kurzen, ermutigenden Schluss-Hinweis. Uebernimm KEINE Empfehlung woertlich, erfinde keine zusaetzlichen, und nur wenn sie wirklich passt:\n` + liste.join('\n');
+    }
+  }
+  const usr = `Kontext: Aufgabe ${n}. Geprüfte Person: ${esc(p.anrede)} ${esc(name||'[Name]')} (${p.who}).${aufgabeBlock}${musterBlock}
+
+Stichpunkte des Korrektors:
+${t.stich.trim()||'(KEINE STICHPUNKTE — gemäß Grundregel nur den Hinweis ausgeben)'}${critBlock}${empfBlock}`;
+
+  return {sys,usr};
+}
+
+function copyPrompt(id){
+  const i=tasks.findIndex(x=>x.id===id), t=tasks[i];
+  const {sys,usr}=promptFor(t,i+1);
+  clip(sys+'\n\n---\n\n'+usr, null, 'st-'+id, 'Prompt kopiert.');
+}
+function copyAllPrompts(){
+  let out='';
+  tasks.forEach((t,i)=>{const {sys,usr}=promptFor(t,i+1);
+    out+=`=== AUFGABE ${i+1} ===\n${sys}\n\n${usr}\n\n\n`;});
+  clip(out, null, 'copyHint', 'Alle Aufgaben-Prompts kopiert.');
+}
+
+/* ============================ PROMPT-REVIEW-MODAL ============================ */
+let _promptModalResolve = null;
+let _promptModalOriginal = null;
+
+/* Öffnet das Modal mit sys/usr-Prompt, wartet auf User-Entscheidung.
+   Resolved mit {sys, usr} oder null (Abbruch). */
+function reviewPrompt(sys, usr, taskNum){
+  return new Promise(resolve => {
+    _promptModalResolve = resolve;
+    _promptModalOriginal = {sys, usr};
+    document.getElementById('promptSys').value = sys;
+    document.getElementById('promptUsr').value = usr;
+    document.getElementById('promptModalHint').innerHTML =
+      `Aufgabe <b>${taskNum}</b> · ggf. anpassen oder direkt abschicken. Änderungen gelten nur für diesen Sendevorgang.`;
+    document.getElementById('promptModal').style.display = 'grid';
+    setTimeout(()=>document.getElementById('promptUsr').focus(), 50);
+  });
+}
+function confirmPromptReview(){
+  const sys = document.getElementById('promptSys').value;
+  const usr = document.getElementById('promptUsr').value;
+  document.getElementById('promptModal').style.display = 'none';
+  const r = _promptModalResolve; _promptModalResolve = null; _promptModalOriginal = null;
+  if(r) r({sys, usr});
+}
+function cancelPromptReview(){
+  document.getElementById('promptModal').style.display = 'none';
+  const r = _promptModalResolve; _promptModalResolve = null; _promptModalOriginal = null;
+  if(r) r(null);
+}
+function resetPromptToOriginal(){
+  if(!_promptModalOriginal) return;
+  document.getElementById('promptSys').value = _promptModalOriginal.sys;
+  document.getElementById('promptUsr').value = _promptModalOriginal.usr;
+}
+/* ESC-Taste schließt Modal */
+document.addEventListener('keydown', e=>{
+  if(e.key === 'Escape' && document.getElementById('promptModal').style.display === 'grid'){
+    cancelPromptReview();
+  }
+});
+
+/* ============================ API-CALL ============================ */
+/* Reine API-Logik, ohne UI-Spaghetti. Wirft bei Fehler. Liefert Text-String. */
+async function callClaudeAPI(sys, usr){
+  const r = await fetch("https://api.anthropic.com/v1/messages",{
+    method:"POST", headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:1000,
+      system:sys, messages:[{role:"user",content:usr}] })
+  });
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  const data=await r.json();
+  const txt=(data.content||[]).filter(b=>b.type==="text").map(b=>b.text).join("\n").trim()
+    .replace(/^```[a-z]*\s*/i,'').replace(/```$/,'').trim();
+  if(!txt) throw new Error("leere Antwort");
+  return txt;
+}
+
+/* ===== Multi-Provider-API (KI-agnostisch, Bring-your-own-Key) ===== */
+const PROVIDER_DEFAULTS = {
+  anthropic:{model:'claude-sonnet-4-6', needsKey:true,  label:'Anthropic (Claude)'},
+  openai:   {model:'gpt-4o-mini',       needsKey:true,  label:'OpenAI (GPT)'},
+  gemini:   {model:'gemini-2.5-flash',  needsKey:true,  label:'Google Gemini'},
+  ollama:   {model:'qwen2.5:14b',       needsKey:false, label:'Ollama (lokal)'}
+};
+function onProviderChange(){
+  const sel=document.getElementById('apiProvider'); if(!sel) return;
+  const p=sel.value, cfg=PROVIDER_DEFAULTS[p]||{};
+  try{ localStorage.setItem('klausur-apiprovider', p); }catch(e){}
+  const kw=document.getElementById('apiKeyWrap'); if(kw) kw.style.display = cfg.needsKey ? '' : 'none';
+  const ke=document.getElementById('apiKey'); if(ke){ try{ ke.value = localStorage.getItem('klausur-apikey-'+p)||''; }catch(e){} }
+  const me=document.getElementById('apiModel'); if(me){ try{ me.value = localStorage.getItem('klausur-apimodel-'+p)||''; }catch(e){} me.placeholder='Standard: '+(cfg.model||''); }
+}
+function saveApiSettings(){
+  const sel=document.getElementById('apiProvider'); if(!sel) return; const p=sel.value;
+  try{ localStorage.setItem('klausur-apikey-'+p, (document.getElementById('apiKey')||{}).value||'');
+       localStorage.setItem('klausur-apimodel-'+p, (document.getElementById('apiModel')||{}).value||''); }catch(e){}
+}
+async function callProvider(sys, usr){
+  const prov=document.getElementById('apiProvider') ? document.getElementById('apiProvider').value : 'anthropic';
+  const cfg=PROVIDER_DEFAULTS[prov]||PROVIDER_DEFAULTS.anthropic;
+  const model=((document.getElementById('apiModel')||{}).value||'').trim() || cfg.model;
+  const key=((document.getElementById('apiKey')||{}).value||'').trim();
+  if(cfg.needsKey && !key) throw new Error('Kein API-Key für '+cfg.label+' — Key eintragen oder „Nur Prompt"-Modus nutzen');
+  let url, headers={'Content-Type':'application/json'}, body, parse;
+  if(prov==='anthropic'){
+    url='https://api.anthropic.com/v1/messages';
+    headers['x-api-key']=key; headers['anthropic-version']='2023-06-01'; headers['anthropic-dangerous-direct-browser-access']='true';
+    body={model, max_tokens:1000, system:sys, messages:[{role:'user',content:usr}]};
+    parse=d=>(d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n');
+  } else if(prov==='openai'){
+    url='https://api.openai.com/v1/chat/completions';
+    headers['Authorization']='Bearer '+key;
+    body={model, messages:[{role:'system',content:sys},{role:'user',content:usr}]};
+    parse=d=>{ const c=(d.choices||[])[0]; return c&&c.message ? c.message.content : ''; };
+  } else if(prov==='gemini'){
+    url='https://generativelanguage.googleapis.com/v1beta/models/'+encodeURIComponent(model)+':generateContent?key='+encodeURIComponent(key);
+    body={systemInstruction:{parts:[{text:sys}]}, contents:[{role:'user',parts:[{text:usr}]}]};
+    parse=d=>{ const c=(d.candidates||[])[0]; return c&&c.content&&c.content.parts ? c.content.parts.map(p=>p.text||'').join('\n') : ''; };
+  } else {
+    url='http://localhost:11434/api/chat';
+    body={model, stream:false, messages:[{role:'system',content:sys},{role:'user',content:usr}]};
+    parse=d=>(d.message||{}).content||'';
+  }
+  const r=await fetch(url,{method:'POST',headers:headers,body:JSON.stringify(body)});
+  if(!r.ok){ let tx=''; try{ tx=await r.text(); }catch(e){} throw new Error('HTTP '+r.status+(tx?' — '+tx.slice(0,140):'')); }
+  const data=await r.json();
+  let txt=(parse(data)||'').trim().replace(/^```[a-z]*\s*/i,'').replace(/```\s*$/,'').trim();
+  if(!txt) throw new Error('leere Antwort vom Anbieter');
+  return txt;
+}
+
+/* Liest Clipboard und fügt den Inhalt als Rückmeldetext der angegebenen Aufgabe ein.
+   Falls Clipboard-API nicht verfügbar (Berechtigung verweigert, älteres Firefox), zeigen wir
+   einen Hinweis und öffnen ein kleines Inline-Eingabefeld als Fallback. */
+async function pasteAnswerForTask(id){
+  const i = tasks.findIndex(x=>x.id===id);
+  if(i<0) return;
+  const t = tasks[i];
+  const st = document.getElementById('st-'+id);
+  st.className = 'status';
+  st.textContent = 'Lese Clipboard …';
+
+  let text = '';
+  try{
+    if(navigator.clipboard && navigator.clipboard.readText){
+      text = await navigator.clipboard.readText();
+    } else {
+      throw new Error('Clipboard-API nicht verfügbar');
+    }
+  }catch(e){
+    /* Fallback: manuelles Paste-Modal */
+    const manual = await openManualPasteDialog(id);
+    if(manual === null){
+      st.className = 'status';
+      st.textContent = '';
+      return;
+    }
+    text = manual;
+  }
+
+  if(!text || !text.trim()){
+    st.className = 'status err';
+    st.textContent = 'Clipboard ist leer.';
+    return;
+  }
+  /* Optional: Markdown-Reste/Code-Fences entfernen */
+  text = text.replace(/^```[a-z]*\s*/i,'').replace(/```\s*$/,'').trim();
+
+  t.text = text;
+  const ta = document.querySelector(`textarea[data-k="text"][data-id="${id}"]`);
+  if(ta) ta.value = text;
+  st.className = 'status ok';
+  st.textContent = `Antwort eingefügt (${text.length} Zeichen).`;
+  render();
+}
+
+/* Manuelles Paste-Dialog für Browser ohne Clipboard-Read-Berechtigung. */
+function openManualPasteDialog(id){
+  return new Promise(resolve=>{
+    const backdrop = document.createElement('div');
+    backdrop.className = 'modal-backdrop';
+    backdrop.style.display = 'grid';
+    backdrop.innerHTML = `
+      <div class="modal" style="max-width:680px">
+        <h3>Antwort einfügen (Aufgabe ${tasks.findIndex(x=>x.id===id)+1})</h3>
+        <p class="modal-hint">Clipboard-Lesen wurde vom Browser blockiert. Bitte den KI-Antworttext hier einfügen (Strg+V) und auf „Übernehmen" klicken.</p>
+        <textarea id="manualPasteTa" spellcheck="false" style="min-height:240px;width:100%;
+          font-family:'Segoe UI',system-ui,sans-serif;font-size:14px;line-height:1.5;
+          border:1px solid var(--line);border-radius:6px;padding:10px 12px;
+          background:#fff;resize:vertical"></textarea>
+        <div class="modal-actions">
+          <button class="btn ghost" data-cancel>Abbrechen</button>
+          <button class="btn accent" data-ok>Übernehmen</button>
+        </div>
+      </div>`;
+    document.body.appendChild(backdrop);
+    const ta = backdrop.querySelector('#manualPasteTa');
+    setTimeout(()=>ta.focus(), 50);
+    const cleanup = (val)=>{ backdrop.remove(); resolve(val); };
+    backdrop.querySelector('[data-ok]').onclick = ()=> cleanup(ta.value);
+    backdrop.querySelector('[data-cancel]').onclick = ()=> cleanup(null);
+    backdrop.addEventListener('click', e=>{ if(e.target===backdrop) cleanup(null); });
+    /* ESC */
+    const esc = e=>{ if(e.key==='Escape'){ document.removeEventListener('keydown', esc); cleanup(null); } };
+    document.addEventListener('keydown', esc);
+  });
+}
+
+/* Sichtbarkeit der API-only-Buttons je nach Schalter steuern.
+   Wird bei jedem Render und nach Init aufgerufen. */
+function updateApiModeUI(){
+  const on = document.getElementById('optApiMode')?.checked;
+  document.querySelectorAll('.api-only').forEach(el=>{
+    el.style.display = on ? '' : 'none';
+  });
+}
+
+async function generate(id,btn){
+  const i=tasks.findIndex(x=>x.id===id), t=tasks[i];
+  const st=document.getElementById('st-'+id);
+  if(!t.stich.trim()){ st.className='status err'; st.textContent='Bitte zuerst Stichpunkte eintragen.'; return; }
+  let {sys,usr}=promptFor(t,i+1);
+
+  /* Optional: Prompt vor dem Absenden zeigen */
+  const wantReview = document.getElementById('optReviewPrompt').checked;
+  if(wantReview){
+    const reviewed = await reviewPrompt(sys, usr, i+1);
+    if(!reviewed){
+      st.className='status'; st.textContent='Absenden abgebrochen.';
+      return;
+    }
+    sys = reviewed.sys; usr = reviewed.usr;
+  }
+
+  btn.disabled=true; const old=btn.textContent; btn.textContent='… wird erzeugt';
+  st.className='status'; st.textContent='Anfrage läuft …';
+  try{
+    const txt = await callProvider(sys, usr);
+    t.text=txt;
+    const ta=document.querySelector(`textarea[data-k="text"][data-id="${id}"]`);
+    if(ta) ta.value=txt;
+    st.className='status ok'; st.textContent='Text erzeugt.';
+    render();
+  }catch(e){
+    st.className='status err';
+    st.innerHTML='Erzeugung nicht möglich ('+esc(e.message)+'). Nutze „Prompt kopieren".';
+  }finally{ btn.disabled=false; btn.textContent=old; }
+}
+
+async function generateAll(){
+  const allBtn = document.getElementById('genAllBtn');
+  const todo = tasks.filter(t => t.stich.trim());
+  if(!todo.length){ setHint('copyHint', 'Keine Aufgabe mit Stichpunkten.', 'err'); return; }
+  allBtn.disabled = true;
+  const old = allBtn.textContent;
+  let done = 0;
+  for(const t of todo){
+    allBtn.textContent = `… erzeuge ${++done} / ${todo.length}`;
+    const btn = document.querySelector(`[data-gen="${t.id}"]`);
+    if(btn) await generate(t.id, btn);
+  }
+  allBtn.disabled = false; allBtn.textContent = old;
+  setHint('copyHint', `${todo.length} Rückmeldungen erzeugt ✓`, 'ok');
+}
+
+/* ============================ COPY ============================ */
+function setHint(id, msg, cls){
+  const h=document.getElementById(id);
+  if(!h) return;
+  h.textContent = msg;
+  h.classList.remove('ok','err');
+  if(cls) h.classList.add(cls);
+  setTimeout(()=>{h.textContent=''; h.classList.remove('ok','err');}, 3500);
+}
+async function clip(text, html, hintId, msg){
+  const done=()=>setHint(hintId, msg||'Kopiert ✓', 'ok');
+  try{
+    if(html && window.ClipboardItem && navigator.clipboard && navigator.clipboard.write){
+      await navigator.clipboard.write([new ClipboardItem({
+        'text/html':  new Blob([html], {type:'text/html'}),
+        'text/plain': new Blob([text], {type:'text/plain'})
+      })]);
+      done(); return;
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(text); done(); return;
+    }
+  }catch(e){}
+  fallbackCopy(text,done);
+}
+function fallbackCopy(text,cb){
+  const ta=document.createElement('textarea'); ta.value=text;
+  ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta);
+  ta.select(); try{document.execCommand('copy');}catch(e){} document.body.removeChild(ta); cb&&cb();
+}
+function copyOut(){ clip(buildPlain(), buildClipHTML(), 'copyHint', 'Rückmeldung kopiert ✓'); }
+function copyPlainOut(){ clip(buildMarkdown(), null, 'copyHint', 'Markdown kopiert ✓'); }
+
+/* ============================ XLSX-IMPORT ============================ */
+function parseHeaders(headerRow){
+  const meta = {
+    vornameCol:-1, nachnameCol:-1, vornameVollCol:-1, nachnameVollCol:-1,
+    nachteilCol:-1,
+    fqCol:-1, gesamtCol:-1, notenpunkteCol:-1,
+    taskSubtotalCols:{}, criterionCols:[], aufgabenNums:new Set(),
+    headers: headerRow.slice()
+  };
+  headerRow.forEach((h,i)=>{
+    if(h==null) return;
+    const s = String(h).trim();
+    if(!s) return;
+    /* _voll-Patterns ZUERST, da spezifischer */
+    if(/^vorname[\s_]*voll$/i.test(s))               meta.vornameVollCol = i;
+    else if(/^nachname[\s_]*voll$/i.test(s))         meta.nachnameVollCol = i;
+    else if(/^vorname$/i.test(s))                    meta.vornameCol = i;
+    else if(/^nachname$/i.test(s))                   meta.nachnameCol = i;
+    else if(/^nachteilsausgleich$/i.test(s))         meta.nachteilCol = i;
+    else if(/^fq\.?$/i.test(s)||/fehlerquotient/i.test(s)) meta.fqCol = i;
+    else if(/^(notenpunkte?|np)$/i.test(s))          meta.notenpunkteCol = i;
+    else if(/^gesamt2?$/i.test(s)){ if(meta.gesamtCol===-1) meta.gesamtCol = i; }
+    else {
+      let m = s.match(/^aufg(?:abe)?\.?\s+(\d+)$/i);
+      if(m){
+        meta.taskSubtotalCols[parseInt(m[1])] = i;
+        meta.aufgabenNums.add(parseInt(m[1])); return;
+      }
+      m = s.match(/^(\d+)\s+(.+?)\s*$/);
+      if(m){
+        const n = parseInt(m[1]);
+        meta.criterionCols.push({col:i, taskNum:n, criterion:m[2].trim()});
+        meta.aufgabenNums.add(n);
+      }
+    }
+  });
+  return meta;
+}
+
+function computeMaxes(rows, meta){
+  const maxPerCrit = {}, maxPerTask = {};
+  rows.forEach(r => {
+    meta.criterionCols.forEach(cc=>{
+      const v = numOrNull(r.values[cc.col]);
+      if(v==null) return;
+      const k = cc.taskNum+'|'+cc.criterion;
+      if(maxPerCrit[k]==null || v>maxPerCrit[k]) maxPerCrit[k]=v;
+    });
+    Object.entries(meta.taskSubtotalCols).forEach(([n,col])=>{
+      const v = numOrNull(r.values[col]);
+      if(v==null) return;
+      if(maxPerTask[n]==null || v>maxPerTask[n]) maxPerTask[n]=v;
+    });
+  });
+  return {maxPerCrit, maxPerTask};
+}
+
+function decodeFqFormula(formula){
+  if(!formula) return null;
+  let f = String(formula).replace(/^=/, '').trim();
+  const m = f.match(/^\(?\s*(\d+(?:\.\d+)?)\s*\/\s*(\d+(?:\.\d+)?)\s*\)?$/);
+  if(!m) return null;
+  const num = parseFloat(m[1]), den = parseFloat(m[2]);
+  if(!(den>0)) return null;
+  const numOver100 = num/100;
+  if(num>=100 && Math.abs(numOver100 - Math.round(numOver100*2)/2) < 1e-9){
+    return {fehler: Math.round(numOver100*2)/2, woerter: den};
+  }
+  return null;
+}
+
+function readWorkbookData(wb){
+  const sheetName = wb.SheetNames[0];
+  const ws = wb.Sheets[sheetName];
+  if(!ws||!ws['!ref']) throw new Error("Sheet leer");
+  const range = XLSX.utils.decode_range(ws['!ref']);
+
+  const headers = [];
+  for(let c=range.s.c; c<=range.e.c; c++){
+    const cell = ws[XLSX.utils.encode_cell({r:range.s.r,c})];
+    headers.push(cell ? cell.v : null);
+  }
+  const meta = parseHeaders(headers);
+
+  const raw = [];
+  for(let r=range.s.r+1; r<=range.e.r; r++){
+    const row = {values:{}, formulas:{}, rowNum: r+1, rowIdx: r};
+    let anyVal = false;
+    for(let c=range.s.c; c<=range.e.c; c++){
+      const cell = ws[XLSX.utils.encode_cell({r,c})];
+      if(cell){
+        row.values[c] = cell.v;
+        if(cell.f !== undefined) row.formulas[c] = cell.f;
+        anyVal = true;
+      }
+    }
+    if(anyVal) raw.push(row);
+  }
+
+  /* Konsistenz-Filter: Aufg-N = sum(crits) und NP plausibel */
+  function isStudentRow(row){
+    const hasCrit = meta.criterionCols.some(cc => numOrNull(row.values[cc.col])!=null);
+    if(!hasCrit){
+      /* Auch leere Schüler-Zeilen sind OK, wenn Name vorhanden (kurz oder voll) */
+      const hasName = (meta.nachnameCol>=0      && row.values[meta.nachnameCol]) ||
+                      (meta.vornameCol>=0       && row.values[meta.vornameCol]) ||
+                      (meta.nachnameVollCol>=0  && row.values[meta.nachnameVollCol]) ||
+                      (meta.vornameVollCol>=0   && row.values[meta.vornameVollCol]);
+      if(!hasName) return false;
+    }
+    /* Wenn Subtotals vorhanden: müssen konsistent sein */
+    let consistencyCheckable = false, consistent = false;
+    for(const [nStr, col] of Object.entries(meta.taskSubtotalCols)){
+      const sub = numOrNull(row.values[col]);
+      if(sub==null) continue;
+      consistencyCheckable = true;
+      const tNum = parseInt(nStr);
+      const crits = meta.criterionCols.filter(c=>c.taskNum===tNum);
+      const sum = crits.reduce((a,c)=>a+(numOrNull(row.values[c.col])||0), 0);
+      if(crits.length && Math.abs(sub - sum) < 0.05){ consistent = true; break; }
+    }
+    if(consistencyCheckable && !consistent) return false;
+    if(meta.notenpunkteCol>=0){
+      const np = numOrNull(row.values[meta.notenpunkteCol]);
+      if(np!=null && (np<0 || np>15)) return false;
+    }
+    return true;
+  }
+  const dataRows = raw.filter(isStudentRow);
+  const {maxPerCrit, maxPerTask} = computeMaxes(dataRows, meta);
+
+  const students = dataRows.map(r=>{
+    const stu = {
+      rawRowNum: r.rowNum, rowIdx: r.rowIdx,
+      vorname:       meta.vornameCol>=0       ? r.values[meta.vornameCol]       : null,
+      nachname:      meta.nachnameCol>=0      ? r.values[meta.nachnameCol]      : null,
+      vornameVoll:   meta.vornameVollCol>=0   ? r.values[meta.vornameVollCol]   : null,
+      nachnameVoll:  meta.nachnameVollCol>=0  ? r.values[meta.nachnameVollCol]  : null,
+      nachteil: meta.nachteilCol>=0 ? !!r.values[meta.nachteilCol] : false,
+      tasks: {}, fq:null, fehler:null, woerter:null,
+      notenpunkte: meta.notenpunkteCol>=0 ? numOrNull(r.values[meta.notenpunkteCol]) : null,
+      gesamt: meta.gesamtCol>=0 ? numOrNull(r.values[meta.gesamtCol]) : null,
+      npHasFormula: meta.notenpunkteCol>=0 && r.formulas[meta.notenpunkteCol]!=null
+    };
+    const taskNums = Array.from(meta.aufgabenNums).sort((a,b)=>a-b);
+    taskNums.forEach(n=>{ stu.tasks[n] = {items:[], beMax:null}; });
+    meta.criterionCols.forEach(cc=>{
+      const v = numOrNull(r.values[cc.col]);
+      const mx = maxPerCrit[cc.taskNum+'|'+cc.criterion] ?? null;
+      stu.tasks[cc.taskNum].items.push({
+        name: cc.criterion, score: v!=null ? v : '', max: mx!=null ? mx : '',
+        col: cc.col
+      });
+    });
+    taskNums.forEach(n=>{ stu.tasks[n].beMax = maxPerTask[n] ?? null; });
+
+    if(meta.fqCol>=0){
+      const v = numOrNull(r.values[meta.fqCol]);
+      const formula = r.formulas[meta.fqCol];
+      if(formula){
+        const dec = decodeFqFormula(formula);
+        if(dec){
+          stu.fehler = dec.fehler; stu.woerter = dec.woerter;
+          stu.fq = dec.fehler/dec.woerter*100;
+        } else if(v!=null) stu.fq = v;
+      } else if(v!=null) stu.fq = v;
+    }
+    return stu;
+  });
+
+  return {wb, sheetName, students, meta, maxPerCrit, maxPerTask};
+}
+
+function handleFile(ev){
+  const file = ev.target.files && ev.target.files[0];
+  if(!file) return;
+  if(typeof XLSX === 'undefined'){
+    document.getElementById('importMeta').innerHTML =
+      '<span style="color:var(--bad)"><b>SheetJS nicht geladen.</b> '
+      + 'CDN nicht erreichbar (Firewall/Werbeblocker?). Seite mit Internet neu laden.</span>';
+    return;
+  }
+  document.getElementById('importMeta').textContent = 'Lese Datei …';
+  file.arrayBuffer().then(buf=>{
+    const wb = XLSX.read(buf, {type:'array', cellFormula:true, cellNF:false, cellStyles:true});
+    const data = readWorkbookData(wb);
+    activateWorkbook(data, file.name);
+  }).catch(err=>{
+    document.getElementById('importMeta').innerHTML =
+      '<span style="color:var(--bad)">Fehler beim Lesen: '+esc(err.message)+'</span>';
+  });
+}
+
+function activateWorkbook(data, filename, fromPersist){
+  activeWB = data.wb;
+  activeSheetName = data.sheetName;
+  activeMeta = data.meta;
+  activeStudents = data.students;
+  activeFilename = filename || 'Klausur.xlsx';
+  currentStudentIdx = activeStudents.length ? 0 : -1;
+
+  fillPicker();
+  const taskNums = Array.from(activeMeta.aufgabenNums).sort((a,b)=>a-b);
+  const m = activeMeta;
+  const detected = [];
+  if(m.vornameCol>=0)      detected.push('Vorname');
+  if(m.nachnameCol>=0)     detected.push('Nachname');
+  if(m.fqCol>=0)           detected.push('FQ');
+  if(m.gesamtCol>=0)       detected.push('Gesamt');
+  if(m.notenpunkteCol>=0)  detected.push('Notenpunkte');
+  const sourceTag = fromPersist ? ' <span class="src-badge green">aus Browser-Speicher</span>' : '';
+  document.getElementById('importMeta').innerHTML =
+    `<b>${activeStudents.length}</b> Schülerinnen und Schüler · Aufgaben: <b>${taskNums.join(', ')}</b> · ${m.criterionCols.length} Items · Header: ${detected.join(', ')||'—'}${sourceTag}`;
+  document.getElementById('pickerWrap').style.display = '';
+  document.getElementById('loadBtn').disabled = false;
+  updateSaveBar();
+  renderOverviewTable();
+  if(!fromPersist) persistDebounced();
+}
+
+function studentLabel(stu, idx){
+  const vF = (stu.vornameVoll||'').toString().trim();
+  const nF = (stu.nachnameVoll||'').toString().trim();
+  const vS = (stu.vorname||'').toString().trim();
+  const nS = (stu.nachname||'').toString().trim();
+  const v = vF || vS;
+  const n = nF || nS;
+  let head;
+  if(v||n){ head = [n, v].filter(Boolean).join(', '); }
+  else { head = `Zeile ${stu.rawRowNum ?? '?'}`; }
+  const bits = [];
+  if(stu.gesamt!=null)      bits.push(deNum(stu.gesamt)+' BE');
+  if(stu.notenpunkte!=null) bits.push(deNum(stu.notenpunkte)+' NP');
+  if(stu.nachteil)          bits.push('NA');
+  return `[${idx+1}] ${head}` + (bits.length ? ' — '+bits.join(' · ') : '');
+}
+
+function fillPicker(){
+  const sel = document.getElementById('picker');
+  sel.innerHTML = '';
+  activeStudents.forEach((stu,i)=>{
+    const o = document.createElement('option');
+    o.value = String(i); o.textContent = studentLabel(stu,i);
+    sel.appendChild(o);
+  });
+  if(currentStudentIdx>=0) sel.value = String(currentStudentIdx);
+  updateNavButtons();
+}
+function onPickStudent(){
+  saveDraftForCurrentStudent();      // alten Stand sichern
+  saveCurrentStudentToWorkbook();    // Items in Workbook-State schreiben
+  currentStudentIdx = parseInt(document.getElementById('picker').value);
+  updateNavButtons();
+  loadCurrentStudent();              // neuen Stand laden
+  persistDebounced();
+}
+function navStudent(delta){
+  if(!activeStudents.length) return;
+  const next = currentStudentIdx + delta;
+  if(next<0 || next>=activeStudents.length) return;
+  saveDraftForCurrentStudent();
+  saveCurrentStudentToWorkbook();
+  currentStudentIdx = next;
+  document.getElementById('picker').value = String(next);
+  updateNavButtons();
+  loadCurrentStudent();
+  persistDebounced();
+}
+function updateNavButtons(){
+  const max = activeStudents.length-1;
+  document.getElementById('prevStu').disabled = !(currentStudentIdx>0);
+  document.getElementById('nextStu').disabled = !(currentStudentIdx<max);
+}
+
+/* Speichert UI-Eingaben (Stichpunkte/Texte/Niveau/FQ/Sprache) im studentDrafts-Objekt,
+   indiziert mit rowIdx. Wird vor jedem Schüler-Wechsel aufgerufen. */
+function saveDraftForCurrentStudent(){
+  if(currentStudentIdx<0 || !activeStudents.length) return;
+  const stu = activeStudents[currentStudentIdx];
+  if(!stu) return;
+  const key = String(stu.rowIdx);
+  studentDrafts[key] = {
+    tasks: tasks.map(t=>({
+      niveau: t.niveau,
+      stich:  t.stich,
+      text:   t.text
+    })),
+    fehler:   getVal('fehler'),
+    woerter:  getVal('woerter'),
+    fqDirect: getVal('fqDirect'),
+    sprache:  getVal('sprache'),
+    maxBE:    getVal('maxBE'),
+    nachteil: isNachteilActive()
+  };
+}
+
+function loadDraftForCurrentStudent(){
+  if(currentStudentIdx<0 || !activeStudents.length) return false;
+  const stu = activeStudents[currentStudentIdx];
+  if(!stu) return false;
+  const key = String(stu.rowIdx);
+  const d = studentDrafts[key];
+  if(!d) return false;
+  /* tasks haben in loadCurrentStudent bereits neue Items aus dem Workbook bekommen.
+     Wir überlagern nur die Draft-Felder. */
+  if(Array.isArray(d.tasks)){
+    d.tasks.forEach((dt, i)=>{
+      if(tasks[i]){
+        if(dt.niveau != null) tasks[i].niveau = dt.niveau;
+        if(dt.stich  != null) tasks[i].stich  = dt.stich;
+        if(dt.text   != null) tasks[i].text   = dt.text;
+      }
+    });
+  }
+  if(d.fehler   != null) setVal('fehler',   d.fehler);
+  if(d.woerter  != null) setVal('woerter',  d.woerter);
+  if(d.fqDirect != null) setVal('fqDirect', d.fqDirect);
+  if(d.nachteil != null){ const _na=document.getElementById('optNachteil'); if(_na) _na.checked=!!d.nachteil; }
+  if(d.sprache  != null) setVal('sprache',  d.sprache);
+  if(d.maxBE    != null) setVal('maxBE',    d.maxBE);
+  return true;
+}
+
+/* Schreibt nur die Items-Werte aus tasks[] in den Workbook-State (ws cells),
+   ohne Download. Wird beim Schüler-Wechsel aufgerufen. Wenn keine Excel aktiv,
+   no-op. Im Gegensatz zu saveCurrentStudentToExcel() startet KEIN Download. */
+function saveCurrentStudentToWorkbook(){
+  if(!activeWB || currentStudentIdx<0) return;
+  const stu = activeStudents[currentStudentIdx];
+  if(!stu) return;
+  const ws = activeWB.Sheets[activeSheetName];
+  const r = stu.rowIdx;
+  const m = activeMeta;
+
+  /* Items pro Aufgabe */
+  const taskNums = Array.from(m.aufgabenNums).sort((a,b)=>a-b);
+  tasks.forEach((t, ti)=>{
+    const tnum = taskNums[ti];
+    if(tnum==null) return;
+    const colsForTask = m.criterionCols.filter(cc=>cc.taskNum===tnum);
+    t.items.forEach(it=>{
+      const nm = String(it.name||'').trim();
+      if(!nm) return;
+      const cc = colsForTask.find(c => c.criterion.toLowerCase() === nm.toLowerCase());
+      if(!cc) return;
+      const val = parseFloat(it.score);
+      if(isFinite(val) && val>=0){
+        setCellValue(ws, r, cc.col, val, 'n');
+        /* Wert auch im Student-Cache aktualisieren, damit Tabelle live richtig zeigt */
+        const stuItem = stu.tasks[tnum] && stu.tasks[tnum].items.find(si=>
+          si.name.toLowerCase() === nm.toLowerCase());
+        if(stuItem) stuItem.score = val;
+      }
+    });
+  });
+
+  /* FQ */
+  if(m.fqCol>=0){
+    const fq = fqInfo();
+    if(fq){
+      if(fq.source==='fw'){
+        setCellFormula(ws, r, m.fqCol, `${Math.round(fq.f*100)}/${fq.w}`);
+      } else {
+        setCellValue(ws, r, m.fqCol, Math.round(fq.fq*100)/100, 'n');
+      }
+      stu.fq = fq.fq;
+      if(fq.source==='fw'){ stu.fehler = fq.f; stu.woerter = fq.w; }
+    }
+  }
+
+  /* Notenpunkte: nur wenn die Zelle ursprünglich KEINE Formel hatte */
+  if(m.notenpunkteCol>=0 && !stu.npHasFormula){
+    let sum=0, have=false;
+    tasks.forEach(t=>{ if(taskAnyScore(t)){ sum+=taskBE(t); have=true; } });
+    const maxBE=parseFloat(document.getElementById('maxBE').value);
+    if(have && maxBE>0){
+      const pct=sum/maxBE*100;
+      const row=NP_TABLE.find(r=>pct>=r.p)||NP_TABLE[NP_TABLE.length-1];
+      const fq=fqInfo(); const ab=fq?fq.abzug:0;
+      const endNp=Math.max(0,row.np-ab);
+      setCellValue(ws, r, m.notenpunkteCol, endNp, 'n');
+      stu.notenpunkte = endNp;
+    }
+  }
+  expandRefIfNeeded(ws, r, Math.max(
+    m.vornameCol, m.nachnameCol, m.vornameVollCol, m.nachnameVollCol,
+    m.fqCol, m.notenpunkteCol,
+    ...m.criterionCols.map(c=>c.col)
+  ));
+  fillPicker();
+  renderOverviewTable();
+}
+
+function loadCurrentStudent(fromPersist){
+  if(currentStudentIdx<0 || !activeStudents.length) return;
+  const stu = activeStudents[currentStudentIdx];
+  const clear = document.getElementById('optClearOnLoad').checked;
+
+  /* Name (vollen Namen bevorzugen, wenn vorhanden) */
+  const nF = (stu.nachnameVoll||'').toString().trim();
+  const vF = (stu.vornameVoll||'').toString().trim();
+  const nS = (stu.nachname||'').toString().trim();
+  const vS = (stu.vorname||'').toString().trim();
+  const n = nF || nS;
+  const v = vF || vS;
+  if(n) document.getElementById('name').value = v ? `${n}, ${v}` : n;
+
+  /* Aufgabenanzahl */
+  const taskNums = Array.from(activeMeta.aufgabenNums).sort((a,b)=>a-b);
+  /* tasks neu aufbauen */
+  tasks = [];
+  taskNums.forEach((tn, i)=>{
+    const id = ++uid;
+    const sd = stu.tasks[tn];
+    const itemsArr = (sd && sd.items.length) ? sd.items.map(it=>({
+      name: it.name, max: it.max!=null?it.max:'', score: it.score!=null?it.score:'',
+      locked: true, col: it.col
+    })) : [{name:'', max:'', score:'', locked:false}];
+    tasks.push({
+      id, niveau:2, items: itemsArr,
+      stich: clear ? '' : (tasks[i]?.stich || ''),
+      text:  clear ? '' : (tasks[i]?.text  || ''),
+      /* Aufgabenstellung & Musterlösung sind klausur-weit, nicht schüler-spezifisch:
+         immer aus dem vorigen Task-Slot übernehmen (clear-Flag ignorieren). */
+      aufgabenstellung: tasks[i]?.aufgabenstellung || '',
+      musterloesung:    tasks[i]?.musterloesung || '',
+      musterloesungOffen: !!tasks[i]?.musterloesungOffen
+    });
+  });
+
+  /* FQ */
+  if(stu.fehler!=null && stu.woerter!=null){
+    document.getElementById('fehler').value  = stu.fehler;
+    document.getElementById('woerter').value = stu.woerter;
+    document.getElementById('fqDirect').value = '';
+  } else if(stu.fq!=null){
+    document.getElementById('fehler').value  = '';
+    document.getElementById('woerter').value = '';
+    document.getElementById('fqDirect').value = stu.fq;
+  } else {
+    document.getElementById('fehler').value  = '';
+    document.getElementById('woerter').value = '';
+    document.getElementById('fqDirect').value = '';
+  }
+  onFqInput();
+  { const _na=document.getElementById('optNachteil'); if(_na) _na.checked=!!stu.nachteil; }
+
+  /* mögliche Gesamt-BE */
+  let totalMax = 0;
+  taskNums.forEach(tn=>{ const m = activeMeta && stu.tasks[tn] && stu.tasks[tn].beMax;
+    if(m!=null) totalMax += m; });
+  if(totalMax>0) document.getElementById('maxBE').value = totalMax;
+
+  /* Niveau anhand der Items-Werte synchronisieren — Draft-niveau wird ggf. überschrieben.
+     Das ist gewollt: Wenn Punkte vorliegen, ist die Note die zuverlässigere Quelle. */
+  tasks.forEach(syncNiveauForTask);
+
+  /* Klausur-weite Metadaten (Aufgabenstellung, Musterlösung) ins Task-Array tragen */
+  applyKlausurMetaToTasks();
+
+  drawTasks();
+  /* Draft (Stichpunkte, Texte, Niveau, FQ) für die Schülerin/den Schüler nachladen.
+     Hinweis: niveau wird hier wieder aus dem Draft geholt, aber wenn der Score sich seit
+     dem letzten Save nicht geändert hat, ist das konsistent. */
+  if(loadDraftForCurrentStudent()){
+    /* Nach Draft-Load: Niveau erneut aus Score ableiten, falls Score-Werte vorhanden */
+    tasks.forEach(syncNiveauForTask);
+    onFqInput();
+    drawTasks();
+  }
+  setHint('copyHint', `„${studentLabel(stu, currentStudentIdx)}" geladen ✓`, 'ok');
+  renderOverviewTable();
+}
+
+/* ============================ EXCEL-NEU-ERZEUGEN ============================ */
+/* Schema-Builder (Setup-Card) */
+function drawSchema(){
+  const host = document.getElementById('schemaList'); host.innerHTML='';
+  schema.forEach((t,ti)=>{
+    const el = document.createElement('div'); el.className='schema-task';
+    el.innerHTML = `
+      <div class="schema-task-head">
+        <h4>Aufgabe ${ti+1}</h4>
+        <button class="x" onclick="schemaDelTask(${ti})" ${schema.length<=1?'style="visibility:hidden"':''}>✕</button>
+      </div>
+      <div class="items-list">
+        ${t.items.map((it,ii)=>`
+          <div class="item-row item-row-schema">
+            <input type="text"   data-s="name" data-ti="${ti}" data-ii="${ii}" placeholder="z.B. Inhalt" value="${esc(it.name)}">
+            <input type="number" data-s="max"  data-ti="${ti}" data-ii="${ii}" placeholder="max" step="0.5" min="0" value="${esc(it.max)}">
+            <button class="x-mini" onclick="schemaDelItem(${ti},${ii})" ${t.items.length<=1?'disabled':''}>✕</button>
+          </div>`).join('')}
+      </div>
+      ${t.items.length<MAX_ITEMS_PER_TASK ? `<button class="addbtn sm" onclick="schemaAddItem(${ti})">+ Bewertungsteil</button>` : ''}
+    `;
+    host.appendChild(el);
+  });
+  host.querySelectorAll('[data-s]').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      const ti = +e.target.dataset.ti, ii = +e.target.dataset.ii, k = e.target.dataset.s;
+      schema[ti].items[ii][k] = e.target.value;
+    });
+  });
+}
+function schemaAddTask(){ schema.push({name:`Aufgabe ${schema.length+1}`, items:[{name:'', max:''}]}); drawSchema(); }
+function schemaDelTask(ti){ if(schema.length<=1) return; schema.splice(ti,1); drawSchema(); }
+function schemaAddItem(ti){ if(schema[ti].items.length<MAX_ITEMS_PER_TASK){ schema[ti].items.push({name:'',max:''}); drawSchema(); } }
+function schemaDelItem(ti,ii){ if(schema[ti].items.length<=1) return; schema[ti].items.splice(ii,1); drawSchema(); }
+function schemaLoadDefault(){
+  schema = JSON.parse(JSON.stringify(DEFAULT_SCHEMA));
+  drawSchema();
+  schemaToTasks();
+}
+
+function fillAnonymous(){
+  const field = document.getElementById('anonCount');
+  let n = parseInt(field.value);
+  if(!(n>0)){ n = 24; field.value = n; }
+  if(n>200) n = 200;
+  const lines = [];
+  for(let i=0; i<n; i++){
+    /* Nachname: "Aaa", "Aab", …, "Aaz", "Aba", "Abb", … (Base-26 fortlaufend) */
+    const c3 = String.fromCharCode(97 + (i % 26));
+    const c2 = String.fromCharCode(97 + (Math.floor(i / 26) % 26));
+    const nachname = 'A' + c2 + c3;
+    /* Vorname-Initial: A, B, C, …, Z, dann wieder A (zyklisch) */
+    const vorname = String.fromCharCode(65 + (i % 26));
+    lines.push(`${nachname}, ${vorname}`);
+  }
+  const ta = document.getElementById('setupStudents');
+  const existing = ta.value.trim();
+  if(existing && !confirm(`Textarea enthält bereits ${existing.split(/\n+/).length} Zeile(n). Mit ${n} anonymen Kürzeln überschreiben?`)) return;
+  ta.value = lines.join('\n');
+  setHint('setupStatus', `${n} anonyme Kürzel erzeugt (Aaa bis ${lines[lines.length-1].split(',')[0]}).`, 'ok');
+}
+
+/* Übernimmt das aktuelle Schema in die untere Aufgaben-Liste.
+   Stichpunkte und Rückmeldetexte je Aufgaben-Index bleiben erhalten;
+   Items (Name + Max) werden aus dem Schema neu aufgebaut, Scores zurückgesetzt. */
+function schemaToTasks(silent){
+  if(activeWB && !silent){
+    setHint('setupStatus',
+      'Excel ist aktiv — Schema-Übernahme nicht ausgeführt. Erst „Zurücksetzen" oder neue Excel erzeugen.',
+      'err');
+    return;
+  }
+  const oldTasks = tasks.slice();
+  tasks = schema.map((st, ti)=>{
+    const id = ++uid;
+    const old = oldTasks[ti];
+    const items = (st.items && st.items.length ? st.items : [{name:'', max:''}]).map(it=>({
+      name: String(it.name||''),
+      max:  (it.max!=null && it.max!=='') ? it.max : '',
+      score: '',
+      locked: false
+    }));
+    return {
+      id,
+      niveau: old ? old.niveau : 2,
+      items,
+      stich: old ? old.stich : '',
+      text:  old ? old.text  : '',
+      aufgabenstellung: old ? (old.aufgabenstellung || '') : '',
+      musterloesung:    old ? (old.musterloesung || '') : '',
+      musterloesungOffen: old ? !!old.musterloesungOffen : false
+    };
+  });
+  if(!tasks.length){
+    tasks = [{id:++uid, niveau:2,
+              items:[{name:'',max:'',score:'',locked:false}],
+              stich:'', text:'', aufgabenstellung:'', musterloesung:'',
+              musterloesungOffen:false}];
+  }
+  /* maxBE-Feld aus Schema-Summe vorschlagen, wenn leer */
+  const schemaMax = schema.reduce((a,t)=> a + (t.items||[]).reduce((b,it)=> b + (parseFloat(it.max)||0), 0), 0);
+  const maxBEField = document.getElementById('maxBE');
+  if(maxBEField && schemaMax>0 && !(parseFloat(maxBEField.value)>0)){
+    maxBEField.value = schemaMax;
+  }
+  applyKlausurMetaToTasks();
+  drawTasks();
+  if(!silent){
+    setHint('setupStatus',
+      `Schema in Aufgaben übernommen: ${tasks.length} Aufgabe${tasks.length===1?'':'n'}, ${tasks.reduce((a,t)=>a+t.items.length,0)} Items, gesamt ${deNum(schemaMax)} BE.`,
+      'ok');
+  }
+}
+
+function generateAndLoadNewExcel(){
+  const status = document.getElementById('setupStatus');
+  status.className='status';
+
+  if(typeof XLSX === 'undefined'){
+    status.className='status err';
+    status.innerHTML = '<b>SheetJS nicht geladen.</b> Seite mit Internet neu laden.';
+    return;
+  }
+
+  /* Validierung */
+  const titel = document.getElementById('setupTitel').value.trim() || 'Klausur';
+  const fach  = document.getElementById('setupFach').value.trim();
+  const datum = document.getElementById('setupDatum').value.trim();
+  /* In Kopfdaten spiegeln, damit Word-Export sie nutzt */
+  if(titel) document.getElementById('titel').value = titel;
+  if(fach)  document.getElementById('fach').value  = fach;
+  if(datum) document.getElementById('datum').value = datum;
+  const studentLines = document.getElementById('setupStudents').value;
+  const students = parseStudentLines(studentLines);
+  if(!students.length){ status.className='status err';
+    status.textContent='Mindestens eine Schülerin oder einen Schüler eintragen.'; return; }
+
+  const cleanSchema = schema.map(t=>({
+    name: t.name,
+    items: t.items.filter(it=>String(it.name||'').trim()).map(it=>({
+      name: String(it.name).trim(),
+      max: parseFloat(it.max)||0
+    }))
+  })).filter(t=>t.items.length>0);
+  if(!cleanSchema.length){ status.className='status err';
+    status.textContent='Aufgaben-Schema ist leer (mind. ein benanntes Item).'; return; }
+
+  /* Workbook bauen */
+  const wb = XLSX.utils.book_new();
+
+  /* Header: Vorname_voll | Nachname_voll | Vorname (Formel) | Nachname (Formel)
+             | Nachteilsausgleich | {N} {Item-Name}…
+             | Gesamt | FQ | Notenpunkte | Aufg 1 | … | Gesamt2 */
+  const headers = ['Vorname_voll','Nachname_voll','Vorname','Nachname','Nachteilsausgleich'];
+  /* Spalten-Indizes festhalten zum späteren Formel-Bau */
+  const colsOfTask = {};       /* {taskNum: [colIdx, colIdx, ...]} */
+  cleanSchema.forEach((t,ti)=>{
+    const tnum = ti+1;
+    colsOfTask[tnum] = [];
+    t.items.forEach(it=>{
+      colsOfTask[tnum].push(headers.length);
+      headers.push(`${tnum} ${it.name}`);
+    });
+  });
+  const gesamtCol = headers.length; headers.push('Gesamt');
+  const fqCol     = headers.length; headers.push('FQ');
+  const npCol     = headers.length; headers.push('Notenpunkte');
+  const subStart  = headers.length;
+  cleanSchema.forEach((t,ti)=> headers.push(`Aufg ${ti+1}`));
+  const gesamt2Col= headers.length; headers.push('Gesamt2');
+
+  /* AOA (Array of Arrays) für initialen Inhalt — nur _voll-Werte füllen,
+     Vorname/Nachname werden gleich danach als Formel gesetzt */
+  const aoa = [headers];
+  students.forEach(stu=>{
+    const row = new Array(headers.length).fill(null);
+    row[0] = stu.vornameVoll;
+    row[1] = stu.nachnameVoll;
+    /* Spalten 2 (Vorname) + 3 (Nachname): bewusst leer; werden Formeln */
+    aoa.push(row);
+  });
+
+  const ws = XLSX.utils.aoa_to_sheet(aoa);
+
+  /* Spaltenbreiten */
+  ws['!cols'] = headers.map((h,i)=>{
+    if(i===0||i===1) return {wch:16};       /* _voll-Spalten breiter */
+    if(i===2||i===3) return {wch:9};        /* Kürzel-Spalten schmal */
+    if(i===4) return {wch:7};               /* Nachteilsausgleich */
+    return {wch:Math.max(8, h.length+2)};
+  });
+
+  /* Formeln in Summen-Spalten setzen, je Schüler-Zeile.
+     SheetJS XLSX: cell.f = "SUM(D2:G2)" (ohne führendes "=") */
+  const colLet = i => XLSX.utils.encode_col(i);
+
+  for(let r=0; r<students.length; r++){
+    const excelRow = r+2; /* 1-based Zeile, +1 für Header */
+    const stu = students[r];
+
+    /* Vorname (Spalte C) = Formel auf Vorname_voll (Spalte A) */
+    ws[XLSX.utils.encode_cell({r:r+1, c:2})] = {
+      t:'s', v: stu.vorname || '',
+      f:`IF(A${excelRow}="","",UPPER(LEFT(A${excelRow},1))&".")`
+    };
+    /* Nachname (Spalte D) = Formel auf Nachname_voll (Spalte B) */
+    ws[XLSX.utils.encode_cell({r:r+1, c:3})] = {
+      t:'s', v: stu.nachname || '',
+      f:`IF(B${excelRow}="","",PROPER(LEFT(B${excelRow},3))&".")`
+    };
+
+    const writeCell = (col, formula)=>{
+      const ref = XLSX.utils.encode_cell({r:r+1, c:col});
+      ws[ref] = {t:'n', f: formula};
+    };
+    /* Aufg N */
+    cleanSchema.forEach((t,ti)=>{
+      const cols = colsOfTask[ti+1];
+      if(!cols.length) return;
+      const firstC = colLet(cols[0]), lastC = colLet(cols[cols.length-1]);
+      writeCell(subStart+ti, `SUM(${firstC}${excelRow}:${lastC}${excelRow})`);
+    });
+    /* Gesamt = SUM aller Kriterien */
+    const allCols = [].concat(...Object.values(colsOfTask));
+    if(allCols.length){
+      const first = colLet(Math.min(...allCols));
+      const last  = colLet(Math.max(...allCols));
+      writeCell(gesamtCol,  `SUM(${first}${excelRow}:${last}${excelRow})`);
+      writeCell(gesamt2Col, `SUM(${first}${excelRow}:${last}${excelRow})`);
+    }
+    /* FQ und Notenpunkte bleiben initial leer */
+  }
+
+  /* Range neu setzen (SheetJS muss '!ref' kennen) */
+  ws['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0}, e:{r:students.length, c:headers.length-1}});
+
+  XLSX.utils.book_append_sheet(wb, ws, 'Bewertungen');
+
+  /* Datei-Name: <fach-kürzel>_<stufe>_<jahr>_<titel>.xlsx
+     Fach-Kürzel: aus Fach-Feld grob abgeleitet (z. B. "Politik & Wirtschaft" → "pw")
+     Stufe: aus Setup-Stufe-Feld (default "Q2")
+     Jahr: aus Datum oder aktuelles Jahr */
+  const fachKurz = fachToKurz(fach);
+  const stufe    = (document.getElementById('setupStufe')?.value || 'Q2').trim().toLowerCase().replace(/\s+/g,'');
+  const jahr     = datumToJahr(datum);
+  const safeTitel = titel.replace(/[^\wÄÖÜäöüß\.\- ]+/g,'_').replace(/\s+/g,'-');
+  const filename = `${fachKurz}_${stufe}_${jahr}_${safeTitel}.xlsx`;
+
+  /* In Memory als aktive Datei setzen.
+     Max-Werte aus dem Schema überlagern, da das leere Excel sie noch nicht „kennt". */
+  const data = readWorkbookData(wb);
+  cleanSchema.forEach((t, ti)=>{
+    const tnum = ti + 1;
+    data.students.forEach(stu=>{
+      if(!stu.tasks[tnum]) return;
+      t.items.forEach((schemaItem, idx)=>{
+        if(stu.tasks[tnum].items[idx] && schemaItem.max>0){
+          stu.tasks[tnum].items[idx].max = schemaItem.max;
+        }
+      });
+    });
+    /* auch beMax pro Task */
+    const taskMax = t.items.reduce((a,it)=>a+(it.max||0), 0);
+    data.students.forEach(stu=>{
+      if(stu.tasks[tnum] && taskMax>0) stu.tasks[tnum].beMax = taskMax;
+    });
+  });
+  activateWorkbook(data, filename);
+
+  /* Erste Schülerin/ersten Schüler laden */
+  if(activeStudents.length){
+    currentStudentIdx = 0;
+    document.getElementById('picker').value = '0';
+    loadCurrentStudent();
+  }
+
+  /* Download anbieten */
+  downloadActiveWorkbook();
+
+  status.className='status ok';
+  status.textContent=`Excel mit ${students.length} Schülerinnen und Schüler erzeugt und aktiviert. Download gestartet.`;
+}
+
+/* ============================ EXCEL-SCHREIBEN ============================ */
+function setCellValue(ws, r, c, value, type){
+  const ref = XLSX.utils.encode_cell({r,c});
+  if(value==null || value===''){
+    if(ws[ref]){ delete ws[ref].v; delete ws[ref].w; delete ws[ref].f; }
+    return;
+  }
+  if(!ws[ref]) ws[ref]={};
+  /* Bestehende Formel überschreiben, wenn explizit ein Wert gesetzt wird */
+  delete ws[ref].f;
+  delete ws[ref].w; /* cached display value löschen, sonst zeigt Excel den alten */
+  ws[ref].v = value;
+  ws[ref].t = type || (typeof value==='number' ? 'n' : 's');
+}
+function setCellFormula(ws, r, c, formula){
+  const ref = XLSX.utils.encode_cell({r,c});
+  if(!ws[ref]) ws[ref]={};
+  ws[ref].t = 'n';
+  ws[ref].f = formula;
+  delete ws[ref].v;
+  delete ws[ref].w;
+}
+function expandRefIfNeeded(ws, r, c){
+  /* '!ref' ggf. erweitern, falls neue Zellen außerhalb liegen */
+  const cur = ws['!ref'] ? XLSX.utils.decode_range(ws['!ref']) : {s:{r:0,c:0},e:{r:0,c:0}};
+  const newR = {
+    s:{r:Math.min(cur.s.r,r), c:Math.min(cur.s.c,c)},
+    e:{r:Math.max(cur.e.r,r), c:Math.max(cur.e.c,c)}
+  };
+  ws['!ref'] = XLSX.utils.encode_range(newR);
+}
+
+function saveCurrentStudentToExcel(){
+  if(!activeWB || currentStudentIdx<0){
+    setHint('saveHint','Keine aktive Datei oder kein Schüler ausgewählt.','err'); return;
+  }
+  const stu = activeStudents[currentStudentIdx];
+  const ws = activeWB.Sheets[activeSheetName];
+  const r = stu.rowIdx;
+  const m = activeMeta;
+  let writtenItems = 0, missingNames = [];
+
+  /* Items pro Aufgabe in Spalten schreiben */
+  const taskNums = Array.from(m.aufgabenNums).sort((a,b)=>a-b);
+  tasks.forEach((t, ti)=>{
+    const tnum = taskNums[ti];
+    if(tnum==null) return;
+    const colsForTask = m.criterionCols.filter(cc=>cc.taskNum===tnum);
+    t.items.forEach(it=>{
+      const nm = String(it.name||'').trim();
+      if(!nm) return;
+      const cc = colsForTask.find(c => c.criterion.toLowerCase() === nm.toLowerCase());
+      if(!cc){ missingNames.push(`A${ti+1}: „${nm}"`); return; }
+      const val = parseFloat(it.score);
+      if(isFinite(val) && val>=0){
+        setCellValue(ws, r, cc.col, val, 'n');
+        writtenItems++;
+      } else {
+        /* leerer Score → Zelle leer machen */
+        setCellValue(ws, r, cc.col, '', 'n');
+      }
+    });
+  });
+
+  /* FQ */
+  if(m.fqCol>=0){
+    const fq = fqInfo();
+    if(fq){
+      if(fq.source==='fw'){
+        /* Konvention =Fehler*100/Wörter */
+        setCellFormula(ws, r, m.fqCol, `${Math.round(fq.f*100)}/${fq.w}`);
+      } else {
+        setCellValue(ws, r, m.fqCol, Math.round(fq.fq*100)/100, 'n');
+      }
+    }
+  }
+
+  /* Nachteilsausgleich (LRS/Notenschutz) */
+  if(m.nachteilCol>=0){
+    const _na = isNachteilActive();
+    setCellValue(ws, r, m.nachteilCol, _na ? 'x' : '', 's');
+    stu.nachteil = _na;
+  }
+
+  /* Name */
+  const nameField = document.getElementById('name').value.trim();
+  if(nameField){
+    /* Vollen Namen aus dem Maskenfeld extrahieren */
+    let nFull = '', vFull = '';
+    if(nameField.includes(',')){
+      const parts = nameField.split(',', 2);
+      nFull = parts[0].trim();
+      vFull = (parts[1]||'').trim();
+    } else { nFull = nameField; }
+    const ns = shortName(nameField);
+
+    /* _voll-Spalten haben Vorrang — Kurzspalten enthalten Formeln, nicht überschreiben */
+    if(m.nachnameVollCol >= 0){
+      setCellValue(ws, r, m.nachnameVollCol, nFull, 's');
+      stu.nachnameVoll = nFull;
+    } else if(m.nachnameCol >= 0 && ns.nachname){
+      setCellValue(ws, r, m.nachnameCol, ns.nachname, 's');
+    }
+    if(m.vornameVollCol >= 0){
+      setCellValue(ws, r, m.vornameVollCol, vFull, 's');
+      stu.vornameVoll = vFull;
+    } else if(m.vornameCol >= 0 && ns.vorname){
+      setCellValue(ws, r, m.vornameCol, ns.vorname, 's');
+    }
+    /* Stu-Objekt: Kurz-Namen aktualisieren (für Picker-Label, vor Excel-Neuberechnung) */
+    stu.nachname = ns.nachname;
+    stu.vorname  = ns.vorname;
+  }
+
+  /* Notenpunkte: nur schreiben, wenn die Zelle ursprünglich KEINE Formel hatte */
+  if(m.notenpunkteCol>=0 && !stu.npHasFormula){
+    /* berechne NP aus Items + FQ */
+    let sum=0, have=false;
+    tasks.forEach(t=>{ if(taskAnyScore(t)){ sum+=taskBE(t); have=true; } });
+    const maxBE=parseFloat(document.getElementById('maxBE').value);
+    if(have && maxBE>0){
+      const pct=sum/maxBE*100;
+      const row=NP_TABLE.find(r=>pct>=r.p)||NP_TABLE[NP_TABLE.length-1];
+      const fq=fqInfo(); const ab=fq?fq.abzug:0;
+      const endNp=Math.max(0,row.np-ab);
+      setCellValue(ws, r, m.notenpunkteCol, endNp, 'n');
+      stu.notenpunkte = endNp;
+    }
+  }
+
+  /* Range ggf. erweitern */
+  expandRefIfNeeded(ws, r, Math.max(
+    m.vornameCol, m.nachnameCol, m.vornameVollCol, m.nachnameVollCol,
+    m.fqCol, m.notenpunkteCol,
+    ...m.criterionCols.map(c=>c.col)
+  ));
+
+  /* Picker-Label aktualisieren */
+  fillPicker();
+
+  /* Download anbieten */
+  downloadActiveWorkbook();
+
+  let msg = `Zeile ${r+1} aktualisiert (${writtenItems} Items).`;
+  if(missingNames.length) msg += ` Nicht zugeordnet: ${missingNames.join(', ')}.`;
+  setHint('saveHint', msg, missingNames.length?'err':'ok');
+}
+
+function downloadActiveWorkbook(){
+  if(!activeWB){ setHint('saveHint','Keine aktive Datei.','err'); return; }
+  try{
+    const out = XLSX.write(activeWB, {bookType:'xlsx', type:'array', cellStyles:true});
+    const blob = new Blob([out], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = activeFilename || 'Klausur.xlsx';
+    document.body.appendChild(a); a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 600);
+  }catch(e){
+    setHint('saveHint','Download fehlgeschlagen: '+e.message,'err');
+  }
+}
+
+function updateSaveBar(){
+  const bar = document.getElementById('saveBar');
+  if(!activeWB){ bar.style.display='none'; return; }
+  bar.style.display='';
+  document.getElementById('saveBarName').textContent = activeFilename || 'Klausur.xlsx';
+  let stuLabel = '—';
+  if(currentStudentIdx>=0 && activeStudents[currentStudentIdx]){
+    const s = activeStudents[currentStudentIdx];
+    const nF = (s.nachnameVoll||'').toString().trim();
+    const vF = (s.vornameVoll||'').toString().trim();
+    const nS = (s.nachname||'').toString().trim();
+    const vS = (s.vorname||'').toString().trim();
+    const n = nF || nS, v = vF || vS;
+    stuLabel = (n||v) ? `${n}${v?', '+v:''}` : `Zeile ${s.rawRowNum}`;
+  }
+  document.getElementById('saveBarStu').textContent = stuLabel;
+  document.getElementById('saveBtn').disabled = (currentStudentIdx<0);
+}
+
+/* ============================ ÜBERSICHTS-TABELLE ============================ */
+function renderOverviewTable(){
+  const card = document.getElementById('overviewCard');
+  if(!activeWB || !activeStudents.length || !activeMeta){
+    if(card) card.style.display = 'none';
+    return;
+  }
+  card.style.display = '';
+  const table = document.getElementById('overviewTable');
+  const m = activeMeta;
+  const taskNums = Array.from(m.aufgabenNums).sort((a,b)=>a-b);
+
+  /* Aktuelle UI-Werte für die laufende Schülerin/den laufenden Schüler einsynchronisieren — damit die Tabelle
+     live zeigt, was im Maskenfeld steht, auch bevor saveCurrentStudentToWorkbook lief. */
+  const liveScores = {};   /* {taskNum: {itemNameLower: score}} */
+  if(currentStudentIdx >= 0){
+    tasks.forEach((t, ti)=>{
+      const tnum = taskNums[ti];
+      if(tnum==null) return;
+      liveScores[tnum] = {};
+      t.items.forEach(it=>{
+        const v = parseFloat(it.score);
+        if(isFinite(v)) liveScores[tnum][String(it.name||'').toLowerCase()] = v;
+      });
+    });
+  }
+  const liveMaxBE = parseFloat(getVal('maxBE'))||0;
+
+  /* HEADER bauen — zweistufig: Aufgaben oben, Items darunter */
+  let head1 = '<tr><th class="left" rowspan="2">Name</th>';
+  let head2 = '<tr>';
+  taskNums.forEach(tn=>{
+    const crits = m.criterionCols.filter(c=>c.taskNum===tn);
+    head1 += `<th class="aufg-head" colspan="${crits.length+1}">Aufgabe ${tn}</th>`;
+    crits.forEach(c=> head2 += `<th>${esc(c.criterion)}</th>`);
+    head2 += `<th class="aufg-head">Σ</th>`;
+  });
+  head1 += `<th class="left" rowspan="2">Gesamt</th><th rowspan="2">FQ</th><th class="left" rowspan="2">NP</th></tr>`;
+  head2 += `</tr>`;
+
+  /* Body bauen */
+  let body = '';
+  activeStudents.forEach((stu, idx)=>{
+    const isCurrent = idx === currentStudentIdx;
+    const nm = (stu.nachnameVoll||stu.nachname||'').toString().trim();
+    const vn = (stu.vornameVoll ||stu.vorname ||'').toString().trim();
+    const label = nm + (vn?', '+vn:'') || `Zeile ${stu.rawRowNum}`;
+    const d = studentDrafts[String(stu.rowIdx)];
+    const hasNotes = d && Array.isArray(d.tasks) && d.tasks.some(t=>(t.stich||'').trim() || (t.text||'').trim());
+    const draftMark = hasNotes ? '<span class="draft-mark" title="Notizen vorhanden"></span>' : '';
+    body += `<tr class="${isCurrent?'current':''}"><td class="left">${esc(label)}${draftMark}</td>`;
+
+    let stuTotal = 0;
+    let stuTotalMax = 0;
+    taskNums.forEach((tn, tnIdx)=>{
+      const crits = m.criterionCols.filter(c=>c.taskNum===tn);
+      let taskSum = 0;
+      let taskMax = 0;
+      crits.forEach(c=>{
+        let v;
+        if(isCurrent && liveScores[tn]){
+          const key = c.criterion.toLowerCase();
+          v = liveScores[tn][key];
+        }
+        if(v == null && stu.tasks[tn]){
+          const it = stu.tasks[tn].items.find(i=>i.name.toLowerCase()===c.criterion.toLowerCase());
+          if(it && it.score!=='' && it.score!=null && isFinite(parseFloat(it.score))){
+            v = parseFloat(it.score);
+          }
+        }
+        if(v!=null){ taskSum += v; }
+        body += `<td>${v!=null ? deNum(v) : '<span class="empty">—</span>'}</td>`;
+      });
+      /* Task-Max bestimmen: bei current-Schüler aus tasks[tnIdx], sonst aus stu.tasks[tn].beMax */
+      if(isCurrent && tasks[tnIdx]){
+        taskMax = taskBeMax(tasks[tnIdx]);
+      } else if(stu.tasks[tn] && stu.tasks[tn].beMax!=null){
+        taskMax = stu.tasks[tn].beMax;
+      }
+      stuTotal += taskSum;
+      stuTotalMax += taskMax;
+      /* Aufgaben-Σ-Pill */
+      let taskPill = '';
+      if(taskSum>0 && taskMax>0){
+        const g = gradeForPercent(taskSum/taskMax*100);
+        if(g) taskPill = `<span class="gp ${gradePillClass(g)}" title="${esc(g.note)} · ${g.np} NP">${esc(g.tendenz)}</span>`;
+      }
+      body += `<td class="aufg-sum">${taskSum>0 ? deNum(taskSum) : '<span class="empty">—</span>'}${taskPill}</td>`;
+    });
+
+    /* Gesamt, FQ, NP */
+    let fq = '';
+    let fqAbzug = 0;
+    if(isCurrent){
+      const fi = fqInfo();
+      if(fi){ fq = de(fi.fq, 1); fqAbzug = fi.abzug; }
+    } else if(stu.fq!=null){
+      fq = de(stu.fq, 1);
+      if(stu.fq>=6) fqAbzug = 2; else if(stu.fq>=3) fqAbzug = 1;
+    }
+    if(!isCurrent && stu.nachteil) fqAbzug = 0;
+    let np = '';
+    let gesamtNote = null;
+    /* Gesamt-Max: bei current aus liveMaxBE (oder stuTotalMax), sonst stuTotalMax */
+    const totMax = isCurrent ? (liveMaxBE>0 ? liveMaxBE : stuTotalMax) : stuTotalMax;
+    if(stuTotal>0 && totMax>0){
+      const pct = stuTotal/totMax*100;
+      gesamtNote = gradeForPercent(pct, fqAbzug);
+      if(gesamtNote) np = gesamtNote.np;
+    }
+    /* Wenn nicht-current und stu.notenpunkte aus Excel da: bevorzugen */
+    if(!isCurrent && stu.notenpunkte!=null){
+      np = stu.notenpunkte;
+      gesamtNote = { np: stu.notenpunkte, niveauIdx: npToNiveauIdx(stu.notenpunkte) };
+      const row = NP_TABLE.find(r=>r.np===stu.notenpunkte);
+      if(row){ gesamtNote.note = row.note; gesamtNote.tendenz = row.t; }
+    }
+
+    /* Gesamt-Zelle mit Pill */
+    let totalPill = '';
+    if(gesamtNote){
+      totalPill = `<span class="gp ${gradePillClass(gesamtNote)}" title="${esc(gesamtNote.note||'')} · ${gesamtNote.np} NP">${esc(gesamtNote.tendenz||'')}</span>`;
+    }
+    body += `<td class="total">${stuTotal>0 ? deNum(stuTotal) : '<span class="empty">—</span>'}</td>`;
+    body += `<td>${fq!==''?fq:'<span class="empty">—</span>'}</td>`;
+    body += `<td class="np">${np!==''?np:'<span class="empty">—</span>'}${totalPill}</td>`;
+    body += `</tr>`;
+  });
+
+  table.innerHTML = `<thead>${head1}${head2}</thead><tbody>${body}</tbody>`;
+}
+
+function confirmClearLocalData(){
+  if(!confirm('Browser-Speicher dieser Anwendung leeren?\n\n' +
+              'Alle Eingaben, Stichpunkte und Rückmeldetexte werden lokal gelöscht. ' +
+              'Die exportierte Excel-Datei bleibt davon unberührt.\n\n' +
+              'Empfehlung: Vorher XLSX exportieren!')) return;
+  clearPersistedState();
+  studentDrafts = {};
+  activeWB = null; activeMeta = null; activeStudents = []; activeFilename = null;
+  activeSheetName = null; currentStudentIdx = -1;
+  document.getElementById('pickerWrap').style.display = 'none';
+  document.getElementById('importMeta').textContent = '';
+  updateSaveBar();
+  renderOverviewTable();
+  setHint('saveHint', 'Browser-Speicher geleert.', 'ok');
+}
+
+/* ============================ FEHLERLISTEN-EDITOR ============================ */
+let _fehlerEditorCurrentKey = null;
+let _fehlerEditorDirtyData = null; /* {key: array} — temporäre Edits, erst beim Speichern committed */
+
+function openFehlerEditor(){
+  _fehlerEditorDirtyData = JSON.parse(JSON.stringify(klausurMeta.fehlerlisten || {}));
+  /* Tabs aus den verfügbaren Kategorien bauen — Defaults + alle, die in fehlerlisten existieren */
+  const allKeys = new Set([
+    ...Object.keys(FEHLER_DEFAULTS),
+    ...Object.keys(_fehlerEditorDirtyData)
+  ]);
+  const keys = Array.from(allKeys).sort();
+  const tabsEl = document.getElementById('fehlerEditorTabs');
+  tabsEl.innerHTML = keys.map(k=>
+    `<button type="button" class="fehler-editor-tab" data-fk="${esc(k)}">${esc(k.charAt(0).toUpperCase()+k.slice(1))}</button>`
+  ).join('');
+  /* Erstes Tab aktivieren */
+  _fehlerEditorCurrentKey = keys[0] || 'einleitung';
+  selectFehlerCategory(_fehlerEditorCurrentKey);
+  tabsEl.querySelectorAll('.fehler-editor-tab').forEach(b=>{
+    b.addEventListener('click', ()=> selectFehlerCategory(b.dataset.fk));
+  });
+  document.getElementById('fehlerEditorModal').style.display = 'grid';
+}
+
+function selectFehlerCategory(key){
+  /* Aktuellen Textarea-Inhalt in dirty-data speichern, bevor Tab gewechselt wird */
+  if(_fehlerEditorCurrentKey){
+    const ta = document.getElementById('fehlerEditorTextarea');
+    _fehlerEditorDirtyData[_fehlerEditorCurrentKey] =
+      ta.value.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  }
+  _fehlerEditorCurrentKey = key;
+  document.getElementById('fehlerEditorTabs').querySelectorAll('.fehler-editor-tab').forEach(t=>{
+    t.classList.toggle('active', t.dataset.fk === key);
+  });
+  const arr = _fehlerEditorDirtyData[key] || [];
+  document.getElementById('fehlerEditorTextarea').value = arr.join('\n');
+  document.getElementById('fehlerEditorHint').textContent =
+    `${arr.length} Fehler in „${key}". Eine pro Zeile.`;
+}
+
+function resetFehlerCategory(){
+  if(!_fehlerEditorCurrentKey) return;
+  const defaults = FEHLER_DEFAULTS[_fehlerEditorCurrentKey];
+  if(!defaults){
+    document.getElementById('fehlerEditorHint').textContent =
+      `Für „${_fehlerEditorCurrentKey}" gibt es keine Default-Liste.`;
+    return;
+  }
+  if(!confirm(`„${_fehlerEditorCurrentKey}" auf Default-Liste zurücksetzen?`)) return;
+  document.getElementById('fehlerEditorTextarea').value = defaults.join('\n');
+  _fehlerEditorDirtyData[_fehlerEditorCurrentKey] = defaults.slice();
+}
+
+function saveFehlerEditor(){
+  /* aktuelle Textarea-Werte committen */
+  if(_fehlerEditorCurrentKey){
+    const ta = document.getElementById('fehlerEditorTextarea');
+    _fehlerEditorDirtyData[_fehlerEditorCurrentKey] =
+      ta.value.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  }
+  klausurMeta.fehlerlisten = _fehlerEditorDirtyData;
+  _fehlerEditorDirtyData = null;
+  _fehlerEditorCurrentKey = null;
+  document.getElementById('fehlerEditorModal').style.display = 'none';
+  drawTasks();
+  persistDebounced();
+  setHint('copyHint', 'Fehlerlisten gespeichert.', 'ok');
+}
+
+function closeFehlerEditor(){
+  _fehlerEditorDirtyData = null;
+  _fehlerEditorCurrentKey = null;
+  document.getElementById('fehlerEditorModal').style.display = 'none';
+}
+
+/* ESC schließt auch dieses Modal */
+document.addEventListener('keydown', e=>{
+  if(e.key === 'Escape' && document.getElementById('fehlerEditorModal').style.display === 'grid'){
+    closeFehlerEditor();
+  }
+});
+
+/* ============================ HELP-SYSTEM ============================ */
+/* Zentrales Wörterbuch für alle (i)-Erklärungen. Format pro Eintrag:
+   { title: "Überschrift", body: "HTML-Text" } */
+const HELP_TEXTS = {
+  'workflow': {
+    title: 'So funktioniert das Tool',
+    body: `<p><b>Grundablauf:</b></p>
+      <p>1. „Neue Klausur anlegen" oder bestehende XLSX laden<br>
+         2. Schülerin oder Schüler auswählen → Items mit Punkten füllen<br>
+         3. Stichpunkte schreiben + Fehler anklicken<br>
+         4. „Prompt kopieren" → in Claude.ai/ChatGPT einfügen → Antwort kopieren<br>
+         5. „Antwort einfügen" zurück ins Tool<br>
+         6. Rückmeldung kopieren und in Word/Mail einfügen</p>
+      <p>Alle Eingaben werden <b>automatisch im Browser-Speicher</b> gehalten — Tab schließen ist okay, beim Wiederöffnen ist alles da.</p>`
+  },
+  'nachteil': {
+    title: 'LRS / Notenschutz (Nachteilsausgleich)',
+    body: `<p>Für Schülerinnen und Schüler mit anerkanntem <b>Notenschutz</b> (z. B. LRS/Legasthenie) wird der Fehlerquotient zwar <b>ausgewiesen</b>, aber <b>nicht in die Notenpunkte eingerechnet</b> — der FQ-Abzug entfällt.</p>
+      <p>Der Schalter gilt <b>je Schülerin und Schüler</b> und wird im Browser-Speicher sowie (falls vorhanden) in der Excel-Spalte „Nachteilsausgleich" gesichert.</p>
+      <p>Maßgeblich bleibt die <b>Entscheidung der Lehrkraft</b> und die geltende Verwaltungsvorschrift des Bundeslands.</p>`
+  },
+  'provider': {
+    title: 'KI-Anbieter (Direkt-Modus)',
+    body: `<p>Nur sichtbar, wenn „API direkt aufrufen" aktiv ist. Wähle den Anbieter, dessen API direkt aus dem Browser angesprochen wird.</p>
+      <p><b>Ohne API geht es immer:</b> Schalter aus = „Nur Prompt" — Prompt kopieren, in eine beliebige KI (Claude/ChatGPT/Gemini) einfügen, Antwort zurück. Kein Key nötig, datenschutzfreundlich.</p>
+      <p><b>Ollama (lokal)</b> braucht keinen Key (läuft auf deinem Rechner, <code>localhost:11434</code>) — am datenschutzfreundlichsten.</p>`
+  },
+  'apikey': {
+    title: 'API-Key',
+    body: `<p>Dein persönlicher Schlüssel des Anbieters. Er wird <b>nur lokal im Browser</b> (localStorage) gespeichert, pro Anbieter getrennt, und ausschließlich an den jeweiligen Anbieter gesendet — nie an Dritte, nie in die Excel.</p>
+      <p>„🗑 Lokal löschen" entfernt ihn wieder. Auf GitHub Pages funktioniert der Direkt-Modus mit eigenem Key (Anthropic mit Spezial-Header, OpenAI/Gemini direkt).</p>`
+  },
+  'empfehlung': {
+    title: 'Weiterentwicklungs-Empfehlung',
+    body: `<p>Wenn aktiv, schlägt die KI pro Aufgabe <b>höchstens einen</b> konkreten, zur Leistung passenden Hinweis vor, wie die Schülerin oder der Schüler das eigene Schreiben weiterentwickeln kann.</p>
+      <p>Grundlage ist eine nach Niveau (einfach → anspruchsvoll) gestaffelte <b>Vorgabeliste</b>. Diese ist im Fehlerlisten-Editor unter „weiterentwicklung" <b>editierbar</b> — am besten im Kollegium abgestimmt.</p>`
+  },
+  'neue-klausur': {
+    title: 'Neue Klausur anlegen',
+    body: `<p>Erstellt eine neue Excel mit allen Bewertungen. Du gibst Titel, Fach, Stufe, Datum und die Liste der Schülerinnen und Schüler ein, definierst das Aufgaben-Schema (Bewertungsteile mit Maximalpunkten).</p>
+      <p>Das Tool erzeugt eine XLSX mit:<br>
+      • Kürzungs-Formeln für Namen („Bacher" → „Bac.")<br>
+      • SUM-Formeln pro Aufgabe und Gesamt<br>
+      • Spalten für Vorname_voll, Nachname_voll, Items, FQ, Notenpunkte</p>
+      <p>Die erzeugte Datei wird automatisch im Tool aktiv und steht als Download bereit.</p>`
+  },
+  'schueler-anonym': {
+    title: 'Anonyme Kürzel',
+    body: `<p>Wenn du keine echten Namen ins Tool eintragen willst, drücke „Aaa, A. · Aab, B. · …" — das Tool füllt die Liste mit fortlaufenden Kürzeln:</p>
+      <p><code>Aaa, A. · Aab, B. · Aac, C. · …</code></p>
+      <p>Diese musst du dir manuell den echten Schülerinnen und Schülern zuordnen (z. B. auf Papier oder in einer separaten Datei).</p>`
+  },
+  'bestehende-klausur': {
+    title: 'Bestehende Excel laden',
+    body: `<p>Lädt eine zuvor mit dem Tool erstellte XLSX. Das Tool erkennt automatisch:</p>
+      <p>• Vorname / Nachname (kurze und volle Form)<br>
+      • Bewertungs-Items pro Aufgabe<br>
+      • Bestehende Punkte und FQ-Werte<br>
+      • Notenpunkte</p>
+      <p>Wichtig: Der Header muss dem Schema folgen, das das Tool selbst erzeugt — andere Excel-Strukturen funktionieren nicht zuverlässig.</p>`
+  },
+  'sprachstufe': {
+    title: 'Sprachstufe der KI-Rückmeldung',
+    body: `<p>Steuert, wie komplex die KI ihre Antwort formuliert. Im Tool steht die GER-Stufe (A1–C2); im Prompt landet eine ausformulierte Anweisung mit Wortzahl-Grenzen, Satzbau-Regeln und Vorgaben zu Fachbegriffen.</p>
+      <p><b>Praktischer Einsatz:</b><br>
+      • Schwächere Schülerinnen und Schüler → A1/A2<br>
+      • Normale Q2-Rückmeldung → Standard (B2)<br>
+      • Leistungskurs/Hochbegabte → C1/C2</p>
+      <p>Die Beschreibung der gewählten Stufe wird unter dem Dropdown angezeigt.</p>`
+  },
+  'anredeform': {
+    title: 'Anredeform',
+    body: `<p>Bestimmt, wie die KI die Schülerin oder den Schüler anspricht:</p>
+      <p>• <b>du</b> — direkt, vertraut (Berufsschule, Mittelstufe)<br>
+      • <b>Sie</b> — formell (Q-Phase, Oberstufe)<br>
+      • <b>sachlich</b> — unpersönlich, ohne direkte Anrede</p>`
+  },
+  'item-row': {
+    title: 'Bewertungsteile',
+    body: `<p>Pro Aufgabe bis zu 4 Bewertungsteile (z. B. Einleitung, Sprache, Stringenz, Inhalt). Jeder Teil hat einen Namen, eine erreichte Punktzahl und eine Maximalpunktzahl.</p>
+      <p><b>Note pro Item</b> wird automatisch berechnet (Pille rechts) — von 1+ (sehr gut) bis 6 (ungenügend). Schritte sind 0,5.</p>
+      <p>Item-Namen sind bei aktiver Excel <b>gebunden</b> (schreibgeschützt), weil sie an Spalten der Datei hängen.</p>`
+  },
+  'niveau': {
+    title: 'Niveau für die KI-Rückmeldung',
+    body: `<p>Bestimmt den Tonfall, mit dem die KI die Rückmeldung schreibt — von „sehr würdigend" bis „durchgängig kritisch".</p>
+      <p>Das Tool stellt diesen Wert <b>automatisch passend zur errechneten Note</b> ein. Du kannst aber manuell überschreiben — bei der nächsten Punkte-Eingabe wird die Synchronisation aber wieder greifen.</p>`
+  },
+  'fq': {
+    title: 'Fehlerquotient (FQ)',
+    body: `<p>Fehler × 100 / Wörter — Standard-Konvention für Sprachrichtigkeit.</p>
+      <p><b>Notenpunkt-Abzug:</b><br>
+      • FQ &lt; 3 → kein Abzug<br>
+      • 3 ≤ FQ &lt; 6 → 1 NP Abzug<br>
+      • FQ ≥ 6 → 2 NP Abzug</p>
+      <p>In der Excel wird FQ als <code>=Fehler*100/Wörter</code> gespeichert (Formel-Zelle).</p>`
+  },
+  'aufgabenstellung': {
+    title: 'Aufgabenstellung',
+    body: `<p>Wortlaut der Klausur-Aufgabe. Bleibt für alle Schülerinnen und Schüler gleich (nicht schüler-spezifisch). Wird mit in den KI-Prompt eingebaut, damit die Rückmeldung sich auf die richtige Aufgabe bezieht.</p>`
+  },
+  'musterloesung': {
+    title: 'Musterlösung / Erwartungshorizont',
+    body: `<p>Erwartete Inhalte / Lösungsskizze. Wird in den KI-Prompt mit dem Hinweis „NUR als Bezugspunkt — nicht im Text zitieren" eingebaut.</p>
+      <p>Hilft der KI zu erkennen, welche Inhalte erwartet wurden, ohne dass sie diese im Rückmeldetext wörtlich auftauchen.</p>`
+  },
+  'fehlerliste': {
+    title: 'Anklickbare Fehlerlisten',
+    body: `<p>Pro Bewertungsteil eine Liste typischer Fehler. Klick markiert die Pille; mehrere gleichzeitig möglich. „↓ Markierte übernehmen" schreibt sie als Spiegelstriche ins Stichpunkte-Feld.</p>
+      <p>Listen sind editierbar über „Listen bearbeiten" — eigene Fehler hinzufügen, vorhandene löschen.</p>
+      <p>Die Listen sind <b>klausur-weit</b>: einmal gepflegt, bei allen Schülerinnen und Schülern verfügbar.</p>`
+  },
+  'stichpunkte': {
+    title: 'Stichpunkte zur Rückmeldung',
+    body: `<p>Deine knappen Notizen zur Aufgabe — eine pro Zeile. Diese werden an die KI weitergegeben, die daraus einen zusammenhängenden Rückmeldetext schreibt.</p>
+      <p>Format: kurze Sätze oder Fragmente, mit Spiegelstrich davor, jede Beobachtung in eine eigene Zeile.</p>`
+  },
+  'prompt-kopieren': {
+    title: 'Prompt kopieren',
+    body: `<p>Kopiert den vollständigen KI-Prompt (System-Anweisung + Stichpunkte + Kontext) ins Clipboard.</p>
+      <p><b>Workflow:</b><br>
+      1. Hier klicken (kopiert)<br>
+      2. In Claude.ai / ChatGPT / Gemini wechseln<br>
+      3. Strg+V einfügen, Antwort abwarten<br>
+      4. Antwort kopieren<br>
+      5. „↓ Antwort einfügen" hier im Tool</p>`
+  },
+  'antwort-einfuegen': {
+    title: 'Antwort einfügen',
+    body: `<p>Liest den Inhalt deines Clipboards und schreibt ihn in das Rückmeldetext-Feld dieser Aufgabe.</p>
+      <p>Wenn der Browser das Clipboard nicht lesen darf (manche Datenschutz-Einstellungen), öffnet sich ein kleines Dialogfenster, in das du den Text manuell mit Strg+V einfügen kannst.</p>`
+  },
+  'api-mode': {
+    title: 'API direkt aufrufen',
+    body: `<p>Wenn aktiv: das Tool ruft die Anthropic-API direkt auf (statt nur den Prompt zu kopieren). Funktioniert nur im claude.ai-Kontext — nicht auf eigenständigen Deployments (Github Pages, lokale HTML-Datei).</p>
+      <p>Default ist <b>aus</b>. Der Standardweg ist „Prompt kopieren" → externes KI-Tool → „Antwort einfügen". Das funktioniert überall und kostet keine API-Gebühren.</p>`
+  },
+  'review-prompt': {
+    title: 'Prompt vor dem Absenden anzeigen',
+    body: `<p>Nur relevant, wenn „API direkt aufrufen" aktiv ist. Zeigt vor jedem API-Call den vollständigen Prompt in einem editierbaren Modal — du kannst noch nachjustieren oder abbrechen.</p>`
+  },
+  'crit-prompt': {
+    title: 'Items in KI-Prompt einbeziehen',
+    body: `<p>Wenn aktiv: Die erreichten Punkte pro Bewertungsteil (z. B. „Einleitung 2/3 BE, 66%") werden im Prompt mitgegeben — als <b>Tonkalibrierung</b> für die KI, nicht zum Zitieren.</p>
+      <p>Hilft der KI, die Schwerpunkte der Rückmeldung passend zu setzen (mehr Kritik bei niedrigeren Werten, mehr Lob bei höheren).</p>`
+  },
+  'clear-on-load': {
+    title: 'Beim Schülerwechsel zurücksetzen',
+    body: `<p>Wenn aktiv: Beim Wechsel zu einer anderen Schülerin oder einem anderen Schüler werden Stichpunkte und Rückmeldetexte geleert.</p>
+      <p>Wenn aus: Diese Felder bleiben stehen — nützlich, wenn du z. B. die selben Stichpunkte für mehrere Personen verwenden willst und nur anpassen musst.</p>
+      <p>Hinweis: <b>Punkte und Items werden immer gespeichert</b>, unabhängig von diesem Schalter.</p>`
+  },
+  'overview-table': {
+    title: 'Übersichts-Tabelle',
+    body: `<p>Zeigt alle Schülerinnen und Schüler mit ihren bisherigen Werten an einem Blick: Punkte pro Item, Aufgaben-Summen, Gesamt-BE, FQ, Notenpunkte.</p>
+      <p>Schreibgeschützt — Eingabe weiterhin oben in den Item-Feldern. Aktuell ausgewählte Schülerin bzw. ausgewählter Schüler ist hervorgehoben. Punkt am Namen zeigt: Notizen vorhanden.</p>`
+  },
+  'save-bar': {
+    title: 'Speichern und Exportieren',
+    body: `<p>Daten werden <b>automatisch</b> im Browser-Speicher gehalten — bei jeder Eingabe, beim Schüler-Wechsel, beim Tab-Schließen.</p>
+      <p>„⤵ In Excel speichern" schreibt die aktuelle Schüler-Bewertung in die Workbook-Struktur und bietet die XLSX zum Download an.<br>
+      „XLSX exportieren" lädt den kompletten aktuellen Stand als Datei herunter.<br>
+      „🗑 Lokal löschen" leert den Browser-Speicher (Empfehlung: vorher exportieren).</p>`
+  },
+  'note-pill': {
+    title: 'Noten-Pille',
+    body: `<p>Zeigt die rechnerische Note in Tendenz-Schreibweise (1+, 1, 1−, 2+, …, 6). Farben:</p>
+      <p>🟢 1+/1/1− — sehr gut · grün<br>
+      🟢 2+/2/2− — gut · hellgrün<br>
+      🟡 3+/3/3− — befriedigend · gelb<br>
+      🟠 4+/4/4− — ausreichend · orange<br>
+      🟠 5+/5/5− — mangelhaft · rotorange<br>
+      🔴 6 — ungenügend · rot</p>
+      <p>Tooltip zeigt zusätzlich Notenpunkte und Notenbezeichnung.</p>`
+  }
+};
+
+let _activePopover = null;
+
+function showHelp(target, key){
+  closeHelp();
+  const def = HELP_TEXTS[key];
+  if(!def){ console.warn('Unknown help key:', key); return; }
+  const pop = document.createElement('div');
+  pop.className = 'help-popover';
+  pop.innerHTML = `<div class="arrow"></div>
+    <button class="close" title="Schließen">✕</button>
+    <h4>${esc(def.title)}</h4>
+    ${def.body}`;
+  document.body.appendChild(pop);
+  /* Positionierung: unter dem Target */
+  const r = target.getBoundingClientRect();
+  let left = r.left + window.scrollX - 14;
+  const top = r.bottom + window.scrollY + 8;
+  /* Rechts nicht aus dem Viewport rauslaufen lassen */
+  const popW = pop.offsetWidth;
+  const maxLeft = window.scrollX + window.innerWidth - popW - 12;
+  if(left > maxLeft) left = maxLeft;
+  if(left < window.scrollX + 8) left = window.scrollX + 8;
+  pop.style.left = left + 'px';
+  pop.style.top  = top + 'px';
+  /* Arrow horizontal so verschieben, dass er auf das Target zeigt */
+  const arrow = pop.querySelector('.arrow');
+  const arrowLeft = (r.left + r.width/2) - left + window.scrollX - 6;
+  arrow.style.left = Math.max(8, Math.min(arrowLeft, popW - 20)) + 'px';
+
+  pop.querySelector('.close').onclick = closeHelp;
+  target.classList.add('open');
+  _activePopover = {pop, target};
+}
+function closeHelp(){
+  if(_activePopover){
+    _activePopover.pop.remove();
+    _activePopover.target.classList.remove('open');
+    _activePopover = null;
+  }
+}
+/* Globaler Klick-Außenraum + ESC */
+document.addEventListener('click', e=>{
+  if(!_activePopover) return;
+  if(e.target.classList && e.target.classList.contains('info')) return;
+  if(_activePopover.pop.contains(e.target)) return;
+  closeHelp();
+});
+document.addEventListener('keydown', e=>{
+  if(e.key === 'Escape' && _activePopover) closeHelp();
+});
+/* Click-Handler delegiert: jedes .info-Element triggert showHelp */
+document.addEventListener('click', e=>{
+  const el = e.target.closest('.info[data-help]');
+  if(!el) return;
+  e.stopPropagation();
+  if(_activePopover && _activePopover.target === el){
+    closeHelp(); return;
+  }
+  showHelp(el, el.dataset.help);
+});
+
+/* ============================ RESET ============================ */
+let _resetArmed=false,_resetTimer=null;
+function resetAll(){
+  const b=document.getElementById('resetBtn');
+  if(!_resetArmed){
+    _resetArmed=true; b.dataset.lbl=b.textContent;
+    b.textContent='Wirklich? Nochmal klicken'; b.classList.add('accent');
+    _resetTimer=setTimeout(()=>{_resetArmed=false;b.textContent=b.dataset.lbl||'Zurücksetzen';b.classList.remove('accent');},3500);
+    return;
+  }
+  clearTimeout(_resetTimer); _resetArmed=false;
+  b.textContent=b.dataset.lbl||'Zurücksetzen'; b.classList.remove('accent');
+  ['name','titel','fach','datum','fehler','woerter','fqDirect','maxBE'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('anrede').value='Frau';
+  document.getElementById('anredeform').value='Sie';
+  document.getElementById('vorschlag').value='';
+  document.getElementById('sprache').selectedIndex=2;
+  { const _na=document.getElementById('optNachteil'); if(_na) _na.checked=false; }
+  tasks=[]; uid=0;
+  schemaLoadDefault();
+  onFqInput();
+}
+
+/* ============================ INIT ============================ */
+/* CDN-Selfcheck: prüft, ob externe Libraries verfügbar sind, und zeigt
+   dem User eine klar lesbare Meldung, falls etwas fehlt (z.B. Firewall). */
+function cdnSelfcheck(){
+  const issues = [];
+  if(typeof XLSX === 'undefined'){
+    issues.push({
+      lib: 'SheetJS (XLSX)',
+      who: 'Excel-Import &amp; -Export',
+      hint: 'Die CDN <code>cdnjs.cloudflare.com</code> oder <code>cdn.jsdelivr.net</code> ist nicht erreichbar (Schul-Firewall, Werbeblocker?)'
+    });
+  }
+  if(!issues.length) return;
+
+  const banner = document.createElement('div');
+  banner.style.cssText = 'background:#f8d7da;border:1px solid #9b2226;border-radius:8px;'
+    + 'padding:14px 18px;margin:0 0 18px;color:#9b2226;font-size:14px;line-height:1.6';
+  banner.innerHTML = '<b style="font-family:\'Segoe UI\',system-ui,sans-serif;font-size:16px">⚠ Externe Library nicht geladen</b><br>'
+    + issues.map(i=>`<b>${i.lib}</b> fehlt — ${i.who} ist nicht verfügbar. <span style="opacity:.85">${i.hint}.</span>`).join('<br>')
+    + '<br><span style="opacity:.85">Lade die Seite mit aktivem Internet neu, oder lade die HTML-Datei lokal mit Internetzugriff.</span>';
+  const wrap = document.querySelector('.wrap');
+  const top = document.querySelector('header.top');
+  if(wrap && top){ wrap.insertBefore(banner, top.nextSibling); }
+}
+cdnSelfcheck();
+initSprachstufeDropdown();
+updateSprachstufeHint();
+updateFilenamePreview();
+['setupFach','setupTitel','setupStufe','setupDatum','fach','titel','datum'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('input', updateFilenamePreview);
+});
+
+/* Persistenten State versuchen zu laden — wenn vorhanden, übernehmen.
+   Fallback: Default-Schema. */
+const restored = loadPersistedState();
+if(!restored){
+  schema = JSON.parse(JSON.stringify(DEFAULT_SCHEMA));
+  drawSchema();
+  schemaToTasks(true);
+}
+
+/* Auto-Save bei jeder Eingabe in Header-Felder + Optionen */
+['anrede','anredeform','vorschlag','titel','fach','datum','sprache','sprachstufe','maxBE',
+ 'fehler','woerter','fqDirect'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('input', persistDebounced);
+});
+['optClearOnLoad','optCritInPrompt','optReviewPrompt','optApiMode','optEmpfehlung'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(el){
+    el.addEventListener('change', persistDebounced);
+    if(id === 'optApiMode') el.addEventListener('change', updateApiModeUI);
+  }
+});
+/* Initial: sichtbar-Status der API-only-Elemente */
+updateApiModeUI();
+
+/* Auto-Save vor Tab-Schließung */
+try{ const _lp=localStorage.getItem('klausur-apiprovider'); const _ps=document.getElementById('apiProvider'); if(_lp&&_ps) _ps.value=_lp; onProviderChange(); }catch(e){}
+window.addEventListener('beforeunload', ()=>{
+  saveDraftForCurrentStudent();
+  persistState();
+});
+</script>
+<script>
+function toggleNav(){var n=document.getElementById('mainNav');if(n)n.classList.toggle('open');}
+(function(){var n=document.getElementById('mainNav');if(!n)return;
+  n.addEventListener('click',function(e){if(e.target.tagName==='A'&&window.innerWidth<=680)n.classList.remove('open');});})();
+</script>
+</body>
+</html>
