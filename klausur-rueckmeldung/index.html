@@ -1670,7 +1670,7 @@ function render(){
   const maxFromTasks = tasks.reduce((a,t)=>a+taskBeMax(t), 0);
   const maxBEFieldVal = document.getElementById('maxBE').value;
   let maxBE = parseFloat(maxBEFieldVal);
-  if(!(maxBE>0) && maxFromTasks>0){
+  if(!(maxBE>0) && maxFromTasks>0 && !window._metaMissing){
     document.getElementById('maxBE').value = maxFromTasks;
     maxBE = maxFromTasks;
   }
@@ -2289,6 +2289,21 @@ function readWorkbookData(wb){
   }
   const dataRows = raw.filter(isStudentRow);
   const {maxPerCrit, maxPerTask} = computeMaxes(dataRows, meta);
+  /* _Meta-Blatt lesen: echte Max-Punkte + Metadaten ueberschreiben das Raten */
+  let hasMeta=false, metaMd=null;
+  if(wb.Sheets['_Meta']){
+    const _mr=XLSX.utils.sheet_to_json(wb.Sheets['_Meta'], {header:1});
+    const kv={}; _mr.forEach(r=>{ if(r && r[0]!=null) kv[String(r[0]).trim()]=r[1]; });
+    if(kv.version!=null){
+      hasMeta=true;
+      metaMd={titel:kv.titel||'', fach:kv.fach||'', stufe:kv.stufe||'', datum:kv.datum||'', sprachstufe:kv.sprachstufe||''};
+      Object.keys(kv).forEach(k=>{ if(k.indexOf('max:')===0){ const head=k.slice(4).trim(); const sp=head.indexOf(' ');
+        if(sp>0){ const tn=parseInt(head.slice(0,sp)); const crit=head.slice(sp+1).trim(); const mx=numOrNull(kv[k]);
+          if(tn && crit && mx!=null) maxPerCrit[tn+'|'+crit]=mx; } } });
+      const _mpt={}; meta.criterionCols.forEach(cc=>{ const mx=maxPerCrit[cc.taskNum+'|'+cc.criterion]; if(mx!=null) _mpt[cc.taskNum]=(_mpt[cc.taskNum]||0)+mx; });
+      Object.keys(_mpt).forEach(k=>{ maxPerTask[k]=_mpt[k]; });
+    }
+  }
 
   const students = dataRows.map(r=>{
     const stu = {
@@ -2329,7 +2344,7 @@ function readWorkbookData(wb){
     return stu;
   });
 
-  return {wb, sheetName, students, meta, maxPerCrit, maxPerTask};
+  return {wb, sheetName, students, meta, maxPerCrit, maxPerTask, hasMeta, metaMd};
 }
 
 function handleFile(ev){
@@ -2359,6 +2374,13 @@ function activateWorkbook(data, filename, fromPersist){
   activeStudents = data.students;
   activeFilename = filename || 'Klausur.xlsx';
   currentStudentIdx = activeStudents.length ? 0 : -1;
+  window._metaMissing = !data.hasMeta;
+  if(data.metaMd){
+    if(data.metaMd.titel) setVal('titel', data.metaMd.titel);
+    if(data.metaMd.fach)  setVal('fach',  data.metaMd.fach);
+    if(data.metaMd.datum) setVal('datum', data.metaMd.datum);
+    if(data.metaMd.sprachstufe){ const _ss=document.getElementById('sprachstufe'); if(_ss) _ss.value=data.metaMd.sprachstufe; }
+  }
 
   fillPicker();
   const taskNums = Array.from(activeMeta.aufgabenNums).sort((a,b)=>a-b);
@@ -2611,7 +2633,8 @@ function loadCurrentStudent(fromPersist){
   let totalMax = 0;
   taskNums.forEach(tn=>{ const m = activeMeta && stu.tasks[tn] && stu.tasks[tn].beMax;
     if(m!=null) totalMax += m; });
-  if(totalMax>0) document.getElementById('maxBE').value = totalMax;
+  if(window._metaMissing){ document.getElementById('maxBE').value=''; }
+  else if(totalMax>0){ document.getElementById('maxBE').value = totalMax; }
 
   /* Niveau anhand der Items-Werte synchronisieren — Draft-niveau wird ggf. überschrieben.
      Das ist gewollt: Wenn Punkte vorliegen, ist die Note die zuverlässigere Quelle. */
@@ -2748,6 +2771,15 @@ function schemaToTasks(silent){
   }
 }
 
+/* _Meta-Blatt: Schluessel-Wert-Zeilen (Max-Punkte pro Kriterium + Klausur-Infos) */
+function buildMetaAoa(cleanSchema, md){
+  const rows=[['Schluessel','Wert'],['version',1]];
+  ['titel','fach','stufe','datum','sprachstufe'].forEach(k=>rows.push([k, (md&&md[k])||'']));
+  let total=0;
+  cleanSchema.forEach((t,ti)=>{ const tn=ti+1; (t.items||[]).forEach(it=>{ const mx=parseFloat(it.max)||0; rows.push(['max:'+tn+' '+it.name, mx]); total+=mx; }); });
+  rows.push(['max_gesamt', total]);
+  return rows;
+}
 function generateAndLoadNewExcel(){
   const status = document.getElementById('setupStatus');
   status.className='status';
@@ -2871,6 +2903,12 @@ function generateAndLoadNewExcel(){
   ws['!ref'] = XLSX.utils.encode_range({s:{r:0,c:0}, e:{r:students.length, c:headers.length-1}});
 
   XLSX.utils.book_append_sheet(wb, ws, 'Bewertungen');
+  /* _Meta-Blatt anhaengen: echte Max-Punkte + Metadaten -> selbstbeschreibend */
+  try{
+    const _md={titel:titel, fach:fach, stufe:(document.getElementById('setupStufe')||{}).value||'', datum:datum, sprachstufe:getVal('sprachstufe')};
+    const _mws=XLSX.utils.aoa_to_sheet(buildMetaAoa(cleanSchema,_md)); _mws['!cols']=[{wch:24},{wch:42}];
+    XLSX.utils.book_append_sheet(wb, _mws, '_Meta');
+  }catch(e){ console.warn('_Meta schreiben fehlgeschlagen', e); }
 
   /* Datei-Name: <fach-kürzel>_<stufe>_<jahr>_<titel>.xlsx
      Fach-Kürzel: aus Fach-Feld grob abgeleitet (z. B. "Politik & Wirtschaft" → "pw")
@@ -2950,6 +2988,13 @@ function expandRefIfNeeded(ws, r, c){
 }
 
 function saveCurrentStudentToExcel(){
+  if(activeWB && !activeWB.Sheets['_Meta']){
+    try{ const _sch=tasks.map(t=>({items:(t.items||[]).filter(it=>String(it.name||'').trim()).map(it=>({name:String(it.name).trim(),max:parseFloat(it.max)||0}))}));
+      const _md={titel:getVal('titel'),fach:getVal('fach'),stufe:(document.getElementById('setupStufe')||{}).value||'',datum:getVal('datum'),sprachstufe:getVal('sprachstufe')};
+      const _mws=XLSX.utils.aoa_to_sheet(buildMetaAoa(_sch,_md)); _mws['!cols']=[{wch:24},{wch:42}];
+      XLSX.utils.book_append_sheet(activeWB, _mws, '_Meta'); window._metaMissing=false;
+    }catch(e){ console.warn('_Meta Auto-Upgrade fehlgeschlagen', e); }
+  }
   if(!activeWB || currentStudentIdx<0){
     setHint('saveHint','Keine aktive Datei oder kein Schüler ausgewählt.','err'); return;
   }
