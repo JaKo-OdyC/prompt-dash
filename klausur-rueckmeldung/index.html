@@ -4603,7 +4603,8 @@ if(!restored){
 }
 registerCustomSchemas();
 initNotenschemaDropdown();
-applyCardDefaults();
+/* applyCardDefaults() wird am Ende des naechsten <script>-Blocks aufgerufen,
+   da die Funktion erst dort definiert ist (Hoisting gilt nicht ueber Block-Grenzen). */
 
 /* Auto-Save bei jeder Eingabe in Header-Felder + Optionen */
 ['anrede','anredeform','vorschlag','titel','fach','datum','sprache','sprachstufe','maxBE',
@@ -4664,6 +4665,8 @@ document.addEventListener('click', function(e){
 function toggleNav(){var n=document.getElementById('mainNav');if(n)n.classList.toggle('open');}
 (function(){var n=document.getElementById('mainNav');if(!n)return;
   n.addEventListener('click',function(e){if(e.target.tagName==='A'&&window.innerWidth<=680)n.classList.remove('open');});})();
+/* Karten-Startzustand anwenden — hier, weil applyCardDefaults erst in diesem Block definiert ist. */
+applyCardDefaults();
 </script>
 </body>
 </html>
