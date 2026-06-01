@@ -700,6 +700,18 @@
     <h2><span class="n">4</span>Notenpunkte (optional)</h2>
     <p class="hint">Summe BE und mögliche Gesamt-BE → Anteil, Notenpunkte, Note. FQ-Abzug wird verrechnet.</p>
     <div class="field" style="max-width:480px"><label>Notenschema</label><select id="notenschema" onchange="onNotenschemaChange()"></select></div>
+    <details class="custom-schema" style="max-width:560px;margin:2px 0 14px">
+      <summary style="cursor:pointer;font-size:.9rem;color:var(--accent);font-weight:600">+ Eigene Notentabelle hinzufügen</summary>
+      <p class="hint" style="margin:8px 0 4px">Eigenen Notenschlüssel (andere Schule/Bundesland) als <b>JSON</b> oder als einfache Liste einfügen — pro Zeile <code>Prozent ; Note ; Wortnote</code>. Die letzte Stufe sollte bei 0 % liegen.</p>
+      <p class="hint" style="margin:2px 0 6px">Unstrukturierte Tabelle? <b>Struktur-Prompt kopieren</b>, in eine KI einfügen, eigene Tabelle anhängen — das zurückgegebene JSON hier einsetzen.</p>
+      <textarea id="customSchemaInput" rows="5" style="width:100%;font-family:monospace;font-size:.85rem;box-sizing:border-box" placeholder='{"label":"Mein Schlüssel","fq":false,"tabelle":[{"p":92,"note":1,"verbal":"sehr gut"}, … ,{"p":0,"note":6,"verbal":"ungenügend"}]}'></textarea>
+      <label style="display:block;margin:6px 0;font-size:.9rem"><input type="checkbox" id="customSchemaFq"> Fehlerquotient-Abzug auf dieses Schema anwenden</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button type="button" class="btn ghost sm" onclick="copyStrukturPrompt()">⎘ Struktur-Prompt kopieren</button>
+        <button type="button" class="btn accent sm" onclick="addCustomSchemaFromInput()">↓ Tabelle übernehmen</button>
+      </div>
+      <div id="customSchemaHint" class="hint" style="margin-top:6px;min-height:1em"></div>
+    </details>
     <div class="calc">
       <div class="field"><label>Summe BE</label><input type="text" id="sumBE" readonly style="background:var(--paper-2)"></div>
       <div class="field"><label>mögliche BE gesamt</label><input type="number" id="maxBE" min="1" placeholder="z. B. 100" step="0.5" oninput="markDirty();render()"></div>
@@ -755,7 +767,7 @@
     </div>
     <p>Ein nutzerorientiertes Helfer-Tool, verwandt mit <a href="https://jako-odyc.github.io/prompt-dash/ausbildungscoach/">Ausbildungscoach</a> · <a href="https://jako-odyc.github.io/prompt-dash/">Prompt-Dash</a>.</p>
     <p><b>Kontakt:</b> Jaroslav Kois — <a href="mailto:jaroslav.kois@fls-da.de">jaroslav.kois@fls-da.de</a> · <a href="mailto:koi@hems.de">koi@hems.de</a> · <em>Kein amtliches Dokument. Ohne Gewähr.</em></p>
-    <p><b>Version:</b> 24.2 — KI-agnostisch (Prompt-Modus + Multi-Provider), LRS-Notenschutz, Notenintegritäts-Härtung, Notenpunkt-Wächter, Notenschema-Auswahl (OAVO/Hessen ↔ IHK, geräteübergreifender Excel-Round-Trip), sicheres API-Key-Handling, Word-Import (Aufgaben + Erwartungshorizont), zentraler KI-Musterlösungsentwurf für die ganze Klausur (prüfpflichtig), getriangulierte und injektionsgehärtete Prompts, frei wählbare Fehler-Kategorien je Bewertungsteil, Lob &amp; Kritik je Punkt (automatische Positiv-Würdigung), Einstellungs-Export/-Import, Maximalpunkte-Übersicht, niveaugerechte Sprachbewertung (A1–C2), Onboarding-Hilfe, Excel-Vorlage-Download, kontextnaher Datenschutz-Hinweis, Schreibempfehlungen. &nbsp;<span class="stand">Stand: 2026-06-01</span></p>
+    <p><b>Version:</b> 24.3 — KI-agnostisch (Prompt-Modus + Multi-Provider), LRS-Notenschutz, Notenintegritäts-Härtung, Notenpunkt-Wächter, Notenschema-Auswahl (OAVO/Hessen ↔ IHK ↔ eigene hochladbare Notentabellen mit Struktur-Prompt, geräteübergreifender Excel-Round-Trip), sicheres API-Key-Handling, Word-Import (Aufgaben + Erwartungshorizont), zentraler KI-Musterlösungsentwurf für die ganze Klausur (prüfpflichtig), getriangulierte und injektionsgehärtete Prompts, frei wählbare Fehler-Kategorien je Bewertungsteil, Lob &amp; Kritik je Punkt (automatische Positiv-Würdigung), Einstellungs-Export/-Import, Maximalpunkte-Übersicht, niveaugerechte Sprachbewertung (A1–C2), Onboarding-Hilfe, Excel-Vorlage-Download, kontextnaher Datenschutz-Hinweis, Schreibempfehlungen. &nbsp;<span class="stand">Stand: 2026-06-01</span></p>
     <div class="qr-row">
       <div class="qr-box">
         <svg viewBox="0 0 37 37" xmlns="http://www.w3.org/2000/svg"><rect width="37" height="37" fill="#fff"/><path d="M2,2h1v1h-1zM3,2h1v1h-1zM4,2h1v1h-1zM5,2h1v1h-1zM6,2h1v1h-1zM7,2h1v1h-1zM8,2h1v1h-1zM11,2h1v1h-1zM13,2h1v1h-1zM20,2h1v1h-1zM23,2h1v1h-1zM24,2h1v1h-1zM28,2h1v1h-1zM29,2h1v1h-1zM30,2h1v1h-1zM31,2h1v1h-1zM32,2h1v1h-1zM33,2h1v1h-1zM34,2h1v1h-1zM2,3h1v1h-1zM8,3h1v1h-1zM10,3h1v1h-1zM14,3h1v1h-1zM15,3h1v1h-1zM16,3h1v1h-1zM19,3h1v1h-1zM20,3h1v1h-1zM23,3h1v1h-1zM28,3h1v1h-1zM34,3h1v1h-1zM2,4h1v1h-1zM4,4h1v1h-1zM5,4h1v1h-1zM6,4h1v1h-1zM8,4h1v1h-1zM10,4h1v1h-1zM12,4h1v1h-1zM16,4h1v1h-1zM17,4h1v1h-1zM22,4h1v1h-1zM23,4h1v1h-1zM24,4h1v1h-1zM28,4h1v1h-1zM30,4h1v1h-1zM31,4h1v1h-1zM32,4h1v1h-1zM34,4h1v1h-1zM2,5h1v1h-1zM4,5h1v1h-1zM5,5h1v1h-1zM6,5h1v1h-1zM8,5h1v1h-1zM10,5h1v1h-1zM11,5h1v1h-1zM16,5h1v1h-1zM18,5h1v1h-1zM19,5h1v1h-1zM22,5h1v1h-1zM23,5h1v1h-1zM25,5h1v1h-1zM28,5h1v1h-1zM30,5h1v1h-1zM31,5h1v1h-1zM32,5h1v1h-1zM34,5h1v1h-1zM2,6h1v1h-1zM4,6h1v1h-1zM5,6h1v1h-1zM6,6h1v1h-1zM8,6h1v1h-1zM11,6h1v1h-1zM12,6h1v1h-1zM19,6h1v1h-1zM20,6h1v1h-1zM21,6h1v1h-1zM22,6h1v1h-1zM24,6h1v1h-1zM25,6h1v1h-1zM28,6h1v1h-1zM30,6h1v1h-1zM31,6h1v1h-1zM32,6h1v1h-1zM34,6h1v1h-1zM2,7h1v1h-1zM8,7h1v1h-1zM12,7h1v1h-1zM14,7h1v1h-1zM15,7h1v1h-1zM18,7h1v1h-1zM20,7h1v1h-1zM22,7h1v1h-1zM23,7h1v1h-1zM24,7h1v1h-1zM28,7h1v1h-1zM34,7h1v1h-1zM2,8h1v1h-1zM3,8h1v1h-1zM4,8h1v1h-1zM5,8h1v1h-1zM6,8h1v1h-1zM7,8h1v1h-1zM8,8h1v1h-1zM10,8h1v1h-1zM12,8h1v1h-1zM14,8h1v1h-1zM16,8h1v1h-1zM18,8h1v1h-1zM20,8h1v1h-1zM22,8h1v1h-1zM24,8h1v1h-1zM26,8h1v1h-1zM28,8h1v1h-1zM29,8h1v1h-1zM30,8h1v1h-1zM31,8h1v1h-1zM32,8h1v1h-1zM33,8h1v1h-1zM34,8h1v1h-1zM10,9h1v1h-1zM11,9h1v1h-1zM13,9h1v1h-1zM17,9h1v1h-1zM18,9h1v1h-1zM20,9h1v1h-1zM21,9h1v1h-1zM24,9h1v1h-1zM2,10h1v1h-1zM8,10h1v1h-1zM10,10h1v1h-1zM11,10h1v1h-1zM12,10h1v1h-1zM13,10h1v1h-1zM15,10h1v1h-1zM16,10h1v1h-1zM17,10h1v1h-1zM18,10h1v1h-1zM19,10h1v1h-1zM22,10h1v1h-1zM24,10h1v1h-1zM26,10h1v1h-1zM27,10h1v1h-1zM28,10h1v1h-1zM31,10h1v1h-1zM32,10h1v1h-1zM33,10h1v1h-1zM4,11h1v1h-1zM5,11h1v1h-1zM11,11h1v1h-1zM14,11h1v1h-1zM15,11h1v1h-1zM16,11h1v1h-1zM17,11h1v1h-1zM19,11h1v1h-1zM21,11h1v1h-1zM24,11h1v1h-1zM25,11h1v1h-1zM26,11h1v1h-1zM30,11h1v1h-1zM31,11h1v1h-1zM32,11h1v1h-1zM33,11h1v1h-1zM2,12h1v1h-1zM3,12h1v1h-1zM4,12h1v1h-1zM5,12h1v1h-1zM8,12h1v1h-1zM12,12h1v1h-1zM13,12h1v1h-1zM14,12h1v1h-1zM15,12h1v1h-1zM16,12h1v1h-1zM17,12h1v1h-1zM18,12h1v1h-1zM22,12h1v1h-1zM23,12h1v1h-1zM24,12h1v1h-1zM28,12h1v1h-1zM30,12h1v1h-1zM32,12h1v1h-1zM33,12h1v1h-1zM3,13h1v1h-1zM5,13h1v1h-1zM7,13h1v1h-1zM11,13h1v1h-1zM13,13h1v1h-1zM14,13h1v1h-1zM15,13h1v1h-1zM17,13h1v1h-1zM18,13h1v1h-1zM24,13h1v1h-1zM25,13h1v1h-1zM29,13h1v1h-1zM30,13h1v1h-1zM31,13h1v1h-1zM32,13h1v1h-1zM4,14h1v1h-1zM6,14h1v1h-1zM7,14h1v1h-1zM8,14h1v1h-1zM9,14h1v1h-1zM10,14h1v1h-1zM12,14h1v1h-1zM13,14h1v1h-1zM15,14h1v1h-1zM18,14h1v1h-1zM22,14h1v1h-1zM27,14h1v1h-1zM28,14h1v1h-1zM29,14h1v1h-1zM33,14h1v1h-1zM34,14h1v1h-1zM2,15h1v1h-1zM4,15h1v1h-1zM6,15h1v1h-1zM9,15h1v1h-1zM11,15h1v1h-1zM17,15h1v1h-1zM18,15h1v1h-1zM20,15h1v1h-1zM21,15h1v1h-1zM22,15h1v1h-1zM24,15h1v1h-1zM25,15h1v1h-1zM28,15h1v1h-1zM29,15h1v1h-1zM31,15h1v1h-1zM32,15h1v1h-1zM33,15h1v1h-1zM34,15h1v1h-1zM2,16h1v1h-1zM4,16h1v1h-1zM5,16h1v1h-1zM6,16h1v1h-1zM8,16h1v1h-1zM9,16h1v1h-1zM11,16h1v1h-1zM12,16h1v1h-1zM13,16h1v1h-1zM17,16h1v1h-1zM22,16h1v1h-1zM23,16h1v1h-1zM24,16h1v1h-1zM27,16h1v1h-1zM28,16h1v1h-1zM30,16h1v1h-1zM32,16h1v1h-1zM33,16h1v1h-1zM2,17h1v1h-1zM3,17h1v1h-1zM5,17h1v1h-1zM6,17h1v1h-1zM7,17h1v1h-1zM10,17h1v1h-1zM12,17h1v1h-1zM13,17h1v1h-1zM15,17h1v1h-1zM17,17h1v1h-1zM24,17h1v1h-1zM26,17h1v1h-1zM27,17h1v1h-1zM30,17h1v1h-1zM32,17h1v1h-1zM34,17h1v1h-1zM3,18h1v1h-1zM4,18h1v1h-1zM6,18h1v1h-1zM7,18h1v1h-1zM8,18h1v1h-1zM9,18h1v1h-1zM10,18h1v1h-1zM12,18h1v1h-1zM16,18h1v1h-1zM19,18h1v1h-1zM24,18h1v1h-1zM26,18h1v1h-1zM27,18h1v1h-1zM29,18h1v1h-1zM30,18h1v1h-1zM34,18h1v1h-1zM4,19h1v1h-1zM9,19h1v1h-1zM10,19h1v1h-1zM11,19h1v1h-1zM12,19h1v1h-1zM13,19h1v1h-1zM15,19h1v1h-1zM16,19h1v1h-1zM17,19h1v1h-1zM20,19h1v1h-1zM21,19h1v1h-1zM22,19h1v1h-1zM24,19h1v1h-1zM25,19h1v1h-1zM28,19h1v1h-1zM31,19h1v1h-1zM32,19h1v1h-1zM33,19h1v1h-1zM34,19h1v1h-1zM3,20h1v1h-1zM4,20h1v1h-1zM5,20h1v1h-1zM7,20h1v1h-1zM8,20h1v1h-1zM12,20h1v1h-1zM13,20h1v1h-1zM15,20h1v1h-1zM17,20h1v1h-1zM19,20h1v1h-1zM21,20h1v1h-1zM24,20h1v1h-1zM25,20h1v1h-1zM29,20h1v1h-1zM31,20h1v1h-1zM32,20h1v1h-1zM34,20h1v1h-1zM4,21h1v1h-1zM5,21h1v1h-1zM6,21h1v1h-1zM10,21h1v1h-1zM13,21h1v1h-1zM15,21h1v1h-1zM16,21h1v1h-1zM17,21h1v1h-1zM18,21h1v1h-1zM21,21h1v1h-1zM22,21h1v1h-1zM25,21h1v1h-1zM26,21h1v1h-1zM27,21h1v1h-1zM28,21h1v1h-1zM30,21h1v1h-1zM31,21h1v1h-1zM32,21h1v1h-1zM33,21h1v1h-1zM2,22h1v1h-1zM4,22h1v1h-1zM7,22h1v1h-1zM8,22h1v1h-1zM9,22h1v1h-1zM10,22h1v1h-1zM11,22h1v1h-1zM12,22h1v1h-1zM13,22h1v1h-1zM14,22h1v1h-1zM19,22h1v1h-1zM25,22h1v1h-1zM26,22h1v1h-1zM27,22h1v1h-1zM30,22h1v1h-1zM31,22h1v1h-1zM33,22h1v1h-1zM34,22h1v1h-1zM2,23h1v1h-1zM4,23h1v1h-1zM5,23h1v1h-1zM7,23h1v1h-1zM9,23h1v1h-1zM12,23h1v1h-1zM15,23h1v1h-1zM16,23h1v1h-1zM17,23h1v1h-1zM20,23h1v1h-1zM21,23h1v1h-1zM23,23h1v1h-1zM24,23h1v1h-1zM25,23h1v1h-1zM29,23h1v1h-1zM30,23h1v1h-1zM31,23h1v1h-1zM2,24h1v1h-1zM4,24h1v1h-1zM5,24h1v1h-1zM8,24h1v1h-1zM9,24h1v1h-1zM10,24h1v1h-1zM11,24h1v1h-1zM12,24h1v1h-1zM14,24h1v1h-1zM17,24h1v1h-1zM18,24h1v1h-1zM19,24h1v1h-1zM20,24h1v1h-1zM22,24h1v1h-1zM23,24h1v1h-1zM26,24h1v1h-1zM28,24h1v1h-1zM31,24h1v1h-1zM32,24h1v1h-1zM33,24h1v1h-1zM2,25h1v1h-1zM5,25h1v1h-1zM10,25h1v1h-1zM14,25h1v1h-1zM15,25h1v1h-1zM18,25h1v1h-1zM20,25h1v1h-1zM22,25h1v1h-1zM24,25h1v1h-1zM28,25h1v1h-1zM31,25h1v1h-1zM32,25h1v1h-1zM33,25h1v1h-1zM2,26h1v1h-1zM3,26h1v1h-1zM4,26h1v1h-1zM6,26h1v1h-1zM7,26h1v1h-1zM8,26h1v1h-1zM9,26h1v1h-1zM11,26h1v1h-1zM14,26h1v1h-1zM17,26h1v1h-1zM18,26h1v1h-1zM20,26h1v1h-1zM21,26h1v1h-1zM22,26h1v1h-1zM26,26h1v1h-1zM27,26h1v1h-1zM28,26h1v1h-1zM29,26h1v1h-1zM30,26h1v1h-1zM31,26h1v1h-1zM10,27h1v1h-1zM12,27h1v1h-1zM13,27h1v1h-1zM14,27h1v1h-1zM16,27h1v1h-1zM17,27h1v1h-1zM18,27h1v1h-1zM19,27h1v1h-1zM20,27h1v1h-1zM21,27h1v1h-1zM22,27h1v1h-1zM23,27h1v1h-1zM26,27h1v1h-1zM30,27h1v1h-1zM32,27h1v1h-1zM34,27h1v1h-1zM2,28h1v1h-1zM3,28h1v1h-1zM4,28h1v1h-1zM5,28h1v1h-1zM6,28h1v1h-1zM7,28h1v1h-1zM8,28h1v1h-1zM11,28h1v1h-1zM12,28h1v1h-1zM14,28h1v1h-1zM17,28h1v1h-1zM18,28h1v1h-1zM23,28h1v1h-1zM24,28h1v1h-1zM25,28h1v1h-1zM26,28h1v1h-1zM28,28h1v1h-1zM30,28h1v1h-1zM32,28h1v1h-1zM33,28h1v1h-1zM2,29h1v1h-1zM8,29h1v1h-1zM11,29h1v1h-1zM14,29h1v1h-1zM18,29h1v1h-1zM20,29h1v1h-1zM21,29h1v1h-1zM25,29h1v1h-1zM26,29h1v1h-1zM30,29h1v1h-1zM31,29h1v1h-1zM32,29h1v1h-1zM33,29h1v1h-1zM2,30h1v1h-1zM4,30h1v1h-1zM5,30h1v1h-1zM6,30h1v1h-1zM8,30h1v1h-1zM11,30h1v1h-1zM13,30h1v1h-1zM15,30h1v1h-1zM16,30h1v1h-1zM18,30h1v1h-1zM19,30h1v1h-1zM21,30h1v1h-1zM22,30h1v1h-1zM24,30h1v1h-1zM26,30h1v1h-1zM27,30h1v1h-1zM28,30h1v1h-1zM29,30h1v1h-1zM30,30h1v1h-1zM31,30h1v1h-1zM33,30h1v1h-1zM34,30h1v1h-1zM2,31h1v1h-1zM4,31h1v1h-1zM5,31h1v1h-1zM6,31h1v1h-1zM8,31h1v1h-1zM12,31h1v1h-1zM13,31h1v1h-1zM16,31h1v1h-1zM17,31h1v1h-1zM18,31h1v1h-1zM19,31h1v1h-1zM20,31h1v1h-1zM21,31h1v1h-1zM22,31h1v1h-1zM24,31h1v1h-1zM25,31h1v1h-1zM26,31h1v1h-1zM27,31h1v1h-1zM29,31h1v1h-1zM30,31h1v1h-1zM31,31h1v1h-1zM32,31h1v1h-1zM33,31h1v1h-1zM34,31h1v1h-1zM2,32h1v1h-1zM4,32h1v1h-1zM5,32h1v1h-1zM6,32h1v1h-1zM8,32h1v1h-1zM11,32h1v1h-1zM12,32h1v1h-1zM15,32h1v1h-1zM17,32h1v1h-1zM18,32h1v1h-1zM21,32h1v1h-1zM22,32h1v1h-1zM24,32h1v1h-1zM25,32h1v1h-1zM26,32h1v1h-1zM27,32h1v1h-1zM29,32h1v1h-1zM30,32h1v1h-1zM31,32h1v1h-1zM32,32h1v1h-1zM33,32h1v1h-1zM34,32h1v1h-1zM2,33h1v1h-1zM8,33h1v1h-1zM12,33h1v1h-1zM14,33h1v1h-1zM16,33h1v1h-1zM18,33h1v1h-1zM20,33h1v1h-1zM21,33h1v1h-1zM24,33h1v1h-1zM28,33h1v1h-1zM29,33h1v1h-1zM30,33h1v1h-1zM31,33h1v1h-1zM32,33h1v1h-1zM2,34h1v1h-1zM3,34h1v1h-1zM4,34h1v1h-1zM5,34h1v1h-1zM6,34h1v1h-1zM7,34h1v1h-1zM8,34h1v1h-1zM10,34h1v1h-1zM12,34h1v1h-1zM15,34h1v1h-1zM16,34h1v1h-1zM17,34h1v1h-1zM19,34h1v1h-1zM25,34h1v1h-1zM26,34h1v1h-1zM27,34h1v1h-1zM28,34h1v1h-1zM29,34h1v1h-1zM33,34h1v1h-1z" fill="#1e3a5f"/></svg>
@@ -903,6 +915,106 @@ function onNotenschemaChange(){
   render();
   persistDebounced();
 }
+
+/* ---- Eigene (hochladbare) Notentabellen -------------------------------- */
+/* Tabelle normalisieren: nur gueltige Zeilen, p auf 0..100, absteigend sortiert,
+   letzte Zeile auf p:0 zwingen (computeGrade findet sonst evtl. keine Stufe). */
+function validateSchemaTabelle(tab){
+  let rows = (tab||[]).map(r=>({p:Number(r.p), note:Number(r.note), verbal:(r.verbal||'').toString().trim()}))
+                      .filter(r=>isFinite(r.p) && isFinite(r.note));
+  if(rows.length<2) throw new Error('Mindestens zwei Notenstufen noetig.');
+  rows.forEach(r=>{ r.p = Math.max(0, Math.min(100, r.p)); });
+  rows.sort((a,b)=> b.p - a.p);
+  rows[rows.length-1].p = 0;
+  return rows;
+}
+/* Freitext (JSON ODER einfache Listen-Zeilen) -> {label, fq, tabelle}. Wirft bei Fehler. */
+function parseCustomSchema(text){
+  text = (text||'').trim();
+  if(!text) throw new Error('Bitte zuerst eine Tabelle (JSON oder Liste) einfuegen.');
+  let def;
+  if(text[0]==='{' || text[0]==='['){
+    let j; try{ j=JSON.parse(text); }catch(e){ throw new Error('JSON nicht lesbar: '+e.message); }
+    const arr = Array.isArray(j) ? j : j.tabelle;
+    if(!Array.isArray(arr)) throw new Error('Feld "tabelle" (Liste) fehlt im JSON.');
+    def = { label:((j&&j.label)||'').toString().trim(), fq:!!(j&&j.fq), tabelle:arr };
+  } else {
+    const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+    let label=''; const rows=[];
+    lines.forEach(l=>{
+      const lm = l.match(/^label\s*[:=]\s*(.+)$/i); if(lm){ label=lm[1].trim(); return; }
+      if(/^fq\s*[:=]/i.test(l)) return;
+      const parts = l.split(/[;,\t]/).map(x=>x.trim());
+      if(parts.length<2) return;
+      const p = parseFloat(parts[0].replace('%','').replace(',','.'));
+      const note = parseFloat(parts[1].replace(',','.'));
+      if(!isFinite(p)||!isFinite(note)) return;
+      rows.push({p, note, verbal:parts[2]||''});
+    });
+    if(!rows.length) throw new Error('Keine gueltigen Zeilen. Format pro Zeile: Prozent ; Note ; Wortnote');
+    def = { label, fq:false, tabelle:rows };
+  }
+  def.tabelle = validateSchemaTabelle(def.tabelle);
+  if(!def.label) def.label = 'Eigene Tabelle';
+  return def;
+}
+/* Gespeicherte custom Schemata in die NOTENSCHEMA-Registry aufnehmen (idempotent). */
+function registerCustomSchemas(){
+  const list = (typeof klausurMeta!=='undefined' && klausurMeta && Array.isArray(klausurMeta.customSchemas)) ? klausurMeta.customSchemas : [];
+  list.forEach(def=>{
+    if(!def || !def.id || NOTENSCHEMA.some(s=>s.id===def.id)) return;
+    NOTENSCHEMA.push({id:def.id, label:def.label||def.id, kind:'note', fq:!!def.fq, einheit:'Note', tabelle:def.tabelle, custom:true});
+  });
+}
+function customSchemaId(label){
+  let base = 'custom-' + ((label||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,24) || 'tabelle');
+  let id=base, n=2;
+  while(NOTENSCHEMA.some(s=>s.id===id) || ((klausurMeta.customSchemas||[]).some(s=>s.id===id))){ id = base+'-'+n; n++; }
+  return id;
+}
+function addCustomSchemaFromInput(){
+  const ta=document.getElementById('customSchemaInput');
+  const fqBox=document.getElementById('customSchemaFq');
+  let def;
+  try{ def = parseCustomSchema(ta?ta.value:''); }
+  catch(e){ setHint('customSchemaHint', e.message, 'err'); return; }
+  def.fq = def.fq || !!(fqBox && fqBox.checked);
+  def.id = customSchemaId(def.label);
+  klausurMeta.customSchemas = (klausurMeta.customSchemas||[]).concat([def]);
+  registerCustomSchemas();
+  klausurMeta.notenschema = def.id;
+  initNotenschemaDropdown();
+  markDirty(); persistState(); render();
+  if(ta) ta.value='';
+  setHint('customSchemaHint', 'Schema "'+def.label+'" uebernommen — '+def.tabelle.length+' Stufen, FQ '+(def.fq?'an':'aus')+'.', 'ok');
+}
+function buildStrukturPrompt(){
+  return [
+'Du bist ein praeziser Daten-Konverter. Wandle die unten stehende Notentabelle in GENAU dieses JSON-Format um und gib AUSSCHLIESSLICH das JSON aus (kein Markdown, keine Code-Zaeune, keine Erklaerung):',
+'',
+'{',
+'  "label": "<kurzer Name der Tabelle>",',
+'  "fq": false,',
+'  "tabelle": [',
+'    {"p": 92, "note": 1, "verbal": "sehr gut"},',
+'    {"p": 81, "note": 2, "verbal": "gut"},',
+'    {"p": 0,  "note": 6, "verbal": "ungenuegend"}',
+'  ]',
+'}',
+'',
+'Regeln:',
+'- "p" = MINDEST-Prozentzahl (ganze Zahl 0-100), ab der die Note gilt.',
+'- Zeilen ABSTEIGEND nach "p" sortieren. Die LETZTE Zeile MUSS "p": 0 sein.',
+'- "note" = Schulnote als Zahl (1 = beste Note).',
+'- "verbal" = Wortnote (z. B. "gut"); leer lassen, wenn nicht vorhanden.',
+'- "fq": nur true, wenn die Tabelle einen Fehlerquotienten/Fehlerabzug vorsieht, sonst false.',
+'- Nichts hinzufuegen; nur uebernehmen, was in der Tabelle steht.',
+'',
+'Hier die umzuwandelnde Tabelle:',
+'<<< TABELLE HIER EINFUEGEN >>>'
+  ].join('\n');
+}
+function copyStrukturPrompt(){ clip(buildStrukturPrompt(), null, 'customSchemaHint', 'Struktur-Prompt kopiert — in eine KI einfuegen, eigene Tabelle anhaengen.'); }
 
 /* Sprachstufen-Dropdown initialisieren */
 function initSprachstufeDropdown(){
@@ -1148,7 +1260,9 @@ let klausurMeta = {
   /* Klausur-weite Kategorie-Zuordnung pro Bewertungsteil: "taskIndex|kriteriumsname" → catKey. */
   itemCat: {},
   /* Aktives Notenschema (OAVO/Hessen, IHK, eigenes). */
-  notenschema: 'oavo-hessen'
+  notenschema: 'oavo-hessen',
+  /* Vom Nutzer hochgeladene eigene Notentabellen → werden in NOTENSCHEMA registriert. */
+  customSchemas: []
 };
 
 /* Überträgt klausurMeta-Felder in tasks[] (nach Schema-Aufbau oder Schüler-Load).
@@ -1504,7 +1618,8 @@ function loadPersistedState(){
       klausurtext:        p.klausurMeta.klausurtext        || '',
       fehlerlisten: mergedFL,
       itemCat:            p.klausurMeta.itemCat            || {},
-      notenschema:        p.klausurMeta.notenschema        || 'oavo-hessen'
+      notenschema:        p.klausurMeta.notenschema        || 'oavo-hessen',
+      customSchemas:      Array.isArray(p.klausurMeta.customSchemas) ? p.klausurMeta.customSchemas : []
     };
   }
 
@@ -2794,7 +2909,7 @@ function readWorkbookData(wb){
     const kv={}; _mr.forEach(r=>{ if(r && r[0]!=null) kv[String(r[0]).trim()]=r[1]; });
     if(kv.version!=null){
       hasMeta=true;
-      metaMd={titel:kv.titel||'', fach:kv.fach||'', stufe:kv.stufe||'', datum:kv.datum||'', sprachstufe:kv.sprachstufe||'', notenschema:kv.notenschema||''};
+      metaMd={titel:kv.titel||'', fach:kv.fach||'', stufe:kv.stufe||'', datum:kv.datum||'', sprachstufe:kv.sprachstufe||'', notenschema:kv.notenschema||'', notenschema_def:kv.notenschema_def||''};
       Object.keys(kv).forEach(k=>{ if(k.indexOf('max:')===0){ const head=k.slice(4).trim(); const sp=head.indexOf(' ');
         if(sp>0){ const tn=parseInt(head.slice(0,sp)); const crit=head.slice(sp+1).trim(); const mx=numOrNull(kv[k]);
           if(tn && crit && mx!=null) maxPerCrit[tn+'|'+crit]=mx; } } });
@@ -2878,7 +2993,19 @@ function activateWorkbook(data, filename, fromPersist){
     if(data.metaMd.fach)  setVal('fach',  data.metaMd.fach);
     if(data.metaMd.datum) setVal('datum', data.metaMd.datum);
     if(data.metaMd.sprachstufe){ const _ss=document.getElementById('sprachstufe'); if(_ss) _ss.value=data.metaMd.sprachstufe; }
-    if(data.metaMd.notenschema && NOTENSCHEMA.some(s=>s.id===data.metaMd.notenschema)){ klausurMeta.notenschema=data.metaMd.notenschema; initNotenschemaDropdown(); }
+    if(data.metaMd.notenschema){
+      let _nid=data.metaMd.notenschema;
+      if(!NOTENSCHEMA.some(s=>s.id===_nid) && data.metaMd.notenschema_def){
+        try{ const _d=JSON.parse(data.metaMd.notenschema_def);
+          if(_d && _d.id && Array.isArray(_d.tabelle)){
+            _d.tabelle=validateSchemaTabelle(_d.tabelle);
+            if(!NOTENSCHEMA.some(s=>s.id===_d.id)){ klausurMeta.customSchemas=(klausurMeta.customSchemas||[]).concat([_d]); registerCustomSchemas(); }
+            _nid=_d.id;
+          }
+        }catch(e){}
+      }
+      if(NOTENSCHEMA.some(s=>s.id===_nid)){ klausurMeta.notenschema=_nid; initNotenschemaDropdown(); }
+    }
   }
 
   fillPicker();
@@ -3294,7 +3421,10 @@ function buildMetaAoa(cleanSchema, md){
   let total=0;
   cleanSchema.forEach((t,ti)=>{ const tn=ti+1; (t.items||[]).forEach(it=>{ const mx=parseFloat(it.max)||0; rows.push(['max:'+tn+' '+it.name, mx]); total+=mx; }); });
   rows.push(['max_gesamt', total]);
-  rows.push(['notenschema', (typeof klausurMeta!=='undefined' && klausurMeta && klausurMeta.notenschema) || 'oavo-hessen']);
+  const _nsId = (typeof klausurMeta!=='undefined' && klausurMeta && klausurMeta.notenschema) || 'oavo-hessen';
+  rows.push(['notenschema', _nsId]);
+  const _ns = (typeof NOTENSCHEMA!=='undefined') ? NOTENSCHEMA.find(s=>s.id===_nsId) : null;
+  if(_ns && _ns.custom){ rows.push(['notenschema_def', JSON.stringify({id:_ns.id, label:_ns.label, fq:!!_ns.fq, tabelle:_ns.tabelle})]); }
   return rows;
 }
 function generateAndLoadNewExcel(){
@@ -4300,6 +4430,7 @@ if(!restored){
   drawSchema();
   schemaToTasks(true);
 }
+registerCustomSchemas();
 initNotenschemaDropdown();
 
 /* Auto-Save bei jeder Eingabe in Header-Felder + Optionen */
