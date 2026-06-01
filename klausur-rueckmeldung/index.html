@@ -547,7 +547,7 @@
         <label title="Wenn aus: nur Copy/Paste — Prompt kopieren, Antwort aus externem KI-Tool einfügen. Wenn an: direkter API-Call (nur im claude.ai-Kontext oder mit gültigem Setup)."><input type="checkbox" id="optApiMode"> API direkt aufrufen <span class="small">(fortgeschritten)</span> <span class="info" data-help="api-mode">i</span></label>
         <label><input type="checkbox" id="optEmpfehlung"> Weiterentwicklungs-Empfehlung anhängen <span class="info" data-help="empfehlung">i</span></label>
       </div>
-      <p class="small" style="margin:10px 0 0;padding:8px 11px;background:#fcefe6;border:1px solid #e8b894;border-radius:6px;color:#8a4b12">🔒 <b>Datenschutz:</b> Beim direkten KI-Aufruf und beim Kopieren in ein externes KI-Tool werden die eingegebenen Daten (inkl. Name und Stichpunkte) an den jeweiligen Dienst übermittelt. Beachte die Vorgaben deiner Schule und den Datenschutz; im Zweifel den Namen weglassen.</p>
+      <p class="small" style="margin:10px 0 0;padding:8px 11px;background:#fcefe6;border:1px solid #e8b894;border-radius:6px;color:#8a4b12">🔒 <b>Datenschutz:</b> Beim direkten KI-Aufruf und beim Kopieren in ein externes KI-Tool werden die eingegebenen <b>Inhalte</b> (Stichpunkte, ggf. Aufgabenstellung und Musterlösung) an den jeweiligen Dienst übermittelt — der <b>Schülername jedoch nicht</b> (im Prompt steht ein Platzhalter). Beachte die Vorgaben deiner Schule und den Datenschutz; bei sensiblen Inhalten sparsam bleiben oder ein lokales Modell nutzen.</p>
       <div class="api-only" id="apiSettings" style="display:none;margin-top:10px;padding:10px 12px;background:var(--blue-light);border:1px solid #cfe0f5;border-radius:6px">
         <div class="row" style="gap:10px;margin:0">
           <div class="field" style="flex:1;min-width:150px;margin:0">
@@ -775,7 +775,7 @@
   <div class="ref">
     <h3>Hinweise &amp; Haftungsausschluss</h3>
     <div class="disclaimer">
-      <p><b>Datenschutz:</b> Alle Eingaben bleiben lokal in deinem Browser (localStorage). Sie verlassen das Gerät nur, wenn du aktiv einen Prompt in einen externen KI-Dienst kopierst oder sendest. Empfehlung: Schülerdaten pseudonymisieren (Kürzel statt Klarnamen); bei Cloud-KI den Schul- und Landesdatenschutz beachten — der „Nur Prompt"-Modus bzw. ein lokales Modell ist datenschutzfreundlicher.</p>
+      <p><b>Datenschutz:</b> Alle Eingaben bleiben lokal in deinem Browser (localStorage). Sie verlassen das Gerät nur, wenn du aktiv einen Prompt in einen externen KI-Dienst kopierst oder sendest — der <b>Schülername wird dabei nicht übermittelt</b> (Platzhalter im Prompt). Empfehlung: für die Excel-Datei dennoch Kürzel statt Klarnamen verwenden; bei Cloud-KI den Schul- und Landesdatenschutz beachten — der „Nur Prompt"-Modus bzw. ein lokales Modell ist datenschutzfreundlicher.</p>
       <p><b>KI-Texte sind Entwürfe:</b> Erzeugte Rückmeldungen müssen fachlich und pädagogisch geprüft und verantwortet werden. Keine Gewähr für Korrektheit oder Angemessenheit.</p>
       <p><b>Notenberechnung ohne Gewähr:</b> Note bzw. Notenpunkte und Fehlerquotient sind Hilfswerte nach dem gewählten Notenschema, kein amtliches Ergebnis. Maßgeblich sind die Bewertung der Lehrkraft und die geltende Prüfungsordnung.</p>
     </div>
