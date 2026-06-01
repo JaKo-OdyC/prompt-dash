@@ -37,7 +37,7 @@
     --mono:'Consolas','Courier New',monospace;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;padding:0}
+  html,body{margin:0;padding:0;overflow-x:hidden;overflow-x:clip;max-width:100%}
   body{
     background:var(--bg);
     color:var(--accent);
@@ -212,6 +212,13 @@
     font-weight:700;font-size:.88rem;cursor:pointer;padding:4px;border-radius:4px;line-height:1}
   .item-row .x-mini:hover{background:#f8d7da}
   .item-row .x-mini:disabled{opacity:.25;cursor:not-allowed}
+  /* Schmale Phones: feste Grid-Spalten verkleinern, damit die Item-Zeile (inkl. ✕) nicht ueberlaeuft */
+  @media(max-width:430px){
+    .item-row{grid-template-columns:1fr 48px 8px 48px 34px 26px;gap:5px;padding:5px 6px}
+    .item-row-schema{grid-template-columns:1fr 60px 26px}
+    .item-row input{padding:5px 5px;font-size:.82rem}
+    .item-row>*{min-width:0}
+  }
 
   /* Setup-Aufgaben-Builder */
   .schema-task{border:1px dashed var(--line);background:#fbfdff;border-radius:7px;
